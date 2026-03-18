@@ -1,0 +1,59 @@
+version: '3.3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-election-dev
+    volumes:
+      - ./:/var/www/html
+      - vendor-data:/var/www/html/vendor
+      - composer-cache:/root/.composer/cache
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      # Настройки подключения к MySQL (переопределяют .env)
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=laravel_election
+      - DB_USERNAME=laravel_user
+      - DB_PASSWORD=secret
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    container_name: laravel-election-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel_election
+      MYSQL_USER: laravel_user
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"   # проброс порта наружу (опционально)
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - laravel-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 5
+      interval: 10s
+
+volumes:
+  vendor-data:
+  composer-cache:
+  db-data:   # том для хранения данных MySQL
+
+networks:
+  laravel-network:
+    driver: bridge
