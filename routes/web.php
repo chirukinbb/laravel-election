@@ -20,3 +20,6 @@ Route::withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken
 // Simple dashboard (protected)
 Route::get("/dashboard", [\App\Http\Controllers\DashboardController::class, 'index'])->middleware('auth')->name("dashboard");
 
+Route::get('widget', function () {
+    dd(request()->all());
+});
