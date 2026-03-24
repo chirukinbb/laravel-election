@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\ElectionRequest;
+use App\Models\Election;
+
+class ElectionController extends Controller
+{
+    public function index()
+    {
+        $elections = Election::all();
+
+        return view('election.index', compact('elections'));
+    }
+
+    public function create()
+    {
+        return view('election.create');
+    }
+
+    public function edit(Election $election)
+    {
+        return view('election.edit', compact('election'));
+    }
+
+    public function show(Election $election)
+    {
+        return view('election.show', compact('election'));
+    }
+
+    public function store(ElectionRequest $request)
+    {
+        Election::create($request->only('name', 'date_end', 'date_start'));
+
+        return redirect()->route('election:list')->with('success', 'Election was created!');
+    }
+
+    public function update(Election $election, ElectionRequest $request)
+    {
+        $election->update($request->only('name', 'date_end', 'date_start'));
+
+        return redirect()->route('election:list')->with('success', 'Election was updated!');
+    }
+
+    public function delete(Election $election)
+    {
+        $election->delete();
+
+        return redirect()->route('election:list')->with('success', 'Election was deleted!');
+    }
+}
