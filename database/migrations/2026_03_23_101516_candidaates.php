@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('socials')->nullable();
             $table->string('photo_url')->nullable();
             $table->string('reason_for_nomination');
+            $table->boolean('approved')->default(false);
 
             $table->timestamps();
         });

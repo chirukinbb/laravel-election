@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title','Election')
+@section('title','Candidates')
 
 @section('content')
     <h5>Candidate List</h5>
@@ -10,22 +10,20 @@
             <th>Name</th>
             <th>Actions</th>
             <th>
-                <a href="{{route('election:create')}}" class="btn btn-primary">Create</a>
+                <a href="{{route('election:candidate:create',compact('election'))}}" class="btn btn-primary">Create</a>
             </th>
         </tr>
         </thead>
         <tbody>
-        @if($elections->count())
-            @foreach($elections as $election)
+        @if($election->candidates->count())
+            @foreach($election->candidates as $candidate)
                 <tr>
-                    <td>{{$election->name}}</td>
+                    <td>{{$candidate->first_name}} {{$candidate->last_name}}</td>
                     <td colspan="2">
                         <div class="d-flex">
-                            <a href="{{route('election:show',compact('election'))}}" class="btn">Show</a>
-                            <a href="{{route('election:candidate:list',compact('election'))}}"
-                               class="btn">Candidates</a>
-                            <a href="{{route('election:edit',compact('election'))}}" class="btn">Edit</a>
-                            <form action="{{route('election:delete',compact('election'))}}" method="post">
+                            <a href="{{route('election:candidate:edit',compact('election','candidate'))}}" class="btn">Edit</a>
+                            <form action="{{route('election:candidate:delete',compact('election','candidate'))}}"
+                                  method="post">
                                 @csrf
                                 @method('DELETE')
                                 <button class="btn" type="submit">Delete</button>
@@ -36,7 +34,7 @@
             @endforeach
         @else
             <tr>
-                <td colspan="3">Elections was not found</td>
+                <td colspan="3">Candidates was not found</td>
             </tr>
         @endif
         </tbody>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\RoleEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CandidateRequest extends FormRequest
@@ -17,8 +18,8 @@ class CandidateRequest extends FormRequest
             'role',
             'website',
             'socials' => 'array',
-            'photo_url' => 'contains:https://',
-            'reason_for_nomination' => 'required|min:50|max:1000'
+            'photo_url' => 'nullable|string|starts_with:https://',
+            'reason_for_nomination' => \Auth::user()->hasRole(RoleEnum::USER->name) ? 'required|min:50|max:1000' : ''
         ];
     }
 

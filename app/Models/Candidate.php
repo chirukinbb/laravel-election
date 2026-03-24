@@ -19,7 +19,8 @@ class Candidate extends Model
         'website',
         'socials',
         'photo_url',
-        'reason_for_nomination'
+        'reason_for_nomination',
+        'approved'
     ];
 
     protected $casts = [

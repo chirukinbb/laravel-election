@@ -69,5 +69,11 @@ return [
         "US" => "United States",
         "UZ" => "Uzbekistan",
         "VN" => "Vietnam"
+    ],
+    'socials' => [
+        'Twitter',
+        'Facebook',
+        'Instagram',
+        'Linkedin'
     ]
 ];

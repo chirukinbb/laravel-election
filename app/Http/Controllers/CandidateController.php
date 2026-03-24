@@ -18,14 +18,14 @@ class CandidateController extends Controller
         return view('candidate.create', compact('election'));
     }
 
-    public function edit(Candidate $candidate)
+    public function edit(Election $election, Candidate $candidate)
     {
-        return view('candidate.edit', compact('candidate'));
+        return view('candidate.edit', compact('election', 'candidate'));
     }
 
     public function store(Election $election, CandidateRequest $request)
     {
-        $election->candidates()->create($request->only(
+        $election->candidates()->create(array_merge($request->only(
             'election_id',
             'first_name',
             'last_name',
@@ -36,8 +36,10 @@ class CandidateController extends Controller
             'website',
             'socials',
             'photo_url',
-            'reason_for_nomination'
-        ));
+        ), [
+            'approved' => true,
+            'reason_for_nomination' => 'from admin'
+        ]));
 
         return redirect()->route('election:candidate:create', compact('election'))->with('success', 'Candidate was created!');
     }
@@ -54,7 +56,8 @@ class CandidateController extends Controller
             'website',
             'socials',
             'photo_url',
-            'reason_for_nomination'
+            'reason_for_nomination',
+            'approved'
         ));
 
         return redirect()->route('election:candidate:list', compact('election'))->with('success', 'Candidate was updated!');

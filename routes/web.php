@@ -32,11 +32,11 @@ Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums
         Route::prefix('{election:id}/candidate')->as('candidate:')->group(function () {
             Route::get('list', [\App\Http\Controllers\CandidateController::class, 'index'])->name('list');
             Route::get('create', [\App\Http\Controllers\CandidateController::class, 'create'])->name('create');
-            Route::get('edit', [\App\Http\Controllers\CandidateController::class, 'edit'])->name('edit');
+            Route::get('edit/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'edit'])->name('edit');
 
             Route::post('store', [\App\Http\Controllers\CandidateController::class, 'store'])->name('store');
-            Route::patch('update/{election:id}', [\App\Http\Controllers\CandidateController::class, 'update'])->name('update');
-            Route::delete('delete/{election:id}', [\App\Http\Controllers\CandidateController::class, 'delete'])->name('delete');
+            Route::patch('update/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'update'])->name('update');
+            Route::delete('delete/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'delete'])->name('delete');
         });
     });
 });
