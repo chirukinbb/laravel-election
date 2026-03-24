@@ -10,9 +10,10 @@ return new class extends Migration {
         Schema::create('votes', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('election_id');
+            $table->unsignedBigInteger('candidate_id');
             $table->unsignedBigInteger('user_id');
-            $table->boolean('approved')->default(false);
+            $table->enum('status', collect(\App\Enums\VoteStatusEnum::cases())->map(fn($case) => $case->name)->toArray())
+                ->default(\App\Enums\VoteStatusEnum::Pending->name);
 
             $table->timestamps();
         });

@@ -21,7 +21,8 @@ return new class extends Migration {
             $table->string('socials')->nullable();
             $table->string('photo_url')->nullable();
             $table->string('reason_for_nomination');
-            $table->boolean('approved')->default(false);
+            $table->enum('status', collect(\App\Enums\CandidateStatusEnum::cases())->map(fn($case) => $case->name)->toArray())
+                ->default(\App\Enums\CandidateStatusEnum::PendingReview->name);
 
             $table->timestamps();
         });

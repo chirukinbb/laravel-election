@@ -139,9 +139,20 @@
             @endif
         </div>
         <div class="mb-3">
-            <input type="checkbox" class="form-check-input" @checked($candidate->approved) id="approved"
-                   name="approved">
-            <label for="approved" class="form-check-label">Approve</label>
+            <label for="status" class="form-label">Status</label><br>
+            <select name="status" id="status" class="form-control">
+                @foreach(\App\Enums\CandidateStatusEnum::cases() as $case)
+                    <option value="{{$case->name}}" @selected($case->name === $candidate->status)>{{$case->value}}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="mb-3 d- merge-block">
+            <label for="merge_with" class="form-label">Merge With</label><br>
+            <select class="form-control" id="merge_with" name="merge_with">
+                @foreach($election->candidates as $c)
+                    <option value="{{$c->id}}">{{$c->first_name}} {{$c->last_name}}</option>
+                @endforeach
+            </select>
         </div>
         <div class="d-flex justify-content-center">
             <button class="btn btn-primary" type="submit">Update</button>
@@ -174,7 +185,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('#country_code').select2();
+            $('#country_code,#merge_with').select2();
         });
     </script>
     <script>
@@ -195,6 +206,17 @@
                 e.preventDefault();
                 $(this).closest('.row').remove();
             });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.merge-block').addClass('d-none')
+            $('#status').on('change', function () {
+                if (this.value === '{{\App\Enums\CandidateStatusEnum::Merged->name}}')
+                    $('.merge-block').removeClass('d-none')
+                else
+                    $('.merge-block').addClass('d-none')
+            })
         });
     </script>
 @endsection

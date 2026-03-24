@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\RoleEnum;
+use App\Enums\VoteStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CandidateRequest extends FormRequest
@@ -19,7 +20,9 @@ class CandidateRequest extends FormRequest
             'website',
             'socials' => 'array',
             'photo_url' => 'nullable|string|starts_with:https://',
-            'reason_for_nomination' => \Auth::user()->hasRole(RoleEnum::USER->name) ? 'required|min:50|max:1000' : ''
+            'reason_for_nomination' => \Auth::user()->hasRole(RoleEnum::USER->name) ? 'required|min:50|max:1000' : '',
+            'merge_with' => 'nullable|numeric|in:candidates,id',
+            'status' => 'nullable|in:' . $this->collect(VoteStatusEnum::cases())->map(fn($case) => $case->name)->join(',')
         ];
     }
 

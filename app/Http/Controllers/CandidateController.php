@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CandidateStatusEnum;
 use App\Http\Requests\CandidateRequest;
 use App\Models\Candidate;
 use App\Models\Election;
+use App\Models\Vote;
 
 class CandidateController extends Controller
 {
@@ -37,7 +39,7 @@ class CandidateController extends Controller
             'socials',
             'photo_url',
         ), [
-            'approved' => true,
+            'status' => CandidateStatusEnum::Approved->name,
             'reason_for_nomination' => 'from admin'
         ]));
 
@@ -57,8 +59,12 @@ class CandidateController extends Controller
             'socials',
             'photo_url',
             'reason_for_nomination',
-            'approved'
+            'status'
         ));
+
+        if ($request->post('status') === CandidateStatusEnum::Merged->name) {
+            $candidate->votes()->each(fn(Vote $vote) => $vote->update(['candidate_id' => $request->post('merge_with')]));
+        }
 
         return redirect()->route('election:candidate:list', compact('election'))->with('success', 'Candidate was updated!');
     }

@@ -16,6 +16,14 @@
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
+
+        input, select, textarea {
+            border-radius: 4px !important;
+        }
+
+        .form-control:focus {
+            box-shadow: none !important;
+        }
     </style>
 </head>
 <body>
@@ -36,16 +44,16 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card dashboard-card">
-                <div class="card-header bg-success text-white">
+                <div class="card-header bg-success text-white d-flex justify-content-between">
                     <h4 class="mb-0"><i class="bi bi-speedometer2"></i> @yield('title')</h4>
-                </div>
-                <div class="card-body">
-                    @yield('content')
                     <div class="mt-4">
                         <a href="{{route('dashboard')}}" class="btn btn-primary"><i class="bi bi-house"></i> Home</a>
                         <a href="{{route('election:list')}}" class="btn btn-primary"><i class="bi bi-house"></i>
                             Election</a>
                     </div>
+                </div>
+                <div class="card-body">
+                    @yield('content')
                 </div>
             </div>
         </div>

@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Vote extends Model
 {
     protected $fillable = [
-        'election_id',
+        'candidate_id',
         'user_id',
-        'approved'
+        'status'
     ];
 
     public function user(): BelongsTo
