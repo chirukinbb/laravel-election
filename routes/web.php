@@ -39,6 +39,12 @@ Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums
             Route::delete('delete/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'delete'])->name('delete');
         });
     });
+
+    Route::get('moderation', [\App\Http\Controllers\ModerationController::class, 'index'])->name('moderation');
+
+    Route::get('settings', [\App\Http\Controllers\SettingsController::class, 'index'])->name('settings');
+
+    Route::get('logs', [\App\Http\Controllers\AntiFraudController::class, 'index'])->name('logs');
 });
 
 Route::get('widget', function () {

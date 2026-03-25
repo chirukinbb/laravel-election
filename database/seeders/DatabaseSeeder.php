@@ -2,8 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Enums\CandidateStatusEnum;
 use App\Enums\RoleEnum;
+use App\Enums\VoteStatusEnum;
+use App\Models\Candidate;
+use App\Models\Election;
 use App\Models\User;
+use App\Models\Vote;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -26,10 +31,52 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('000')
         ])->assignRole(Role::create(['name' => RoleEnum::ADMIN->name]));
 
-        User::create([
+        $voters = User::create([
             'name' => 'Test Basic User',
             'email' => 'user@example.com',
-            'password' => Hash::make('111')
+            'shopify_user_id' => Hash::make('111')
         ])->assignRole(Role::create(['name' => RoleEnum::USER->name]));
+
+        $election = Election::create([
+            'name' => 'President of USA',
+            'date_start' => '2025-03-22',
+            'date_end' => '2025-03-24'
+        ]);
+
+        Candidate::create([
+            'first_name' => 'Donny',
+            'last_name' => 'Trump',
+            'reason_for_nomination' => 'because',
+            'country_code' => 'AF',
+            'status' => CandidateStatusEnum::PendingReview->name,
+            'election_id' => $election->id
+        ]);
+
+        $candidate = Candidate::create([
+            'first_name' => 'Donny',
+            'last_name' => 'Trump jr',
+            'reason_for_nomination' => 'because',
+            'country_code' => 'AF',
+            'status' => CandidateStatusEnum::Approved->name,
+            'election_id' => $election->id
+        ]);
+
+        Vote::create([
+            'user_id' => $voters->id,
+            'candidate_id' => $candidate->id,
+            'status' => VoteStatusEnum::Pending->name
+        ]);
+
+        Vote::create([
+            'user_id' => $voters->id,
+            'candidate_id' => $candidate->id,
+            'status' => VoteStatusEnum::Verified->name
+        ]);
+
+        Vote::create([
+            'user_id' => $voters->id,
+            'candidate_id' => $candidate->id,
+            'status' => VoteStatusEnum::Rejected->name
+        ]);
     }
 }

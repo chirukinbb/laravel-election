@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CandidateStatusEnum;
+use App\Enums\VoteStatusEnum;
+use App\Models\Candidate;
 use App\Models\GoogleApiKey;
 use App\Models\GoogleCloudSetting;
 use App\Models\GoogleProject;
+use App\Models\User;
+use App\Models\Vote;
 use App\Services\GoogleCloudService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +21,19 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('dashboard');
+        $totalVotes = Vote::whereStatus(VoteStatusEnum::Verified->name)->count();
+        $suspiciousVotes = Vote::whereStatus(VoteStatusEnum::Suspicious->name)->count();
+        $approvedCandidates = Candidate::whereStatus(CandidateStatusEnum::Approved->name)->count();
+        $pendingCandidates = Candidate::whereStatus(CandidateStatusEnum::PendingReview->name)->count();
+        $conversion = $totalVotes * 100 / User::whereNotNull('shopify_user_id')->count();
+
+        return view('dashboard', compact(
+            'totalVotes',
+            'suspiciousVotes',
+            'approvedCandidates',
+            'pendingCandidates',
+            'conversion'
+        ));
     }
 
     /**

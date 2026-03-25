@@ -18,8 +18,8 @@ class Vote extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function election(): BelongsTo
+    public function candidate(): BelongsTo
     {
-        return $this->belongsTo(Election::class);
+        return $this->belongsTo(Candidate::class);
     }
 }
