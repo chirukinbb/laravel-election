@@ -43,6 +43,7 @@ Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums
     Route::get('moderation', [\App\Http\Controllers\ModerationController::class, 'index'])->name('moderation');
 
     Route::get('settings', [\App\Http\Controllers\SettingsController::class, 'index'])->name('settings');
+    Route::put('settings', [\App\Http\Controllers\SettingsController::class, 'update'])->name('settings.update');
 
     Route::get('logs', [\App\Http\Controllers\AntiFraudController::class, 'index'])->name('logs');
 });
