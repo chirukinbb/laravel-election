@@ -48,6 +48,6 @@ Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums
     Route::get('logs', [\App\Http\Controllers\AntiFraudController::class, 'index'])->name('logs');
 });
 
-Route::get('widget', function () {
-    dd(request()->all());
+Route::get('widget/{election:id}', function (\App\Models\Election $election) {
+    return view('widget', compact('election'));
 });
