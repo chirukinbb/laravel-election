@@ -1,7 +1,5 @@
 @extends('adminlte::page')
 
-@section('plugins.BootstrapSelect', true)
-
 @section('title','Edit Candidate')
 
 @section('content_header')

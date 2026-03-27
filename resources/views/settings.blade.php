@@ -85,5 +85,4 @@
             </form>
         </div>
     </div>
-    {{Sett}}
 @endsection

@@ -61,6 +61,15 @@ class DatabaseSeeder extends Seeder
             'election_id' => $election->id
         ]);
 
+        $candidate = Candidate::create([
+            'first_name' => 'Elon',
+            'last_name' => 'Musk jr',
+            'reason_for_nomination' => 'because',
+            'country_code' => 'AF',
+            'status' => CandidateStatusEnum::Approved->name,
+            'election_id' => $election->id
+        ]);
+
         Vote::create([
             'user_id' => $voters->id,
             'candidate_id' => $candidate->id,

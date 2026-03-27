@@ -10,7 +10,6 @@ class FlagVoteRequest extends FormRequest
     {
         return [
             'vote_id' => 'required|exists:votes,id',
-            'reason' => 'required|string|max:1000',
         ];
     }
 
