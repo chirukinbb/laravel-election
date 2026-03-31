@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SuggestCandidateRequest;
 use App\Http\Requests\Api\VerifyCaptchaRequest;
 use App\Http\Requests\Api\VoteRequest;
+use App\Http\Resources\CandidateCollection;
+use App\Http\Resources\CandidateResource;
 use App\Models\Candidate;
 use App\Models\Vote;
 use Illuminate\Http\JsonResponse;
@@ -19,32 +21,22 @@ class VotingController extends Controller
     /**
      * Get list of approved candidates with pagination
      */
-    public function candidates(Request $request): JsonResponse
+    public function candidates(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $perPage = $request->input('per_page', 15);
-        $perPage = min(max($perPage, 1), 100);
+        $electionId = $request->input('election_id');
 
-        $candidates = Candidate::with(['election'])
-            ->where('status', CandidateStatusEnum::Approved->name)
+        $candidates = Candidate::where('status', CandidateStatusEnum::Approved->name)
+            ->where('election_id', $electionId)
             ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $candidates->items(),
-            'pagination' => [
-                'current_page' => $candidates->currentPage(),
-                'per_page' => $candidates->perPage(),
-                'total' => $candidates->total(),
-                'last_page' => $candidates->lastPage(),
-            ],
-        ]);
+        return CandidateResource::collection($candidates);
     }
 
     /**
      * Search candidates by name, country, city, or profession
      */
-    public function searchCandidates(Request $request): JsonResponse
+    public function searchCandidates(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $query = $request->input('query', '');
         $country = $request->input('country');
@@ -71,16 +63,7 @@ class VotingController extends Controller
 
         $results = $candidates->paginate($perPage);
 
-        return response()->json([
-            'success' => true,
-            'data' => $results->items(),
-            'pagination' => [
-                'current_page' => $results->currentPage(),
-                'per_page' => $results->perPage(),
-                'total' => $results->total(),
-                'last_page' => $results->lastPage(),
-            ],
-        ]);
+        return CandidateResource::collection($results);
     }
 
     /**
@@ -117,37 +100,11 @@ class VotingController extends Controller
      */
     public function vote(VoteRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-
-        // Verify captcha
-        $captchaValid = $this->verifyCaptchaToken($validated['captcha_token']);
-        if (!$captchaValid) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Captcha verification failed',
-            ], 422);
-        }
-
         $user = $request->user();
-
-        // Check if user already voted for this candidate
-        $existingVote = Vote::where('candidate_id', $validated['candidate_id'])
-            ->where('user_id', $user->id)
-            ->first();
-
-        if ($existingVote) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You have already voted for this candidate',
-            ], 409);
-        }
-
-        // Create vote
-        $vote = Vote::create([
-            'candidate_id' => $validated['candidate_id'],
+        $vote = Vote::create(array_merge([
             'user_id' => $user->id,
             'status' => VoteStatusEnum::Pending->name,
-        ]);
+        ], $request->only('candidate_id')));
 
         return response()->json([
             'success' => true,
@@ -166,26 +123,8 @@ class VotingController extends Controller
     {
         $validated = $request->validated();
 
-        // Verify captcha
-        $captchaValid = $this->verifyCaptchaToken($validated['captcha_token']);
-        if (!$captchaValid) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Captcha verification failed',
-            ], 422);
-        }
-
-        // Get or create default election
-        $election = \App\Models\Election::first();
-        if (!$election) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No active election available',
-            ], 400);
-        }
-
         $candidate = Candidate::create([
-            'election_id' => $election->id,
+            'election_id' => $validated['election_id'],
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'country_code' => $validated['country_code'],

@@ -11,7 +11,6 @@ Route::get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->name . ',' . \App\Enums\RoleEnum::USER->name])
     ->prefix('voting')->group(function () {
         // Public voting routes
-        Route::get('/candidates', [\App\Http\Controllers\Api\VotingController::class, 'candidates'])->name('voting.candidates');
         Route::get('/candidates/search', [\App\Http\Controllers\Api\VotingController::class, 'searchCandidates'])->name('voting.candidates.search');
         Route::get('/candidates/{id}', [\App\Http\Controllers\Api\VotingController::class, 'candidate'])->name('voting.candidate');
         Route::post('/vote', [\App\Http\Controllers\Api\VotingController::class, 'vote'])->name('voting.vote');
@@ -20,6 +19,7 @@ Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->na
         Route::get('/top50', [\App\Http\Controllers\Api\VotingController::class, 'top50'])->name('voting.top50');
         Route::get('/countries', [\App\Http\Controllers\Api\VotingController::class, 'countries'])->name('voting.countries');
     });
+Route::get('/candidates', [\App\Http\Controllers\Api\VotingController::class, 'candidates'])->name('voting.candidates');
 
 // Admin Routes
 Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->name])

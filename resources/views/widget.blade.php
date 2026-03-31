@@ -8,9 +8,10 @@
 
 @php
     $heads = [
-        ['label' => 'Position', 'width' => 20],
+        ['label' => 'Position', 'width' => 5],
         ['label' => 'Country', 'width' => 20],
         'Name',
+        ['label' => 'Votes', 'width' => 10],
         ['label' => 'Vote for', 'width' => 20]
     ];
 
@@ -18,7 +19,7 @@
     $config = [
         'data' => [],
         'order' => [[1, 'asc']],
-        'columns' => [null, null, null, ['orderable' => false]],
+        'columns' => [null, null, null, null,['orderable' => false]],
     ];
 @endphp
 
@@ -33,7 +34,7 @@
 @section('classes_body','container')
 
 @section('body')
-    <form class="wrapper">
+    <div class="wrapper">
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -48,7 +49,7 @@
             </li>
         </ul>
         <div class="tab-content mt-3" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <form class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
                 <x-adminlte-datatable id="candidates" :heads="$heads">
                     @foreach($config['data'] as $row)
@@ -59,11 +60,14 @@
                         </tr>
                     @endforeach
                 </x-adminlte-datatable>
-                <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
-                <button class="btn" id="vote">Vote For</button>
-
-            </div>
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <input type="hidden" value="{{$election->id}}" name="election_id">
+                <div class="action-zone">
+                    <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                    <div class="errors-vote"></div>
+                    <button class="btn" type="submit">Vote For</button>
+                </div>
+            </form>
+            <form class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <div class="row mb-3">
                     <div class="col-6">
                         <label for="first_name" class="form-label">First Name</label><br>
@@ -181,10 +185,14 @@
                         <div class="form-text text-danger">{{$errors->get('photo_url')[0]}}</div>
                     @endif
                 </div>
-
-            </div>
+                <div class="action-zone">
+                    <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                    <div class="errors-nominate"></div>
+                    <button class="btn" type="submit">Nominate</button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 @stop
 
 @section('adminlte_js')
@@ -223,16 +231,96 @@
                 });
             });
         });
+        $(document).on('click keydown input change', () => {
+            $('.errors-nominate').html('');
+            $('.errors-vote').html('');
+        });
     </script>
     <script>
-        $('#vote').on('click', function (e) {
-            e.preventDefault()
-        })
+        const apiToken = '{{auth()->user()->createToken(\App\Enums\RoleEnum::USER->name)->plainTextToken}}';
+        document.getElementById('home').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            let formData = new FormData(this);
+
+            fetch('{{route('voting.vote')}}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + apiToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json().then(data => {
+                            $('#candidates tr').each((i, tr) => {
+                                $(tr).find('td:last-child, th:last-child').addClass('d-none');
+                            });
+                            $('form .action-zone').addClass('d-none')
+                        });
+                    }
+
+                    if (response.status === 422) {
+                        return response.json().then(errorsData => {
+                            let list = '';
+
+                            const errors = errorsData.errors;
+
+                            Object.keys(errors).forEach(field => {
+                                errors[field].forEach(message => {
+                                    list += '<li class="mt-1 d-block">' + message + '</li>';
+                                });
+                            });
+
+                            $('.errors-vote').html('<ul class="m-0 p-0 text-danger">' + list + '</ul>');
+
+                            if (typeof grecaptcha !== "undefined") {
+                                grecaptcha.reset();
+                            }
+                        });
+                    }
+
+                    throw new Error('Щось пішло не так');
+                })
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                    if (typeof grecaptcha !== "undefined") {
+                        grecaptcha.reset();
+                    }
+                });
+        });
     </script>
     <script>
-        $('#nominate').on('click', function (e) {
-            e.preventDefault()
-        })
+        document.getElementById('profile').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            let formData = new FormData(this);
+
+            fetch('/your-endpoint', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    // 'X-CSRF-TOKEN': стеріть це, якщо токен вже у FormData
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Успішно!');
+                    } else {
+                        // Якщо сервер повернув помилку валідації
+                        alert('Помилка валідації');
+                        grecaptcha.reset(); // Скидаємо капчу для нової спроби
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    grecaptcha.reset(); // Скидаємо навіть при помилці мережі
+                });
+        });
     </script>
     <script>
         // 4. Инициализация
@@ -241,18 +329,10 @@
             hideSelected: true,
             maxItems: 1,
             openOnFocus: false,
-            placeholder: "Candidates",
             onItemAdd: (a, s) => {
                 $('#home-tab').click()
-
                 $('input[value=' + a + ']').click()
             },
-            optgroups: [
-                {value: 'candidates_group', label: 'Candidates'}
-            ], optgroupField: 'optgroup', // поле в options, которое указывает на группу
-            optgroupLabelField: 'label',
-            optgroupValueField: 'value',
-            lockOptgroupOrder: true, // чтобы заголовок всегда был сверху
         }
 
         const fnSelect = null
@@ -285,11 +365,44 @@
     </script>
     <script>
         $(() => {
-            $.post()
-            let candidates = @json(collect())
-            $('#candidates').rows.add([
-                {}
-            ])
-        })
+            // Load candidates via AJAX
+            $.ajax({
+                url: '{{ route("voting.candidates") }}',
+                method: 'GET',
+                data: {
+                    election_id: {{ $election->id }}
+                },
+                success: function (response) {
+                    let candidates = response.data || [];
+
+                    // Sort by votes_count descending
+                    candidates.sort((a, b) => (b.votes_count || 0) - (a.votes_count || 0));
+
+                    // Calculate position (rank) based on votes
+                    candidates.forEach((candidate, index) => {
+                        candidate.position = index + 1;
+                    });
+
+                    // Clear existing rows and add new ones
+                    const table = $('#candidates').DataTable();
+                    table.clear();
+
+                    candidates.forEach(function (candidate) {
+                        const position = '#' + candidate.position;
+                        const country = candidate.country || '-';
+                        const name = candidate.name || '-';
+                        const voteCell = `<input type="radio" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}">`;
+                        const votes = candidate.votes_count
+
+                        table.row.add([position, country, name, votes.toLocaleString(), voteCell]);
+                    });
+
+                    table.draw();
+                },
+                error: function (xhr) {
+                    console.error('Failed to load candidates:', xhr);
+                }
+            });
+        });
     </script>
 @stop

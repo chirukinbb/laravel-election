@@ -20,7 +20,7 @@ class SuggestCandidateRequest extends FormRequest
             'socials.*' => 'nullable|string|max:255',
             'photo_url' => 'nullable|string|starts_with:https://',
             'reason_for_nomination' => 'required|min:50|max:1000',
-            'captcha_token' => 'required|string',
+            'g-recaptcha-response' => 'required|recaptcha',
         ];
     }
 
