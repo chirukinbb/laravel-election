@@ -34,6 +34,7 @@ class SuggestCandidateRequest extends FormRequest
         return [
             'reason_for_nomination.min' => 'The reason for nomination must be at least 50 characters.',
             'reason_for_nomination.max' => 'The reason for nomination must not exceed 1000 characters.',
+            'g-recaptcha-response.required' => 'Pass the reCaptcha'
         ];
     }
 }

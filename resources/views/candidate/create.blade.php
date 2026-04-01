@@ -14,14 +14,20 @@
             @csrf
             <div class="row mb-3">
                 <div class="col-6">
-                    <label for="first_name" class="form-label">First Name</label><br>
+                    <label for="first_name" class="form-label">
+                        First Name
+                        <span class="text-danger">*</span>
+                    </label><br>
                     <input type="text" class="form-control" id="first_name" name="first_name">
                     @if($errors->get('first_name'))
                         <div class="form-text text-danger">{{$errors->get('first_name')[0]}}</div>
                     @endif
                 </div>
                 <div class="col-6">
-                    <label for="last_name" class="form-label">Last Name</label><br>
+                    <label for="first_name" class="form-label">
+                        Last Name
+                        <span class="text-danger">*</span>
+                    </label><br>
                     <input type="text" class="form-control" id="last_name" name="last_name">
                     @if($errors->get('last_name'))
                         <div class="form-text text-danger">{{$errors->get('last_name')[0]}}</div>

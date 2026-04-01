@@ -24,8 +24,224 @@
 @endphp
 
 @section('adminlte_css')
-    @stack('css')
-    @yield('css')
+    <link href="//www.treeofunity.com/cdn/shop/t/18/assets/theme.css?v=54130150842442101401767804645" rel="stylesheet"
+          type="text/css" media="all"/>
+    <link rel="stylesheet" href="//www.treeofunity.com/cdn/shop/t/18/assets/apps.css?v=162097722211979372921767804619"
+          media="print" fetchpriority="low" onload="this.media='all'">
+
+    <link rel="preload" as="font"
+          href="https://www.treeofunity.com/cdn/fonts/inter/inter_n4.b2a3f24c19b4de56e8871f609e73ca7f6d2e2bb9.woff2"
+          type="font/woff2" crossorigin>
+    <link rel="preload" as="font"
+          href="https://www.treeofunity.com/cdn/fonts/inter/inter_n7.02711e6b374660cfc7915d1afc1c204e633421e4.woff2"
+          type="font/woff2" crossorigin>
+    <style>
+        /* Inter - Regular (400) */
+        @font-face {
+            font-family: 'Inter';
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+            src: url("https://www.treeofunity.com/cdn/fonts/inter/inter_n4.b2a3f24c19b4de56e8871f609e73ca7f6d2e2bb9.woff2") format("woff2"),
+            url("https://www.treeofunity.com/cdn/fonts/inter/inter_n4.af8052d517e0c9ffac7b814872cecc27ae1fa132.woff") format("woff");
+        }
+
+        /* Inter - Medium (500) */
+        @font-face {
+            font-family: 'Inter';
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+            src: url("https://www.treeofunity.com/cdn/fonts/inter/inter_n5.d7101d5e168594dd06f56f290dd759fba5431d97.woff2") format("woff2"),
+            url("https://www.treeofunity.com/cdn/fonts/inter/inter_n5.5332a76bbd27da00474c136abb1ca3cbbf259068.woff") format("woff");
+        }
+
+        /* Inter - Bold (700) */
+        @font-face {
+            font-family: 'Inter';
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+            src: url("https://www.treeofunity.com/cdn/fonts/inter/inter_n7.02711e6b374660cfc7915d1afc1c204e633421e4.woff2") format("woff2"),
+            url("https://www.treeofunity.com/cdn/fonts/inter/inter_n7.6dab87426f6b8813070abd79972ceaf2f8d3b012.woff") format("woff");
+        }
+
+        /* Inter - Italic (400) */
+        @font-face {
+            font-family: 'Inter';
+            font-weight: 400;
+            font-style: italic;
+            font-display: swap;
+            src: url("https://www.treeofunity.com/cdn/fonts/inter/inter_i4.feae1981dda792ab80d117249d9c7e0f1017e5b3.woff2") format("woff2");
+        }
+
+        /* Скрываем всё выпадающее меню, если в нем есть блок с классом no-results */
+        .no-results,
+        .ts-dropdown-content .create {
+            display: none !important;
+        }
+
+        .ts-dropdown.single:not(:has(.option)) {
+            display: none !important;
+        }
+
+        .input, .select, .textarea {
+            font-family: Inter, sans-serif;
+            font-weight: 400;
+            font-size: 16px; /* var(--text-base) ≈ 1rem */
+            line-height: 1.5; /* обычно дефолт для Inter */
+            letter-spacing: normal;
+            color: rgb(23, 23, 23);
+        }
+
+        :root {
+            --color-base-text: 23 23 23;
+            --color-base-highlight: 255 221 191;
+            --color-base-background: 255 255 255;
+            --color-base-button: 23 23 23;
+            --color-base-button-gradient: #171717;
+            --color-base-button-text: 255 255 255;
+            --color-keyboard-focus: 11 97 205;
+            --color-shadow: 216 216 216;
+            --color-price: 23 23 23;
+            --color-sale-price: 225 29 72;
+            --color-sale-tag: 225 29 72;
+            --color-sale-tag-text: 255 255 255;
+            --color-rating: 245 158 11;
+            --color-placeholder: 250 250 250;
+            --color-success-text: 77 124 15;
+            --color-success-background: 247 254 231;
+            --color-error-text: 190 18 60;
+            --color-error-background: 255 241 242;
+            --color-info-text: 180 83 9;
+            --color-info-background: 255 251 235;
+            --color-drawer-text: 23 23 23;
+            --color-drawer-background: 255 255 255;
+            --color-drawer-button-background: 23 23 23;
+            --color-drawer-button-gradient: #171717;
+            --color-drawer-button-text: 255 255 255;
+            --color-drawer-overlay: 23 23 23;
+            --card-radius: var(--rounded-card);
+            --card-border-width: 0.0rem;
+            --card-border-opacity: 0.0;
+            --card-shadow-opacity: 0.1;
+            --card-shadow-horizontal-offset: 0.0rem;
+            --card-shadow-vertical-offset: 0.0rem;
+            --buttons-radius: var(--rounded-button);
+            --buttons-border-width: 2px;
+            --buttons-border-opacity: 1.0;
+            --buttons-shadow-opacity: 0.0;
+            --buttons-shadow-horizontal-offset: 0px;
+            --buttons-shadow-vertical-offset: 0px;
+            --inputs-radius: var(--rounded-input);
+            --inputs-border-width: 0px;
+            --inputs-border-opacity: 0.65;
+            --sp-0d5: 0.125rem;
+            --sp-1: 0.25rem;
+            --sp-1d5: 0.375rem;
+            --sp-2: 0.5rem;
+            --sp-2d5: 0.625rem;
+            --sp-3: 0.75rem;
+            --sp-3d5: 0.875rem;
+            --sp-4: 1rem;
+            --sp-4d5: 1.125rem;
+            --sp-5: 1.25rem;
+            --sp-5d5: 1.375rem;
+            --sp-6: 1.5rem;
+            --sp-6d5: 1.625rem;
+            --sp-7: 1.75rem;
+            --sp-7d5: 1.875rem;
+            --sp-8: 2rem;
+            --sp-8d5: 2.125rem;
+            --sp-9: 2.25rem;
+            --sp-9d5: 2.375rem;
+            --sp-10: 2.5rem;
+            --sp-10d5: 2.625rem;
+            --sp-11: 2.75rem;
+            --sp-12: 3rem;
+            --sp-13: 3.25rem;
+            --sp-14: 3.5rem;
+            --sp-15: 3.875rem;
+            --sp-16: 4rem;
+            --sp-18: 4.5rem;
+            --sp-20: 5rem;
+            --sp-23: 5.625rem;
+            --sp-24: 6rem;
+            --sp-28: 7rem;
+            --sp-32: 8rem;
+            --sp-36: 9rem;
+            --sp-40: 10rem;
+            --sp-44: 11rem;
+            --sp-48: 12rem;
+            --sp-52: 13rem;
+            --sp-56: 14rem;
+            --sp-60: 15rem;
+            --sp-64: 16rem;
+            --sp-68: 17rem;
+            --sp-72: 18rem;
+            --sp-80: 20rem;
+            --sp-96: 24rem;
+            --sp-100: 32rem;
+            --font-heading-family: Inter, sans-serif;
+            --font-heading-style: normal;
+            --font-heading-weight: 700;
+            --font-heading-line-height: 1;
+            --font-heading-letter-spacing: -0.03em;
+            --font-body-family: Inter, sans-serif;
+            --font-body-style: normal;
+            --font-body-weight: 400;
+            --font-body-line-height: 1.2;
+            --font-body-letter-spacing: 0.0em;
+            --font-navigation-family: var(--font-body-family);
+            --font-navigation-size: clamp(0.75rem, 0.748rem + 0.3174vw, 0.875rem);
+            --font-navigation-weight: 500;
+            --font-navigation-text-transform: uppercase;
+            --font-button-family: var(--font-body-family);
+            --font-button-size: clamp(0.875rem, 0.8115rem + 0.1587vw, 1.0rem);
+            --font-button-weight: 500;
+            --font-button-text-transform: uppercase;
+            --font-product-family: var(--font-body-family);
+            --font-product-size: clamp(1.0rem, 0.873rem + 0.3175vw, 1.25rem);
+            --font-product-weight: 500;
+            --text-3xs: 0.625rem;
+            --text-2xs: 0.6875rem;
+            --text-xs: 0.75rem;
+            --text-2sm: 0.8125rem;
+            --text-sm: 0.875rem;
+            --text-base: 1.0rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3.0rem;
+            --text-6xl: 3.75rem;
+            --text-7xl: 4.5rem;
+            --text-8xl: 6.0rem;
+            --page-width: 2000px;
+            --gap-padding: clamp(var(--sp-5), 2.526vw, var(--sp-12));
+            --grid-gap: clamp(40px, 20vw, 60px);
+            --page-padding: var(--sp-5);
+            --page-container: min(calc(100vw - var(--scrollbar-width, 0px) - var(--page-padding) * 2), var(--page-width));
+            --rounded-button: 3.75rem;
+            --rounded-input: 0.375rem;
+            --rounded-card: clamp(var(--sp-2d5), 1.053vw, var(--sp-5));
+            --rounded-block: clamp(var(--sp-2d5), 1.053vw, var(--sp-5));
+            --icon-weight: 1.5px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.03em; /* Як в оригіналі для щільності заголовків */
+        }
+    </style>
     <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
     <!-- 2. Подключаем скрипт -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
@@ -70,18 +286,18 @@
             <form class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <div class="row mb-3">
                     <div class="col-6">
-                        <label for="first_name" class="form-label">First Name</label><br>
-                        <input type="text" class="form-control2" id="first_name" name="first_name">
-                        @if($errors->get('first_name'))
-                            <div class="form-text text-danger">{{$errors->get('first_name')[0]}}</div>
-                        @endif
+                        <label for="first_name" class="label is-floating">
+                            First Name
+                            <span class="text-danger">*</span>
+                        </label><br>
+                        <input type="text" placeholder="First Name" id="first_name" name="first_name">
                     </div>
                     <div class="col-6">
-                        <label for="last_name" class="form-label">Last Name</label><br>
-                        <input type="text" class="form-control0" id="last_name" name="last_name">
-                        @if($errors->get('last_name'))
-                            <div class="form-text text-danger">{{$errors->get('last_name')[0]}}</div>
-                        @endif
+                        <label for="first_name" class="label is-floating">
+                            Last Name
+                            <span class="text-danger">*</span>
+                        </label><br>
+                        <input type="text" placeholder=" Last Name" id="last_name" name="last_name">
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -95,59 +311,61 @@
                             ];
                         @endphp
 
-                        <x-adminlte-select-bs id="country_code" name="country_code" label="Country" :config="$config">
+                        <x-adminlte-select-bs id="country_code" name="country_code" label="Country" :config="$config"
+                                              :required="true">
                             @foreach(config('election.countries') as $code => $name)
                                 <option value="{{$code}}">{{$name}}</option>
                             @endforeach
                         </x-adminlte-select-bs>
-                        @if($errors->get('country_code'))
-                            <div class="form-text text-danger">{{$errors->get('country_code')[0]}}</div>
-                        @endif
                     </div>
-                    <div class="col-6">
-                        <label for="city" class="form-label">City</label><br>
-                        <input type="text" class="form-control" id="city" name="city">
-                        @if($errors->get('city'))
-                            <div class="form-text text-danger">{{$errors->get('city')[0]}}</div>
-                        @endif
+                    <div class="col-6 ">
+                        <div class="field">
+                            <input type="text" class="input is-floating" id="city" name="city" placeholder="City">
+                            <label for="city" class="label is-floating">City</label>
+                        </div>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-6">
-                        <label for="profession" class="form-label">Profession</label><br>
-                        <input type="text" class="form-control" id="profession" name="profession">
-                        @if($errors->get('profession'))
-                            <div class="form-text text-danger">{{$errors->get('profession')[0]}}</div>
-                        @endif
+                        <input type="text" class="input is-floating" id="profession" name="profession"
+                               placeholder="Profession">
+                        <label for="profession" class="label is-floating">Profession</label>
                     </div>
                     <div class="col-6">
-                        <label for="role" class="form-label">Role</label><br>
-                        <input type="text" class="form-control" id="role" name="role">
-                        @if($errors->get('role'))
-                            <div class="form-text text-danger">{{$errors->get('role')[0]}}</div>
-                        @endif
+                        <input type="text" class="input is-floating" id="role" name="role" placeholder="Role">
+                        <label for="role" class="label is-floating">Role</label>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="website" class="form-label">Website</label><br>
-                    <input type="text" class="form-control" id="website" name="website">
-                    @if($errors->get('website'))
-                        <div class="form-text text-danger">{{$errors->get('website')[0]}}</div>
-                    @endif
+                    <div class="field">
+                        <input type="text" class="input is-floating" id="website" name="website" placeholder="Website">
+                        <label for="website" class="label is-floating">Website</label>
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label for="socials" class="form-label">Socials</label><br>
+                    <label for="socials" class="label">Socials</label>
                     <div class="social-block mb-3" id="social-wrapper">
-                        <div class="row mb-1">
+                        <div class="row mb-1 field">
                             <div class="col-4">
-                                <select name="socials[]" id="socials" class="form-control">
+                                <select class="select is-floating"
+                                        id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
+                                        name="contact[Subject]" required="">
+                                    <option value="" disabled="" selected=""></option>
                                     @foreach(config('election.socials') as $i => $social)
                                         <option value="{{$i}}">{{$social}}</option>
                                     @endforeach
                                 </select>
+                                <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
+                                     viewBox="0 0 24 24" stroke="currentColor" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 15L12 9L18 15"></path>
+                                </svg>
+                                <label class="label is-floating"
+                                       for="ContactFormInput-template--27983535997271__contact-form-custom_field-2">Network</label>
                             </div>
                             <div class="col-6">
-                                <input type="text" name="socials[]" class="form-control">
+                                <input type="text" name="socials[]" class="input is-floating" placeholder="Link">
+                                <label for="" class="label is-floating">Link</label>
                             </div>
                             <div class="col-2">
                                 <a href="#" class="btn btn-danger">Delete</a>
@@ -157,20 +375,28 @@
                     <div class="d-flex justify-content-center">
                         <button class="btn" id="add-social">Add Social</button>
                     </div>
-                    @if($errors->get('socials'))
-                        <div class="form-text text-danger">{{$errors->get('socials')[0]}}</div>
-                    @endif
                     <template id="social">
                         <div class="row mb-1">
                             <div class="col-4">
-                                <select name="socials[]" id="socials" class="form-control">
+                                <select class="select is-floating"
+                                        id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
+                                        name="contact[Subject]" required="">
+                                    <option value="" disabled="" selected=""></option>
                                     @foreach(config('election.socials') as $i => $social)
                                         <option value="{{$i}}">{{$social}}</option>
                                     @endforeach
                                 </select>
+                                <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
+                                     viewBox="0 0 24 24" stroke="currentColor" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 15L12 9L18 15"></path>
+                                </svg>
+                                <label class="label is-floating"
+                                       for="ContactFormInput-template--27983535997271__contact-form-custom_field-2">Network</label>
                             </div>
                             <div class="col-6">
-                                <input type="text" name="socials[]" class="form-control">
+                                <input type="text" name="socials[]" class="input is-floating" placeholder="Link">
+                                <label for="" class="label is-floating">Link</label>
                             </div>
                             <div class="col-2">
                                 <a href="#" class="btn btn-danger">Delete</a>
@@ -179,11 +405,21 @@
                     </template>
                 </div>
                 <div class="mb-3">
-                    <label for="photo_url" class="form-label">Photo URL</label><br>
-                    <input type="text" class="form-control" id="photo_url" name="photo_url">
-                    @if($errors->get('photo_url'))
-                        <div class="form-text text-danger">{{$errors->get('photo_url')[0]}}</div>
-                    @endif
+                    <div class="field">
+                        <input type="text" class="input is-floating" id="photo_url" name="photo_url"
+                               placeholder="Photo URL">
+                        <label for="photo_url" class="label is-floating">Photo URL</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="field">
+                    <textarea class="textarea is-floating" id="reason_for_nomination" name="reason_for_nomination"
+                              rows="3" placeholder=""></textarea>
+                        <label for="reason_for_nomination" class="label is-floating">
+                            Reason for Nomination
+                            <span class="text-danger">*</span>
+                        </label>
+                    </div>
                 </div>
                 <div class="action-zone">
                     <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
@@ -297,41 +533,92 @@
             e.preventDefault();
 
             let formData = new FormData(this);
+            formData.append('election_id', {{ $election->id }});
 
-            fetch('/your-endpoint', {
+            fetch('{{route('voting.candidate.suggest')}}', {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    // 'X-CSRF-TOKEN': стеріть це, якщо токен вже у FormData
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + apiToken,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Успішно!');
-                    } else {
-                        // Якщо сервер повернув помилку валідації
-                        alert('Помилка валідації');
-                        grecaptcha.reset(); // Скидаємо капчу для нової спроби
+                .then(response => {
+                    if (response.ok) {
+                        return response.json().then(data => {
+                            $('.errors-nominate').html('');
+                            $('#profile')[0].reset();
+                            if (typeof grecaptcha !== "undefined") {
+                                grecaptcha.reset();
+                            }
+                            alert('Candidate suggestion submitted for review');
+                        });
                     }
+
+                    if (response.status === 422) {
+                        return response.json().then(errorsData => {
+                            let list = '';
+
+                            const errors = errorsData.errors;
+
+                            Object.keys(errors).forEach(field => {
+                                errors[field].forEach(message => {
+                                    list += '<li class="mt-1 d-block">' + message + '</li>';
+                                });
+                            });
+
+                            $('.errors-nominate').html('<ul class="m-0 p-0 text-danger">' + list + '</ul>');
+
+                            if (typeof grecaptcha !== "undefined") {
+                                grecaptcha.reset();
+                            }
+                        });
+                    }
+
+                    throw new Error('Something went wrong');
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    grecaptcha.reset(); // Скидаємо навіть при помилці мережі
+                    console.error('Fetch Error:', error);
+                    if (typeof grecaptcha !== "undefined") {
+                        grecaptcha.reset();
+                    }
                 });
         });
     </script>
     <script>
         // 4. Инициализация
         var config = {
-            options:@json(collect($election->candidates)->map(fn(\App\Models\Candidate $candidate)=>['value'=>$candidate->id,'text'=>$candidate->first_name.' '.$candidate->last_name])),
+            options:@json(collect($election->candidates)->map(fn(\App\Models\Candidate $candidate)=>['value'=>$candidate->id,'text'=>$candidate->first_name.' '.$candidate->last_name,'optgroup'=>'candidates_group'])),
             hideSelected: true,
             maxItems: 1,
             openOnFocus: false,
+            valueField: 'value',
+            labelField: 'text',
+            searchField: ['text'],
+            // 1. Определяем саму группу
+            optgroups: [
+                {
+                    value: 'candidates_group',
+                    label: 'A similar candidate already exists. Would you like to vote for them instead?'
+                }
+            ],
+            create: true,
+            createOnBlur: true,
+            // Настройки отображения групп
+            optgroupField: 'optgroup', // поле в options, которое указывает на группу
+            optgroupLabelField: 'label',
+            optgroupValueField: 'value',
+            lockOptgroupOrder: true,
             onItemAdd: (a, s) => {
-                $('#home-tab').click()
-                $('input[value=' + a + ']').click()
+                const vars = @json(collect($election->candidates)->map(fn(\App\Models\Candidate $candidate)=>$candidate->id));
+
+                console.log(a, s)
+
+                if (vars.includes(a)) {
+                    $('#home-tab').click()
+                    $('input[value=' + a + ']').click()
+                }
             },
         }
 

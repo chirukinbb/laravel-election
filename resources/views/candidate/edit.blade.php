@@ -14,7 +14,10 @@
             <h5>Edit Candidate</h5>
             <div class="row mb-3">
                 <div class="col-6">
-                    <label for="first_name" class="form-label">First Name</label><br>
+                    <label for="first_name" class="form-label">
+                        First Name
+                        <span class="text-danger">*</span>
+                    </label><br>
                     <input type="text" class="form-control" id="first_name" name="first_name"
                            value="{{old('first_name',$candidate->first_name)}}">
                     @if($errors->get('first_name'))
@@ -22,7 +25,10 @@
                     @endif
                 </div>
                 <div class="col-6">
-                    <label for="last_name" class="form-label">Last Name</label><br>
+                    <label for="first_name" class="form-label">
+                        Last Name
+                        <span class="text-danger">*</span>
+                    </label><br>
                     <input type="text" class="form-control" id="last_name" name="last_name"
                            value="{{old('last_name',$candidate->last_name)}}">
                     @if($errors->get('last_name'))
