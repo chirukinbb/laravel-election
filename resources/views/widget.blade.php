@@ -8,11 +8,11 @@
 
 @php
     $heads = [
-        ['label' => 'Position', 'width' => 5],
-        ['label' => 'Country', 'width' => 20],
+        ['label' => 'Position', 'width' => 3],
+        ['label' => 'Country', 'width' => 10],
         'Name',
         ['label' => 'Votes', 'width' => 10],
-        ['label' => 'Vote for', 'width' => 20]
+        ['label' => 'Vote for', 'width' => 15]
     ];
 
 
@@ -24,9 +24,7 @@
 @endphp
 
 @section('adminlte_css')
-    <link href="//www.treeofunity.com/cdn/shop/t/18/assets/theme.css?v=54130150842442101401767804645" rel="stylesheet"
-          type="text/css" media="all"/>
-    <link rel="stylesheet" href="//www.treeofunity.com/cdn/shop/t/18/assets/apps.css?v=162097722211979372921767804619"
+    <link rel="stylesheet" href="{{asset('css/widget.css?'.time())}}"
           media="print" fetchpriority="low" onload="this.media='all'">
 
     <link rel="preload" as="font"
@@ -242,7 +240,6 @@
             letter-spacing: -0.03em; /* Як в оригіналі для щільності заголовків */
         }
     </style>
-    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
     <!-- 2. Подключаем скрипт -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 @stop
@@ -252,15 +249,21 @@
 @section('body')
     <div class="wrapper">
 
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
-                        role="tab" aria-controls="home" aria-selected="true">Ballot paper
+        <ul class="nav nav-tabs d-flex justify-content-center border-0 mb-5" id="myTab" role="tablist">
+            <li class="nav-item me-2" role="presentation">
+                <button class="button mr-2 button--primary" is="hover-button" id="home-tab" data-bs-toggle="tab"
+                        data-bs-target="#home" type="button"
+                        role="tab" aria-controls="home" aria-selected="true">
+                    <span class="btn-fill" data-fill></span>
+                    <span class="btn-text">Ballot paper</span>
                 </button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
-                        role="tab" aria-controls="profile" aria-selected="false">Nominate
+            <li class="nav-item " role="presentation">
+                <button class="ml-2 button button--primary" is="hover-button" id="profile-tab" data-bs-toggle="tab"
+                        data-bs-target="#profile" type="button"
+                        role="tab" aria-controls="profile" aria-selected="false">
+                    <span class="btn-fill" data-fill></span>
+                    <span class="btn-text">Nominate</span>
                 </button>
             </li>
         </ul>
@@ -283,25 +286,26 @@
                     <button class="btn" type="submit">Vote For</button>
                 </div>
             </form>
+
             <form class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                <div class="row mb-3">
-                    <div class="col-6">
+                <div class="flex flex-wrap gap-4d5 md:gap-6 raw">
+                    <div class="field">
+                        <input type="text" placeholder="First Name" id="first_name" name="first_name"
+                               class="input is-floating">
                         <label for="first_name" class="label is-floating">
                             First Name
                             <span class="text-danger">*</span>
-                        </label><br>
-                        <input type="text" placeholder="First Name" id="first_name" name="first_name">
+                        </label>
                     </div>
-                    <div class="col-6">
-                        <label for="first_name" class="label is-floating">
+                    <div class="field">
+                        <input type="text" placeholder=" Last Name" id="last_name" name="last_name"
+                               class="input is-floating">
+                        <label for="first_name" class="label is-floating" id="last_name-ts-label">
                             Last Name
                             <span class="text-danger">*</span>
-                        </label><br>
-                        <input type="text" placeholder=" Last Name" id="last_name" name="last_name">
+                        </label>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-6">
+                    <div class="field">
                         @php
                             $config = [
                                 "liveSearch" => true,
@@ -311,42 +315,72 @@
                             ];
                         @endphp
 
-                        <x-adminlte-select-bs id="country_code" name="country_code" label="Country" :config="$config"
+                        <x-adminlte-select-bs id="country_code" name="country_code" label="Country"
+                                              label-class="label is-floating" :config="$config"
                                               :required="true">
+                            <option value="" disabled="" selected=""></option>
                             @foreach(config('election.countries') as $code => $name)
                                 <option value="{{$code}}">{{$name}}</option>
                             @endforeach
                         </x-adminlte-select-bs>
                     </div>
-                    <div class="col-6 ">
-                        <div class="field">
-                            <input type="text" class="input is-floating" id="city" name="city" placeholder="City">
-                            <label for="city" class="label is-floating">City</label>
-                        </div>
+                    <div class="field">
+                        <input type="text" class="input is-floating" id="city" name="city" placeholder="City">
+                        <label for="city" class="label is-floating">City</label>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-6">
+                    <div class="field">
                         <input type="text" class="input is-floating" id="profession" name="profession"
                                placeholder="Profession">
                         <label for="profession" class="label is-floating">Profession</label>
                     </div>
-                    <div class="col-6">
+                    <div class="field">
                         <input type="text" class="input is-floating" id="role" name="role" placeholder="Role">
                         <label for="role" class="label is-floating">Role</label>
                     </div>
-                </div>
-                <div class="mb-3">
-                    <div class="field">
+                    <div class="field--full">
                         <input type="text" class="input is-floating" id="website" name="website" placeholder="Website">
                         <label for="website" class="label is-floating">Website</label>
                     </div>
-                </div>
-                <div class="mb-3">
-                    <label for="socials" class="label">Socials</label>
-                    <div class="social-block mb-3" id="social-wrapper">
-                        <div class="row mb-1 field">
-                            <div class="col-4">
+                    <div class="field--full">
+                        <label for="socials" class="label">Socials</label>
+                        <div class="social-block mb-3" id="social-wrapper">
+                            <div class="flex flex-wrap gap-4d5 md:gap-3 raw">
+                                <div class="field1">
+                                    <select class="select is-floating"
+                                            id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
+                                            name="contact[Subject]" required="">
+                                        <option value="" disabled="" selected=""></option>
+                                        @foreach(config('election.socials') as $i => $social)
+                                            <option value="{{$i}}">{{$social}}</option>
+                                        @endforeach
+                                    </select>
+                                    <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
+                                         viewBox="0 0 24 24" stroke="currentColor" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M6 15L12 9L18 15"></path>
+                                    </svg>
+                                    <label class="label is-floating"
+                                           for="ContactFormInput-template--27983535997271__contact-form-custom_field-2">Network</label>
+                                </div>
+                                <div class="field2">
+                                    <input type="text" name="socials[]" class="input is-floating" placeholder="Link">
+                                    <label for="" class="label is-floating">Link</label>
+                                </div>
+                                <div class="field3">
+                                    <button class="button button--secondary btn-delete btn-close-white">
+                                        <span class="btn-fill" data-fill></span>
+                                        <span class="btn-close-white"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="button button--primary" type="submit" is="hover-button">
+                            <span class="btn-fill" data-fill></span>
+                            <span class="btn-text">Add Row</span>
+                        </button>
+                        <template id="social">
+                            <div class="field1">
                                 <select class="select is-floating"
                                         id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
                                         name="contact[Subject]" required="">
@@ -363,56 +397,21 @@
                                 <label class="label is-floating"
                                        for="ContactFormInput-template--27983535997271__contact-form-custom_field-2">Network</label>
                             </div>
-                            <div class="col-6">
+                            <div class="field2">
                                 <input type="text" name="socials[]" class="input is-floating" placeholder="Link">
                                 <label for="" class="label is-floating">Link</label>
                             </div>
-                            <div class="col-2">
+                            <div class="field3">
                                 <a href="#" class="btn btn-danger">Delete</a>
                             </div>
-                        </div>
+                        </template>
                     </div>
-                    <div class="d-flex justify-content-center">
-                        <button class="btn" id="add-social">Add Social</button>
-                    </div>
-                    <template id="social">
-                        <div class="row mb-1">
-                            <div class="col-4">
-                                <select class="select is-floating"
-                                        id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
-                                        name="contact[Subject]" required="">
-                                    <option value="" disabled="" selected=""></option>
-                                    @foreach(config('election.socials') as $i => $social)
-                                        <option value="{{$i}}">{{$social}}</option>
-                                    @endforeach
-                                </select>
-                                <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
-                                     viewBox="0 0 24 24" stroke="currentColor" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 15L12 9L18 15"></path>
-                                </svg>
-                                <label class="label is-floating"
-                                       for="ContactFormInput-template--27983535997271__contact-form-custom_field-2">Network</label>
-                            </div>
-                            <div class="col-6">
-                                <input type="text" name="socials[]" class="input is-floating" placeholder="Link">
-                                <label for="" class="label is-floating">Link</label>
-                            </div>
-                            <div class="col-2">
-                                <a href="#" class="btn btn-danger">Delete</a>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-                <div class="mb-3">
-                    <div class="field">
+                    <div class="field--full">
                         <input type="text" class="input is-floating" id="photo_url" name="photo_url"
                                placeholder="Photo URL">
                         <label for="photo_url" class="label is-floating">Photo URL</label>
                     </div>
-                </div>
-                <div class="mb-3">
-                    <div class="field">
+                    <div class="field--full">
                     <textarea class="textarea is-floating" id="reason_for_nomination" name="reason_for_nomination"
                               rows="3" placeholder=""></textarea>
                         <label for="reason_for_nomination" class="label is-floating">
@@ -420,11 +419,11 @@
                             <span class="text-danger">*</span>
                         </label>
                     </div>
-                </div>
-                <div class="action-zone">
-                    <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
-                    <div class="errors-nominate"></div>
-                    <button class="btn" type="submit">Nominate</button>
+                    <div class="action-zone">
+                        <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                        <div class="errors-nominate"></div>
+                        <button class="btn" type="submit">Nominate</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -586,55 +585,71 @@
                 });
         });
     </script>
-    <script>
-        // 4. Инициализация
-        var config = {
-            options:@json(collect($election->candidates)->map(fn(\App\Models\Candidate $candidate)=>['value'=>$candidate->id,'text'=>$candidate->first_name.' '.$candidate->last_name,'optgroup'=>'candidates_group'])),
-            hideSelected: true,
-            maxItems: 1,
-            openOnFocus: false,
-            valueField: 'value',
-            labelField: 'text',
-            searchField: ['text'],
-            // 1. Определяем саму группу
-            optgroups: [
-                {
-                    value: 'candidates_group',
-                    label: 'A similar candidate already exists. Would you like to vote for them instead?'
+    <script id="tom-selector-init">
+        $(['#first_name', '#last_name']).each((i, selector) => {
+            $(selector).on('click', function (e) {
+                const value = $(selector).val()
+                e.preventDefault()
+                var config = {
+                    options:@json(collect($election->candidates)->map(fn(\App\Models\Candidate $candidate)=>['value'=>$candidate->id,'text'=>$candidate->first_name.' '.$candidate->last_name,'optgroup'=>'candidates_group'])),
+                    hideSelected: true,
+                    maxItems: 1,
+                    openOnFocus: false,
+                    valueField: 'value',
+                    labelField: 'text',
+                    searchField: ['text'],
+                    // 1. Определяем саму группу
+                    optgroups: [
+                        {
+                            value: 'candidates_group',
+                            label: 'A similar candidate already exists. Would you like to vote for them instead?'
+                        }
+                    ],
+                    create: true,
+                    createOnBlur: true,
+                    // Настройки отображения групп
+                    optgroupField: 'optgroup', // поле в options, которое указывает на группу
+                    optgroupLabelField: 'label',
+                    optgroupValueField: 'value',
+                    lockOptgroupOrder: true,
+                    onItemAdd: (a, s) => {
+                        const vars = @json(collect($election->candidates)->map(fn(\App\Models\Candidate $candidate)=>$candidate->id));
+                        $(selector + '-ts-control').val($(s).text())
+                        if (vars.includes(Number(a))) {
+                            $('#home-tab').click()
+                            $('input[value=' + a + ']').click()
+                        }
+                    },
+                    onInitialize: function (a, b) {
+                        const label = selector.replace('#', '').replace('_', ' ').split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                        $(selector + '-ts-control').addClass('input is-floating')
+                        $(selector + '-ts-control').parent().append('<label class="label is-floating">' + label + '</label>')
+
+                        $(selector).addClass('d-none')
+                        $(selector).parent().children('label').first().addClass('d-none');
+                        $(selector).parent().find('div').removeClass('input is-floating')
+                    },
+                    onBlur: function (a, s) {
+                        s = $(selector + '-ts-control').parent().find('div')
+                        this.destroy()
+                        $(selector).attr('value', s.text())
+                        $(selector).removeClass('d-none')
+                        $(selector).parent().find('label').removeClass('d-none')
+                    }
                 }
-            ],
-            create: true,
-            createOnBlur: true,
-            // Настройки отображения групп
-            optgroupField: 'optgroup', // поле в options, которое указывает на группу
-            optgroupLabelField: 'label',
-            optgroupValueField: 'value',
-            lockOptgroupOrder: true,
-            onItemAdd: (a, s) => {
-                const vars = @json(collect($election->candidates)->map(fn(\App\Models\Candidate $candidate)=>$candidate->id));
-
-                console.log(a, s)
-
-                if (vars.includes(a)) {
-                    $('#home-tab').click()
-                    $('input[value=' + a + ']').click()
-                }
-            },
-        }
-
-        const fnSelect = null
-
-        // $('#first_name').on('change',function () {
-        //     if ($(this).val().length > 2)
-        // })
-        new TomSelect('#first_name', config);
-        new TomSelect('#last_name', config);
+                const tomSelect = new TomSelect(selector, config);
+                tomSelect.setTextboxValue(value)
+                tomSelect.focus()
+            })
+        })
     </script>
     <script>
         $(document).ready(function () {
             // 1. Store the raw HTML string from the template
             const socTemplate = $('#social').html();
-            const $container = $('#social-wrapper'); // The div where rows will be added
+            const $container = $('#social-wrapper > div'); // The div where rows will be added
 
             // 2. Add Row Event
             $('#add-social').on('click', function (e) {
@@ -644,7 +659,7 @@
             });
 
             // 3. Delete Row Event (using Event Delegation)
-            $container.on('click', '.btn-danger', function (e) {
+            $container.on('click', '.btn-delete', function (e) {
                 e.preventDefault();
                 $(this).closest('.row').remove();
             });
@@ -690,6 +705,44 @@
                     console.error('Failed to load candidates:', xhr);
                 }
             });
+        });
+    </script>
+    <script id="table__customization">
+        const countries = @json(config('election.countries'));
+
+        $('body').on('draw.dt', function () {
+            $('#candidates_wrapper .row:first-child > div').each((i, el) => {
+                $(el)
+                    .removeClass('col-sm-12 col-md-6')
+                    .addClass('col-6');
+            });
+            $('#candidates_length').addClass('float-left')
+            $('#candidates_filter').addClass('float-right')
+            $('#candidates th').eq(0).html('<span class="d-none d-sm-inline">Position</span><span class="d-inline-block d-sm-none">#</span>')
+            $('#candidates tr').each((i, el) => {
+                const country = $(el).find('td').eq(1).text().trim();
+
+                const code = Object.keys(countries).find(
+                    key => countries[key] === country
+                ) || '';
+
+                $(el).find('td').eq(1).html(
+                    '<span class="d-none d-sm-inline">' + country + '</span>' +
+                    '<span class="d-inline-block d-sm-none">' + code.toUpperCase() + '</span>'
+                );
+            });
+            const classes = ['d-none d-sm-block col-5', 'col-12 col-sm-7']
+            $('#candidates_wrapper .row:last-child > div').each((i, el) => {
+                $(el)
+                    .removeClass('col-sm-12 col-md-5 col-md-7')
+                    .addClass(classes[i]);
+            });
+            $('#candidates_paginate').addClass('d-flex justify-content-center')
+            $('#candidates_paginate a').each((i, a) => {
+                $(a).addClass('button mx-1')
+                if ($(a).hasClass('active'))
+                    $(a).addClass('bg-black')
+            })
         });
     </script>
 @stop
