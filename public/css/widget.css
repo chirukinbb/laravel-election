@@ -15873,18 +15873,22 @@ moe
     position: relative;
 }
 
-.raw .field1 {
-    width: calc(25% - var(--sp-6) / 3);
+.row .field1 {
+    flex: 0 0 25%; /* фиксированные 25% */
     position: relative;
 }
 
-.raw .field2 {
-    width: calc(50% - var(--sp-6) / 3);
+.row .field2 {
+    flex: 1; /* занимает всё свободное место */
     position: relative;
 }
 
-.raw .field3 {
-    width: calc(25% - var(--sp-6) / 3);
+.row .field3 {
+    flex: 0 0 auto; /* не растягивается */
+    aspect-ratio: 1;
+    border-radius: 50%;
+    margin-left: auto; /* прижимаем вправо */
+    position: relative;
 }
 
 .raw .field--full {
@@ -15911,6 +15915,20 @@ moe
     #candidates tr > td:last-child {
         display: none;
     }
+
+    #candidates tr:has(input:checked) {
+        background-color: #dae0e5;
+    }
+
+    #candidates tr:has(input:checked) td {
+        border-color: #dae0e5 !important;
+    }
+}
+
+#candidates tr {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ts-control {
@@ -15944,4 +15962,124 @@ moe
 .optgroup .option.active {
     background-color: #007bff;
     color: white;
+}
+
+/*
+bs selector
+ */
+.bootstrap-select .dropdown-toggle:focus, .bootstrap-select > select.mobile-device:focus + .dropdown-toggle {
+    outline: none !important;
+    outline-offset: -2px;
+}
+
+.select[required]:valid ~ .label, .select[selected] ~ .label, :is(.input,.textarea):focus ~ .label, :is(.input,.textarea):not(:placeholder-shown) ~ .label, :is(.input,.textarea,.select):-webkit-autofill ~ .label {
+    --tw-translate-y: calc(var(--sp-2d5) * -1);
+    --tw-scale-x: .8;
+    --tw-scale-y: .8;
+    transform: translateY(var(--tw-translate-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.btn-light:hover,
+.btn-light:active {
+    color: #1f2d3d;
+    background-color: rgb(var(--color-foreground) / .025);
+!important;
+    border-color: #dae0e5;
+}
+
+button.bs-placeholder * {
+    display: none;
+}
+
+.bootstrap-select:has(button.bs-placeholder) + label.is-floating {
+    --tw-translate-y: calc(var(--sp-2d5) * -1);
+    --tw-scale-x: .8;
+    --tw-scale-y: .8;
+    transform: translateY(var(--tw-translate-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+button.select .filter-option {
+    display: flex;
+    align-items: center;
+    margin-top: 2px;
+}
+
+button.dropdown-toggle::after {
+    display: none !important;
+}
+
+.btn-light:not(:disabled):not(.disabled).active, .btn-light:not(:disabled):not(.disabled):active, .show > .btn-light.dropdown-toggle, .select:has(~.icon) {
+    background-color: rgb(var(--color-foreground) / .025);
+!important;
+}
+
+.bootstrap-select .dropdown-menu {
+    box-shadow: none;
+    border: 1px solid black;
+    border-radius: 0;
+}
+
+.dropdown-menu li.disabled,
+.dropdown-menu li .check-mark {
+    display: none !important;
+}
+
+.dropdown-menu li a {
+    padding: 3px 25px;
+}
+
+/*
+типография
+ */
+
+.input,
+.select,
+.textarea {
+    line-height: 1.25 !important;
+    font-family: 'Inter', sans-serif !important;
+
+
+/* квадрат */
+.radio-box {
+    width: 25px;
+    aspect-ratio: 1;
+    border: 1px solid #444;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* иконка скрыта по умолчанию */
+.radio-box svg {
+    width: 16px;
+    height: 16px;
+    opacity: 0;
+}
+
+
+/* квадрат */
+.radio-box {
+    width: 25px;
+    aspect-ratio: 1;
+    border: 1px solid #444;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* иконка скрыта по умолчанию */
+.radio-box svg {
+    width: 16px;
+    height: 16px;
+    opacity: 0;
+}
+
+/* ✅ когда активен */
+.radio input:checked + .radio-box {
+    border: none;
+}
+
+/* показываем иконку */
+.radio input:checked + .radio-box svg {
+    opacity: 1;
 }

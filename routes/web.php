@@ -49,6 +49,5 @@ Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums
 });
 
 Route::get('widget/{election:id}', function (\App\Models\Election $election) {
-    \Illuminate\Support\Facades\Auth::login(\App\Models\User::find(1));
     return view('widget', compact('election'));
 })->middleware(\App\Http\Middlewares\ShopifyMiddleware::class);

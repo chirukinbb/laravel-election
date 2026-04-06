@@ -10,16 +10,19 @@
     $heads = [
         ['label' => 'Position', 'width' => 3],
         ['label' => 'Country', 'width' => 10],
-        'Name',
-        ['label' => 'Votes', 'width' => 10],
-        ['label' => 'Vote for', 'width' => 15]
+        ['label' => 'Name', 'width' => 67],
+        ['label' => 'Votes', 'width' => 10]
     ];
 
+if (auth()->user()){
+    $heads = array_merge($heads,[
+        ['label' => 'Vote for', 'width' => 15]]);
+}
 
     $config = [
         'data' => [],
         'order' => [[1, 'asc']],
-        'columns' => [null, null, null, null,['orderable' => false]],
+        'columns' => [null, null, null,null,['orderable' => false]],
     ];
 @endphp
 
@@ -239,6 +242,33 @@
             font-weight: 700;
             letter-spacing: -0.03em; /* Як в оригіналі для щільності заголовків */
         }
+
+        /* квадрат */
+        .radio-box {
+            width: 25px;
+            aspect-ratio: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* иконка скрыта по умолчанию */
+        .radio-box svg {
+            width: 25px;
+            height: 25px;
+        }
+
+        .radio-box .svg1 {
+            display: none;
+        }
+
+        td:has(input:checked) .radio-box .svg1 {
+            display: block;
+        }
+
+        td:has(input:checked) .radio-box .svg2 {
+            display: none;
+        }
     </style>
     <!-- 2. Подключаем скрипт -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
@@ -249,7 +279,7 @@
 @section('body')
     <div class="wrapper">
 
-        <ul class="nav nav-tabs d-flex justify-content-center border-0 mb-5" id="myTab" role="tablist">
+        <ul class="nav nav-tabs d-flex justify-content-center border-0 my-5" id="myTab" role="tablist">
             <li class="nav-item me-2" role="presentation">
                 <button class="button mr-2 button--primary" is="hover-button" id="home-tab" data-bs-toggle="tab"
                         data-bs-target="#home" type="button"
@@ -268,7 +298,7 @@
             </li>
         </ul>
         <div class="tab-content mt-3" id="myTabContent">
-            <form class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <form class="tab-pane fade show active mb-5" id="home" role="tabpanel" aria-labelledby="home-tab">
 
                 <x-adminlte-datatable id="candidates" :heads="$heads">
                     @foreach($config['data'] as $row)
@@ -280,14 +310,26 @@
                     @endforeach
                 </x-adminlte-datatable>
                 <input type="hidden" value="{{$election->id}}" name="election_id">
-                <div class="action-zone">
-                    <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
-                    <div class="errors-vote"></div>
-                    <button class="btn" type="submit">Vote For</button>
-                </div>
+
+                @auth()
+                    <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column">
+                        <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                        <div class="errors-vote"></div>
+                        <div class="field field--full">
+                            <label for="ContactSubmit-template--27983535997271__contact-form" class="sr-only">Vote
+                                For</label>
+                            <button type="submit" id="ContactSubmit-template--27983535997271__contact-form"
+                                    class="button button--primary button--fixed" is="hover-button">
+                                <span class="btn-fill" data-fill></span>
+                                <span class="btn-text">Vote For</span>
+                            </button>
+                        </div>
+                    </div>
+                @endauth
+
             </form>
 
-            <form class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <form class="tab-pane fade mb-5" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <div class="flex flex-wrap gap-4d5 md:gap-6 raw">
                     <div class="field">
                         <input type="text" placeholder="First Name" id="first_name" name="first_name"
@@ -345,6 +387,60 @@
                         <label for="socials" class="label">Socials</label>
                         <div class="social-block mb-3" id="social-wrapper">
                             <div class="flex flex-wrap gap-4d5 md:gap-3 raw">
+                                <div class="flex flex-wrap gap-4d5 md:gap-3 row w-100 m-0 p-0">
+                                    <div class="field1">
+                                        <select class="select is-floating"
+                                                id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
+                                                name="contact[Subject]" required="">
+                                            <option value="" disabled="" selected=""></option>
+                                            @foreach(config('election.socials') as $i => $social)
+                                                <option value="{{$i}}">{{$social}}</option>
+                                            @endforeach
+                                        </select>
+                                        <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
+                                             viewBox="0 0 24 24" stroke="currentColor" fill="none"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                  d="M6 15L12 9L18 15"></path>
+                                        </svg>
+                                        <label class="label is-floating"
+                                               for="ContactFormInput-template--27983535997271__contact-form-custom_field-2">Network</label>
+                                    </div>
+                                    <div class="field2">
+                                        <input type="text" name="socials[]" class="input is-floating"
+                                               placeholder="Link">
+                                        <label for="" class="label is-floating">Link</label>
+                                    </div>
+                                    <div class="field3">
+                                        <button class="rounded-circle border border-2 border-black h-100 btn-delete"
+                                                style="aspect-ratio: 1">
+                                            <svg fill="#000000" height="20px" width="64px" version="1.1" id="Layer_1"
+                                                 xmlns="http://www.w3.org/2000/svg"
+                                                 xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.00 512.00"
+                                                 xml:space="preserve" transform="matrix(1, 0, 0, -1, 0, 0)rotate(0)"
+                                                 stroke="#000000" stroke-width="0.00512"><g id="SVGRepo_bgCarrier"
+                                                                                            stroke-width="0"></g>
+                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                                                   stroke-linejoin="round" stroke="#CCCCCC" stroke-width="2.048"></g>
+                                                <g id="SVGRepo_iconCarrier">
+                                                    <g>
+                                                        <g>
+                                                            <polygon
+                                                                    points="512,59.076 452.922,0 256,196.922 59.076,0 0,59.076 196.922,256 0,452.922 59.076,512 256,315.076 452.922,512 512,452.922 315.076,256 "></polygon>
+                                                        </g>
+                                                    </g>
+                                                </g></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="button button--primary" type="submit" id="add-social">
+                            <span class="btn-" data-fill></span>
+                            <span class="btn-text">Add Row</span>
+                        </button>
+                        <template id="social">
+                            <div class="flex flex-wrap gap-4d5 md:gap-3 row w-100 m-0 p-0">
                                 <div class="field1">
                                     <select class="select is-floating"
                                             id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
@@ -368,41 +464,26 @@
                                     <label for="" class="label is-floating">Link</label>
                                 </div>
                                 <div class="field3">
-                                    <button class="button button--secondary btn-delete btn-close-white">
-                                        <span class="btn-fill" data-fill></span>
-                                        <span class="btn-close-white"></span>
+                                    <button class="rounded-circle border border-2 border-black h-100 btn-delete"
+                                            style="aspect-ratio: 1">
+                                        <svg fill="#000000" height="20px" width="64px" version="1.1" id="Layer_1"
+                                             xmlns="http://www.w3.org/2000/svg"
+                                             xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.00 512.00"
+                                             xml:space="preserve" transform="matrix(1, 0, 0, -1, 0, 0)rotate(0)"
+                                             stroke="#000000" stroke-width="0.00512"><g id="SVGRepo_bgCarrier"
+                                                                                        stroke-width="0"></g>
+                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"
+                                               stroke="#CCCCCC" stroke-width="2.048"></g>
+                                            <g id="SVGRepo_iconCarrier">
+                                                <g>
+                                                    <g>
+                                                        <polygon
+                                                                points="512,59.076 452.922,0 256,196.922 59.076,0 0,59.076 196.922,256 0,452.922 59.076,512 256,315.076 452.922,512 512,452.922 315.076,256 "></polygon>
+                                                    </g>
+                                                </g>
+                                            </g></svg>
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                        <button class="button button--primary" type="submit" is="hover-button">
-                            <span class="btn-fill" data-fill></span>
-                            <span class="btn-text">Add Row</span>
-                        </button>
-                        <template id="social">
-                            <div class="field1">
-                                <select class="select is-floating"
-                                        id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
-                                        name="contact[Subject]" required="">
-                                    <option value="" disabled="" selected=""></option>
-                                    @foreach(config('election.socials') as $i => $social)
-                                        <option value="{{$i}}">{{$social}}</option>
-                                    @endforeach
-                                </select>
-                                <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
-                                     viewBox="0 0 24 24" stroke="currentColor" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 15L12 9L18 15"></path>
-                                </svg>
-                                <label class="label is-floating"
-                                       for="ContactFormInput-template--27983535997271__contact-form-custom_field-2">Network</label>
-                            </div>
-                            <div class="field2">
-                                <input type="text" name="socials[]" class="input is-floating" placeholder="Link">
-                                <label for="" class="label is-floating">Link</label>
-                            </div>
-                            <div class="field3">
-                                <a href="#" class="btn btn-danger">Delete</a>
                             </div>
                         </template>
                     </div>
@@ -412,18 +493,30 @@
                         <label for="photo_url" class="label is-floating">Photo URL</label>
                     </div>
                     <div class="field--full">
-                    <textarea class="textarea is-floating" id="reason_for_nomination" name="reason_for_nomination"
-                              rows="3" placeholder=""></textarea>
+                        <textarea class="textarea is-floating" id="reason_for_nomination" name="reason_for_nomination"
+                                  rows="3" placeholder=""></textarea>
                         <label for="reason_for_nomination" class="label is-floating">
                             Reason for Nomination
                             <span class="text-danger">*</span>
                         </label>
                     </div>
-                    <div class="action-zone">
-                        <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
-                        <div class="errors-nominate"></div>
-                        <button class="btn" type="submit">Nominate</button>
-                    </div>
+
+                    @auth()
+                        <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column">
+                            <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                            <div class="errors-nominate"></div>
+                            <div class="field field--full">
+                                <label for="ContactSubmit-template--27983535997271__contact-form" class="sr-only">Send
+                                    message</label>
+                                <button type="submit" id="ContactSubmit-template--27983535997271__contact-form"
+                                        class="button button--primary button--fixed" is="hover-button">
+                                    <span class="btn-fill" data-fill></span>
+                                    <span class="btn-text">Send message</span>
+                                </button>
+                            </div>
+                        </div>
+                    @endauth
+
                 </div>
             </form>
         </div>
@@ -434,157 +527,124 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     @stack('js')
     @yield('js')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
 
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = this.getAttribute('data-bs-target');
+    @auth()
+        <script>
+            const apiToken = '{{auth()->user()->createToken(\App\Enums\RoleEnum::USER->name)->plainTextToken}}';
+            document.getElementById('home').addEventListener('submit', function (e) {
+                e.preventDefault();
 
-                    // Deactivate all tabs
-                    tabButtons.forEach(btn => {
-                        btn.classList.remove('active');
-                        btn.setAttribute('aria-selected', 'false');
-                    });
+                let formData = new FormData(this);
 
-                    // Hide all tab panes
-                    document.querySelectorAll('.tab-pane').forEach(pane => {
-                        pane.classList.remove('show', 'active');
-                    });
-
-                    // Activate clicked tab
-                    this.classList.add('active');
-                    this.setAttribute('aria-selected', 'true');
-
-                    // Show target tab pane
-                    const targetPane = document.querySelector(target);
-                    if (targetPane) {
-                        targetPane.classList.add('show', 'active');
+                fetch('{{route('voting.vote')}}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + apiToken,
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
-                });
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json().then(data => {
+                                $('#candidates tr').each((i, tr) => {
+                                    $(tr).find('td:last-child, th:last-child').addClass('d-none');
+                                });
+                                $('form .action-zone').addClass('d-none')
+                            });
+                        }
+
+                        if (response.status === 422) {
+                            return response.json().then(errorsData => {
+                                let list = '';
+
+                                const errors = errorsData.errors;
+
+                                Object.keys(errors).forEach(field => {
+                                    errors[field].forEach(message => {
+                                        list += '<li class="mt-1 d-block">' + message + '</li>';
+                                    });
+                                });
+
+                                $('.errors-vote').html('<ul class="m-0 p-0 text-danger">' + list + '</ul>');
+
+                                if (typeof grecaptcha !== "undefined") {
+                                    grecaptcha.reset();
+                                }
+                            });
+                        }
+
+                        throw new Error('Щось пішло не так');
+                    })
+                    .catch(error => {
+                        console.error('Fetch Error:', error);
+                        if (typeof grecaptcha !== "undefined") {
+                            grecaptcha.reset();
+                        }
+                    });
             });
-        });
-        $(document).on('click keydown input change', () => {
-            $('.errors-nominate').html('');
-            $('.errors-vote').html('');
-        });
-    </script>
-    <script>
-        const apiToken = '{{auth()->user()->createToken(\App\Enums\RoleEnum::USER->name)->plainTextToken}}';
-        document.getElementById('home').addEventListener('submit', function (e) {
-            e.preventDefault();
+        </script>
+        <script>
+            document.getElementById('profile').addEventListener('submit', function (e) {
+                e.preventDefault();
 
-            let formData = new FormData(this);
+                let formData = new FormData(this);
+                formData.append('election_id', {{ $election->id }});
 
-            fetch('{{route('voting.vote')}}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': 'Bearer ' + apiToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json().then(data => {
-                            $('#candidates tr').each((i, tr) => {
-                                $(tr).find('td:last-child, th:last-child').addClass('d-none');
-                            });
-                            $('form .action-zone').addClass('d-none')
-                        });
+                fetch('{{route('voting.candidate.suggest')}}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + apiToken,
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
-
-                    if (response.status === 422) {
-                        return response.json().then(errorsData => {
-                            let list = '';
-
-                            const errors = errorsData.errors;
-
-                            Object.keys(errors).forEach(field => {
-                                errors[field].forEach(message => {
-                                    list += '<li class="mt-1 d-block">' + message + '</li>';
-                                });
-                            });
-
-                            $('.errors-vote').html('<ul class="m-0 p-0 text-danger">' + list + '</ul>');
-
-                            if (typeof grecaptcha !== "undefined") {
-                                grecaptcha.reset();
-                            }
-                        });
-                    }
-
-                    throw new Error('Щось пішло не так');
                 })
-                .catch(error => {
-                    console.error('Fetch Error:', error);
-                    if (typeof grecaptcha !== "undefined") {
-                        grecaptcha.reset();
-                    }
-                });
-        });
-    </script>
-    <script>
-        document.getElementById('profile').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            let formData = new FormData(this);
-            formData.append('election_id', {{ $election->id }});
-
-            fetch('{{route('voting.candidate.suggest')}}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': 'Bearer ' + apiToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json().then(data => {
-                            $('.errors-nominate').html('');
-                            $('#profile')[0].reset();
-                            if (typeof grecaptcha !== "undefined") {
-                                grecaptcha.reset();
-                            }
-                            alert('Candidate suggestion submitted for review');
-                        });
-                    }
-
-                    if (response.status === 422) {
-                        return response.json().then(errorsData => {
-                            let list = '';
-
-                            const errors = errorsData.errors;
-
-                            Object.keys(errors).forEach(field => {
-                                errors[field].forEach(message => {
-                                    list += '<li class="mt-1 d-block">' + message + '</li>';
-                                });
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json().then(data => {
+                                $('.errors-nominate').html('');
+                                $('#profile')[0].reset();
+                                if (typeof grecaptcha !== "undefined") {
+                                    grecaptcha.reset();
+                                }
+                                alert('Candidate suggestion submitted for review');
                             });
+                        }
 
-                            $('.errors-nominate').html('<ul class="m-0 p-0 text-danger">' + list + '</ul>');
+                        if (response.status === 422) {
+                            return response.json().then(errorsData => {
+                                let list = '';
 
-                            if (typeof grecaptcha !== "undefined") {
-                                grecaptcha.reset();
-                            }
-                        });
-                    }
+                                const errors = errorsData.errors;
 
-                    throw new Error('Something went wrong');
-                })
-                .catch(error => {
-                    console.error('Fetch Error:', error);
-                    if (typeof grecaptcha !== "undefined") {
-                        grecaptcha.reset();
-                    }
-                });
-        });
-    </script>
+                                Object.keys(errors).forEach(field => {
+                                    errors[field].forEach(message => {
+                                        list += '<li class="mt-1 d-block">' + message + '</li>';
+                                    });
+                                });
+
+                                $('.errors-nominate').html('<ul class="m-0 p-0 text-danger">' + list + '</ul>');
+
+                                if (typeof grecaptcha !== "undefined") {
+                                    grecaptcha.reset();
+                                }
+                            });
+                        }
+
+                        throw new Error('Something went wrong');
+                    })
+                    .catch(error => {
+                        console.error('Fetch Error:', error);
+                        if (typeof grecaptcha !== "undefined") {
+                            grecaptcha.reset();
+                        }
+                    });
+            });
+        </script>
+    @endauth
+
     <script id="tom-selector-init">
         $(['#first_name', '#last_name']).each((i, selector) => {
             $(selector).on('click', function (e) {
@@ -693,10 +753,29 @@
                         const position = '#' + candidate.position;
                         const country = candidate.country || '-';
                         const name = candidate.name || '-';
-                        const voteCell = `<input type="radio" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}">`;
-                        const votes = candidate.votes_count
+                        const voteCell = `<div class="radio-box">
+<svg width="25px" height="25px" viewBox="0 0 16 16" version="1.1" class="svg1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
+<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+<g id="SVGRepo_iconCarrier">
+<path fill="#444" d="M14 6.2v7.8h-12v-12h10.5l1-1h-12.5v14h14v-9.8z"></path>
+<path fill="#444" d="M7.9 10.9l-4.2-4.2 1.5-1.4 2.7 2.8 6.7-6.7 1.4 1.4z"></path> </g></svg>
 
-                        table.row.add([position, country, name, votes.toLocaleString(), voteCell]);
+<svg width="25px" height="25px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="svg2">
+  <rect x="2" y="2" width="12" height="12"
+        fill="none"
+        stroke="#444"
+        stroke-width="1.2"/>
+</svg>
+</div><input type="radio" class="d-none" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}">`;
+                        const votes = candidate.votes_count
+                        let row = [position, country, name, votes.toLocaleString(), voteCell]
+
+                        @auth()
+                        row.push(voteCell)
+                        @endauth
+
+                        table.row.add(row);
                     });
 
                     table.draw();
@@ -737,12 +816,150 @@
                     .removeClass('col-sm-12 col-md-5 col-md-7')
                     .addClass(classes[i]);
             });
-            $('#candidates_paginate').addClass('d-flex justify-content-center')
+            $('#candidates_paginate').addClass('d-flex justify-content-center justify-content-sm-end')
             $('#candidates_paginate a').each((i, a) => {
                 $(a).addClass('button mx-1')
-                if ($(a).hasClass('active'))
+                if ($(a).parent().hasClass('active')) {
+                    $(a).removeClass('page-link')
                     $(a).addClass('bg-black')
+                }
             })
+        });
+
+        $('body').on('click', 'tr', function () {
+            const input = $(this).find('input');
+
+            input.prop('checked', true);
+        });
+    </script>
+    <script id="selectBS-customize">
+        $('#country_code').on('rendered.bs.select', function (select) {
+            select = this
+            $(select).parent().find('button').addClass('btn select is-floating')
+            const label = $(select).closest('.form-group').children('label')
+            if (!$(select).parent().find('button').hasClass('bs-placeholder')) {
+                $(select)
+                    .parent()
+                    .find('label.is-floating')
+                    .css({
+                        '--tw-translate-y': 'calc(var(--sp-2d5) * -1)',
+                        '--tw-scale-x': '.8',
+                        '--tw-scale-y': '.8',
+                        'transform': 'translateY(var(--tw-translate-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))'
+                    });
+            }
+            $(select).parent().append('<svg class="icon icon-chevron-up icon-sm absolute pointer-events-none" viewBox="0 0 24 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg"> <path stroke-linecap="round" stroke-linejoin="round" d="M6 15L12 9L18 15"></path></svg>')
+            $(select).parent().append(label)
+            $(select).closest('.form-group').addClass('m-0')
+            $(select).closest('.form-group').find('input[type=search]').removeClass('form-control').addClass('input')
+        })
+    </script>
+    <script id="button-animation">
+        document.querySelectorAll(".button").forEach(button => {
+            const fill = button.querySelector(".btn-fill");
+            const text = button.querySelector(".btn-text");
+
+            if (!fill || !text) return;
+
+            fill.style.transform = "translateY(100%)";
+
+            const activate = () => {
+                fill.style.transition = "transform 0.6s cubic-bezier(.3,1,.3,1)";
+                fill.style.transform = "translateY(0%)";
+                text.style.color = "black";
+                fill.dataset.state = "center";
+            };
+
+            const deactivate = () => {
+                fill.style.transition = "transform 0.6s cubic-bezier(.7,0,.3,1)";
+                fill.style.transform = "translateY(-100%)";
+                text.style.color = "white";
+                fill.dataset.state = "top";
+            };
+
+            button.addEventListener("mouseenter", () => {
+                if (button.classList.contains("active")) return;
+
+                if (fill.dataset.state === "top") {
+                    fill.style.transition = "none";
+                    fill.style.transform = "translateY(100%)";
+                    fill.offsetHeight;
+                }
+
+                activate();
+            });
+
+            button.addEventListener("mouseleave", () => {
+                if (button.classList.contains("active")) return;
+                deactivate();
+            });
+
+            // методы для табов
+            button._activateFill = activate;
+            button._deactivateFill = deactivate;
+        });
+    </script>
+    <script id="tab-animation">
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('data-bs-target');
+
+                    // ❗ деактивируем ВСЕ
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-selected', 'false');
+
+                        if (btn._deactivateFill) {
+                            btn._deactivateFill(); // ← анимация вверх
+                        }
+                    });
+
+                    document.querySelectorAll('.tab-pane').forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                    });
+
+                    // ✅ активируем текущую
+                    this.classList.add('active');
+                    this.setAttribute('aria-selected', 'true');
+
+                    if (this._activateFill) {
+                        this._activateFill(); // ← фиксируем как hover
+                    }
+
+                    const targetPane = document.querySelector(target);
+                    if (targetPane) {
+                        targetPane.classList.add('show', 'active');
+                    }
+                });
+            })
+            $(tabButtons[0]).click()
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('body').on('click', function () {
+                $('.errors-nominate,.errors-vote').html('');
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+// Функция отправки высоты
+            function sendHeight() {
+                window.parent.postMessage({height: $('body').outerHeight}, '*');
+            }
+
+// Вызываем при загрузке и при изменении контента
+            window.addEventListener('load', sendHeight);
+            window.addEventListener('resize', sendHeight);
+
+// Если контент динамический (например, список товаров подгрузился)
+            const observer = new ResizeObserver(sendHeight);
+            observer.observe(document.body);
         });
     </script>
 @stop
