@@ -18,6 +18,7 @@ Route::withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken
 
 Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums\RoleEnum::ADMIN->name))->group(function () {
     Route::get("dashboard", [\App\Http\Controllers\DashboardController::class, 'index'])->name("dashboard");
+    Route::get("dashboard/candidates", [\App\Http\Controllers\DashboardController::class, 'getTopCandidates'])->name("dashboard.candidates");
 
     Route::prefix('election')->as('election:')->group(function () {
         Route::get('list', [\App\Http\Controllers\ElectionController::class, 'index'])->name('list');

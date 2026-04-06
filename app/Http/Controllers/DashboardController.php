@@ -5,62 +5,116 @@ namespace App\Http\Controllers;
 use App\Enums\CandidateStatusEnum;
 use App\Enums\VoteStatusEnum;
 use App\Models\Candidate;
+use App\Models\Election;
 use App\Models\GoogleApiKey;
 use App\Models\GoogleCloudSetting;
 use App\Models\GoogleProject;
 use App\Models\User;
 use App\Models\Vote;
-use App\Services\GoogleCloudService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $totalVotes = Vote::whereStatus(VoteStatusEnum::Verified->name)->count();
-        $suspiciousVotes = Vote::whereStatus(VoteStatusEnum::Suspicious->name)->count();
-        $approvedCandidates = Candidate::whereStatus(CandidateStatusEnum::Approved->name)->count();
-        $pendingCandidates = Candidate::whereStatus(CandidateStatusEnum::PendingReview->name)->count();
-        $conversion = $totalVotes * 100 / User::whereNotNull('shopify_user_id')->count();
+        $elections = Election::orderBy('date_start', 'desc')->get();
+
+        $electionId = $request->get('election');
+        if ($electionId) {
+            $selectedElection = $elections->firstWhere('id', $electionId) ?: $elections->first();
+        } else {
+            $selectedElection = $elections->first();
+        }
+
+        if ($selectedElection) {
+            $totalVotes = Vote::whereHas('candidate', function ($q) use ($selectedElection) {
+                $q->where('election_id', $selectedElection->id);
+            })->whereStatus(VoteStatusEnum::Verified->name)->count();
+
+            $suspiciousVotes = Vote::whereHas('candidate', function ($q) use ($selectedElection) {
+                $q->where('election_id', $selectedElection->id);
+            })->whereStatus(VoteStatusEnum::Suspicious->name)->count();
+
+            $approvedCandidates = Candidate::where('election_id', $selectedElection->id)
+                ->whereStatus(CandidateStatusEnum::Approved->name)->count();
+
+            $pendingCandidates = Candidate::where('election_id', $selectedElection->id)
+                ->whereStatus(CandidateStatusEnum::PendingReview->name)->count();
+
+            $usersWithVotes = User::whereHas('votes', function ($q) use ($selectedElection) {
+                $q->whereHas('candidate', function ($q2) use ($selectedElection) {
+                    $q2->where('election_id', $selectedElection->id);
+                });
+            })->whereNotNull('shopify_user_id')->count();
+
+            $conversion = $usersWithVotes > 0 ? $totalVotes * 100 / $usersWithVotes : 0;
+
+            $topCandidates = Candidate::where('election_id', $selectedElection->id)
+                ->withCount(['votes' => function ($q) {
+                    $q->whereStatus(VoteStatusEnum::Verified->name);
+                }])
+                ->orderByDesc('votes_count')
+                ->limit(50)
+                ->get();
+        } else {
+            $totalVotes = 0;
+            $suspiciousVotes = 0;
+            $approvedCandidates = 0;
+            $pendingCandidates = 0;
+            $conversion = 0;
+            $topCandidates = collect();
+        }
 
         return view('dashboard', compact(
+            'elections',
+            'selectedElection',
             'totalVotes',
             'suspiciousVotes',
             'approvedCandidates',
             'pendingCandidates',
-            'conversion'
+            'conversion',
+            'topCandidates'
         ));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Get top candidates via API for AJAX loading
      */
-    public function create()
+    public function getTopCandidates(Request $request)
     {
-        return view("google-cloud.create");
-    }
+        $electionId = $request->input('election_id');
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            "api_key" => "required|string",
-            "org_id" => "required|numeric",
-            "socks5_proxy" => "nullable|string",
-            "billing_account" => "nullable|string",
-            "is_active" => "boolean",
+        if (!$electionId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Election ID is required',
+                'data' => []
+            ], 400);
+        }
+
+        $topCandidates = Candidate::where('election_id', $electionId)
+            ->withCount(['votes' => function ($q) {
+                $q->whereStatus(VoteStatusEnum::Verified->name);
+            }])
+            ->orderByDesc('votes_count')
+            ->limit(50)
+            ->get()
+            ->map(function ($candidate, $index) {
+                return [
+                    'rank' => $index + 1,
+                    'country' => config('election.countries.' . $candidate->country_code, $candidate->country_code),
+                    'name' => $candidate->first_name . ' ' . $candidate->last_name,
+                    'votes' => number_format($candidate->votes_count, 0, '.', ',')
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $topCandidates
         ]);
-
-        GoogleCloudSetting::create($validated);
-
-        return redirect()->route("google-cloud.index")
-            ->with("success", "Settings saved successfully.");
     }
 
     /**
@@ -69,114 +123,5 @@ class DashboardController extends Controller
     public function show(string $id)
     {
         abort(404);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $setting = GoogleCloudSetting::findOrFail($id);
-        return view("google-cloud.edit", compact("setting"));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $validated = $request->validate([
-            "api_key" => "required|string",
-            "socks5_proxy" => "nullable|string",
-            "billing_account" => "nullable|string",
-            "is_active" => "boolean",
-        ]);
-
-        $setting = GoogleCloudSetting::findOrFail($id);
-        $setting->update($validated);
-
-        return redirect()->route("google-cloud.index")
-            ->with("success", "Settings updated successfully.");
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $setting = GoogleCloudSetting::findOrFail($id);
-        $setting->delete();
-
-        return redirect()->route("google-cloud.index")
-            ->with("success", "Settings deleted successfully.");
-    }
-
-    /**
-     * Generate 5 projects and API keys for the given setting.
-     */
-    public function generateProjects(string $id)
-    {
-        $setting = GoogleCloudSetting::findOrFail($id);
-
-        try {
-            $service = new GoogleCloudService($setting->api_key, $setting->ord_id, $setting->socks5_proxy, $setting->billing_account);
-            $results = $service->generateFiveProjects();
-
-            $createdCount = 0;
-            foreach ($results as $result) {
-                if (isset($result["project"]) && isset($result["api_key"])) {
-                    $project = GoogleProject::create([
-                        "setting_id" => $setting->id,
-                        "project_id" => $result["project"]["id"],
-                        "project_number" => $result["project"]["number"],
-                        "name" => $result["project"]["name"],
-                        "state" => $result["project"]["state"] ?? "ACTIVE",
-                        "labels" => [],
-                        "created_at_gcp" => now(),
-                    ]);
-
-                    GoogleApiKey::create([
-                        "project_id" => $project->id,
-                        "key_id" => "generated",
-                        "api_key" => $result["api_key"],
-                        "display_name" => "AI Key",
-                        "restrictions" => [],
-                        "created_at_gcp" => now(),
-                    ]);
-
-                    $createdCount++;
-                }
-            }
-
-            $message = "Successfully created {$createdCount} projects with API keys.";
-            if ($createdCount < 5) {
-                $message .= " Some projects may have failed.";
-            }
-
-            return redirect()->route("google-cloud.index")
-                ->with("success", $message);
-        } catch (\Exception $e) {
-            Log::error("Failed to generate projects: " . $e->getMessage());
-            return redirect()->route("google-cloud.index")
-                ->with("error", "Failed to generate projects: " . $e->getMessage());
-        }
-    }
-
-    /**
-     * Display all projects with their API keys.
-     */
-    public function projectsWithKeys(int $id)
-    {
-        try {
-            $projects = GoogleProject::with(["setting", "apiKeys"])
-                ->orderBy("created_at", "desc")
-                ->where('setting_id', $id)
-                ->get();
-
-            return view("google-cloud.projects-keys", compact("projects"));
-        } catch (\Exception $e) {
-            Log::error("Error in GoogleCloudController::projectsWithKeys: " . $e->getMessage());
-            return response("Error: " . $e->getMessage(), 500);
-        }
     }
 }
