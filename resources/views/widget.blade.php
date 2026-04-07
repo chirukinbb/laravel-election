@@ -313,7 +313,7 @@ if (auth()->user()){
 
                 @auth()
                     <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column">
-                        <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                        {!! NoCaptcha::display() !!}
                         <div class="errors-vote"></div>
                         <div class="field field--full">
                             <label for="ContactSubmit-template--27983535997271__contact-form" class="sr-only">Vote
@@ -503,7 +503,7 @@ if (auth()->user()){
 
                     @auth()
                         <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column">
-                            <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                            {!! NoCaptcha::display() !!}
                             <div class="errors-nominate"></div>
                             <div class="field field--full">
                                 <label for="ContactSubmit-template--27983535997271__contact-form" class="sr-only">Send
