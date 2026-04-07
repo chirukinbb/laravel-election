@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Rules\ElectionRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SuggestCandidateRequest extends FormRequest
@@ -21,6 +22,7 @@ class SuggestCandidateRequest extends FormRequest
             'photo_url' => 'nullable|string|starts_with:https://',
             'reason_for_nomination' => 'required|min:50|max:1000',
             'g-recaptcha-response' => 'required|recaptcha',
+            'election_id' => ['required', 'exists:elections,id', new ElectionRule($this->post('election_id'))],
         ];
     }
 
