@@ -10,7 +10,10 @@ class Vote extends Model
     protected $fillable = [
         'candidate_id',
         'user_id',
-        'status'
+        'status',
+        'ip_hash',
+        'fingerprint_hash',
+        'anti_fraud_score'
     ];
 
     public function user(): BelongsTo

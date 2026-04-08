@@ -140,6 +140,8 @@ class VotingController extends Controller
             'election_id' => $request->post('election_id')
         ]);
 
+        unset($vote['election_id']);
+
         $vote = Vote::create($vote);
 
         return response()->json([

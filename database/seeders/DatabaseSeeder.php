@@ -73,19 +73,25 @@ class DatabaseSeeder extends Seeder
         Vote::create([
             'user_id' => $voters->id,
             'candidate_id' => $candidate->id,
-            'status' => VoteStatusEnum::Pending->name
+            'status' => VoteStatusEnum::Pending->name,
+            'ip_hash' => '33333333333333333333333',
+            'fingerprint_hash' => '3333333333333',
         ]);
 
         Vote::create([
             'user_id' => $voters->id,
             'candidate_id' => $candidate->id,
-            'status' => VoteStatusEnum::Verified->name
+            'status' => VoteStatusEnum::Verified->name,
+            'ip_hash' => '33333333333333333333333',
+            'fingerprint_hash' => '3333333333333',
         ]);
 
         Vote::create([
             'user_id' => $voters->id,
             'candidate_id' => $candidate->id,
-            'status' => VoteStatusEnum::Rejected->name
+            'status' => VoteStatusEnum::Rejected->name,
+            'ip_hash' => '33333333333333333333333',
+            'fingerprint_hash' => '3333333333333',
         ]);
     }
 }

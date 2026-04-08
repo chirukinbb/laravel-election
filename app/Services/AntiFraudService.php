@@ -57,16 +57,12 @@ class AntiFraudService
         $query = Vote::where('ip_hash', $voteData['ip_hash']);
 
         if (!empty($voteData['election_id'])) {
-            $query->where('election_id', $voteData['election_id']);
+            $query->whereRelation('candidate', 'election_id', $voteData['election_id']);
         }
 
         $duplicateCount = $query->count();
 
-        if ($duplicateCount > 0) {
-            return min($this->ipWeight * $duplicateCount, $this->ipWeight * 3);
-        }
-
-        return 0;
+        return $this->ipWeight * $duplicateCount;
     }
 
     /**
@@ -79,14 +75,10 @@ class AntiFraudService
         }
 
         $duplicateCount = Vote::where('fingerprint_hash', $voteData['fingerprint_hash'])
-            ->where('election_id', $voteData['election_id'])
+            ->whereRelation('candidate', 'election_id', $voteData['election_id'])
             ->count();
 
-        if ($duplicateCount > 0) {
-            return min($this->fpWeight * $duplicateCount, $this->fpWeight * 3);
-        }
-
-        return 0;
+        return $this->fpWeight * $duplicateCount;
     }
 
     /**
@@ -142,11 +134,12 @@ class AntiFraudService
      */
     public function determineStatus(int $score): string
     {
-        if ($score >= $this->approveLimit) {
-            return VoteStatusEnum::Suspicious->name;
-        }
         if ($score >= $this->rejectLimit) {
             return VoteStatusEnum::Rejected->name;
+        }
+
+        if ($score >= $this->approveLimit) {
+            return VoteStatusEnum::Suspicious->name;
         }
 
         return VoteStatusEnum::Pending->name;

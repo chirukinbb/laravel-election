@@ -12,7 +12,7 @@ class ModerationController extends Controller
     public function index()
     {
         $candidates = Candidate::where('status', CandidateStatusEnum::PendingReview->name)->get();
-        $votes = Vote::where('status', VoteStatusEnum::Pending->name)->get();
+        $votes = Vote::where('status', '!=', VoteStatusEnum::Verified->name)->get();
 
         return view('moderation', compact('candidates', 'votes'));
     }
