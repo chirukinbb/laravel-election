@@ -79,7 +79,7 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
         $data->push([
             $item->candidate->first_name.' '.$item->candidate->last_name,
             $item->candidate->election->name,
-            3,
+            $item->anti_fraud_score,
             '<nobr>'.sprintf($btnApprove,$item->id).sprintf($btnFlagSuspicious,$item->id).
             sprintf($btnReject,$item->id).'</nobr>'
 ]);
@@ -207,7 +207,7 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 $.ajax({
                     url: '{{route('admin.vote.reject')}}',
                     type: 'POST',
-                    data: {vote_id, reason},
+                    data: {vote_id},
                     headers: {
                         'Authorization': 'Bearer ' + apiToken
                     },

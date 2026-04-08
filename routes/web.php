@@ -47,6 +47,7 @@ Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums
     Route::put('settings', [\App\Http\Controllers\SettingsController::class, 'update'])->name('settings.update');
 
     Route::get('logs', [\App\Http\Controllers\AntiFraudController::class, 'index'])->name('logs');
+    Route::get('clean-logs', [\App\Http\Controllers\AntiFraudController::class, 'clean'])->name('clean');
 });
 
 Route::get('widget/{election:id}', function (\App\Models\Election $election) {

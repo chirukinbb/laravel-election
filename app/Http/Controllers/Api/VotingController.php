@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\CandidateStatusEnum;
+use App\Enums\SettingKeyEnum;
 use App\Enums\VoteStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SuggestCandidateRequest;
@@ -12,6 +13,7 @@ use App\Http\Resources\CandidateCollection;
 use App\Http\Resources\CandidateResource;
 use App\Models\Candidate;
 use App\Models\Vote;
+use App\Services\AntiFraudService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -101,10 +103,44 @@ class VotingController extends Controller
     public function vote(VoteRequest $request): JsonResponse
     {
         $user = $request->user();
-        $vote = Vote::create(array_merge([
+
+        // Get IP address and hash it
+        $ipAddress = $request->ip();
+        $ipHash = hash('sha256', $ipAddress);
+
+        // Get browser fingerprint from request headers and hash it
+        $fingerprintData = [
+            'user_agent' => $request->userAgent(),
+            'accept_language' => $request->header('Accept-Language'),
+            'accept_encoding' => $request->header('Accept-Encoding'),
+            'accept' => $request->header('Accept'),
+            'connection' => $request->header('Connection'),
+            'sec_ch_ua' => $request->header('sec-ch-ua'),
+            'sec_ch_ua_mobile' => $request->header('sec-ch-ua-mobile'),
+            'sec_ch_ua_platform' => $request->header('sec-ch-ua-platform'),
+        ];
+        $fingerprintHash = hash('sha256', json_encode($fingerprintData));
+
+        $antiFraudService = new AntiFraudService(
+            ipWeight: (int)$this->settingsService->get(SettingKeyEnum::ScoreIP),
+            fpWeight: (int)$this->settingsService->get(SettingKeyEnum::ScoreFP),
+            ipFreqWeight: (int)$this->settingsService->get(SettingKeyEnum::RateLimitIP),
+            fpFreqWeight: (int)$this->settingsService->get(SettingKeyEnum::RateLimitFP),
+            approveLimit: (int)$this->settingsService->get(SettingKeyEnum::VoteApproveLimit),
+            rejectLimit: (int)$this->settingsService->get(SettingKeyEnum::VoteRejectLimit)
+        );
+
+        // Analyze vote for fraud
+        $vote = $antiFraudService->analyzeVote([
+            'candidate_id' => $request->input('candidate_id'),
             'user_id' => $user->id,
             'status' => VoteStatusEnum::Pending->name,
-        ], $request->only('candidate_id')));
+            'ip_hash' => $ipHash,
+            'fingerprint_hash' => $fingerprintHash,
+            'election_id' => $request->post('election_id')
+        ]);
+
+        $vote = Vote::create($vote);
 
         return response()->json([
             'success' => true,

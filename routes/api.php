@@ -30,4 +30,10 @@ Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->na
         Route::post('/vote/flag', [\App\Http\Controllers\Api\AdminController::class, 'flagVote'])->name('admin.vote.flag');
         Route::post('/vote/approve', [\App\Http\Controllers\Api\AdminController::class, 'approveVote'])->name('admin.vote.approve');
         Route::post('/vote/reject', [\App\Http\Controllers\Api\AdminController::class, 'rejectVote'])->name('admin.vote.reject');
+
+        // Anti-fraud routes
+        Route::get('/vote/fraud-analysis', [\App\Http\Controllers\Api\AdminController::class, 'getVoteFraudAnalysis'])->name('admin.vote.fraud-analysis');
+        Route::post('/vote/reanalyze-fraud', [\App\Http\Controllers\Api\AdminController::class, 'reanalyzeVoteFraud'])->name('admin.vote.reanalyze-fraud');
+        Route::get('/votes/suspicious-stats', [\App\Http\Controllers\Api\AdminController::class, 'getSuspiciousVotesStats'])->name('admin.votes.suspicious-stats');
+        Route::get('/votes/suspicious', [\App\Http\Controllers\Api\AdminController::class, 'getSuspiciousVotes'])->name('admin.votes.suspicious');
     });

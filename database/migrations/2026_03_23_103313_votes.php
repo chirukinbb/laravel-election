@@ -14,6 +14,9 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->enum('status', collect(\App\Enums\VoteStatusEnum::cases())->map(fn($case) => $case->name)->toArray())
                 ->default(\App\Enums\VoteStatusEnum::Pending->name);
+            $table->string('ip_hash');
+            $table->string('fingerprint_hash');
+            $table->integer('anti_fraud_score')->default(0);
 
             $table->timestamps();
         });

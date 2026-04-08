@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\CandidateStatusEnum;
+use App\Enums\SettingKeyEnum;
 use App\Enums\VoteStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ApproveCandidateRequest;
@@ -13,11 +14,28 @@ use App\Http\Requests\Api\RejectCandidateRequest;
 use App\Http\Requests\Api\RejectVoteRequest;
 use App\Models\Candidate;
 use App\Models\Vote;
+use App\Services\AntiFraudService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    /**
+     * Create AntiFraudService instance with current settings
+     */
+    private function createAntiFraudService(): AntiFraudService
+    {
+        return new AntiFraudService(
+            ipWeight: (int)$this->settingsService->get(SettingKeyEnum::ScoreIP),
+            fpWeight: (int)$this->settingsService->get(SettingKeyEnum::ScoreFP),
+            ipFreqWeight: (int)$this->settingsService->get(SettingKeyEnum::RateLimitIP),
+            fpFreqWeight: (int)$this->settingsService->get(SettingKeyEnum::RateLimitFP),
+            approveLimit: (int)$this->settingsService->get(SettingKeyEnum::VoteApproveLimit),
+            rejectLimit: (int)$this->settingsService->get(SettingKeyEnum::VoteRejectLimit)
+        );
+    }
+
     /**
      * Approve a candidate
      */
@@ -214,6 +232,122 @@ class AdminController extends Controller
             'data' => [
                 'vote_id' => $vote->id,
                 'status' => $vote->status,
+            ],
+        ]);
+    }
+
+    /**
+     * Get fraud analysis for a specific vote
+     */
+    public function getVoteFraudAnalysis(Request $request): JsonResponse
+    {
+        $request->validate([
+            'vote_id' => 'required|exists:votes,id',
+        ]);
+
+        $vote = Vote::with(['user', 'candidate'])->find($request->vote_id);
+
+        if (!$vote) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vote not found',
+            ], 404);
+        }
+
+        $antiFraudService = $this->createAntiFraudService();
+        $analysis = $antiFraudService->getAnalysisReport($vote);
+
+        return response()->json([
+            'success' => true,
+            'data' => $analysis,
+        ]);
+    }
+
+    /**
+     * Re-analyze fraud score for a specific vote
+     */
+    public function reanalyzeVoteFraud(Request $request): JsonResponse
+    {
+        $request->validate([
+            'vote_id' => 'required|exists:votes,id',
+        ]);
+
+        $vote = Vote::find($request->vote_id);
+
+        if (!$vote) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vote not found',
+            ], 404);
+        }
+
+        $antiFraudService = $this->createAntiFraudService();
+        $vote = $antiFraudService->analyzeVote($vote);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Fraud score recalculated',
+            'data' => [
+                'vote_id' => $vote->id,
+                'anti_fraud_score' => $vote->anti_fraud_score,
+                'status' => $vote->status,
+            ],
+        ]);
+    }
+
+    /**
+     * Get suspicious votes statistics
+     */
+    public function getSuspiciousVotesStats(): JsonResponse
+    {
+        $antiFraudService = $this->createAntiFraudService();
+        $stats = $antiFraudService->getSuspiciousVotesStats();
+
+        return response()->json([
+            'success' => true,
+            'data' => $stats,
+        ]);
+    }
+
+    /**
+     * Get list of suspicious votes with pagination
+     */
+    public function getSuspiciousVotes(Request $request): JsonResponse
+    {
+        $request->validate([
+            'per_page' => 'integer|min:1|max:100',
+            'min_score' => 'integer|min:0|max:100',
+        ]);
+
+        $perPage = $request->input('per_page', 20);
+        $minScore = $request->input('min_score', 50);
+
+        $suspiciousVotes = Vote::with(['user', 'candidate'])
+            ->where('anti_fraud_score', '>=', $minScore)
+            ->orderByDesc('anti_fraud_score')
+            ->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $suspiciousVotes->map(function ($vote) {
+                return [
+                    'id' => $vote->id,
+                    'user_id' => $vote->user_id,
+                    'candidate_id' => $vote->candidate_id,
+                    'candidate_name' => $vote->candidate ?
+                        $vote->candidate->first_name . ' ' . $vote->candidate->last_name : null,
+                    'status' => $vote->status,
+                    'anti_fraud_score' => $vote->anti_fraud_score,
+                    'ip_hash' => $vote->ip_hash,
+                    'fingerprint_hash' => $vote->fingerprint_hash,
+                    'created_at' => $vote->created_at,
+                ];
+            }),
+            'pagination' => [
+                'current_page' => $suspiciousVotes->currentPage(),
+                'per_page' => $suspiciousVotes->perPage(),
+                'total' => $suspiciousVotes->total(),
+                'last_page' => $suspiciousVotes->lastPage(),
             ],
         ]);
     }

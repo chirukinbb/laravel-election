@@ -3,17 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SettingKeyEnum;
-use App\Services\SettingsService;
 use Illuminate\Http\Request;
 
 class SettingsController extends Controller
 {
-    public function __construct(
-        private SettingsService $settingsService
-    )
-    {
-    }
-
     public function index()
     {
         $settings = [];
