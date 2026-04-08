@@ -269,6 +269,54 @@ if (auth()->user()){
         td:has(input:checked) .radio-box .svg2 {
             display: none;
         }
+
+
+        table#candidates tr,
+        table#candidates td,
+        table#candidates tbody,
+        table#candidates thead,
+        table#candidates th {
+            border: none !important;
+            background-color: #fff;
+        }
+
+        table td,
+        table th {
+            padding: .5625rem 0 !important;
+        }
+
+        table {
+            box-shadow: none !important;
+        }
+
+        .textarea.roww {
+            padding-block-end: var(--sp-4);
+            padding-block-start: var(--sp-4);
+        }
+
+        table#candidates td:not(:first-child,:last-child) > div,
+        table#candidates th:not(:first-child,:last-child) > div {
+            border-radius: 0 !important;
+        }
+
+        table#candidates th:after,
+        table#candidates th:before {
+            bottom: 1.2rem;
+        }
+
+        table#candidates td:first-child > div,
+        table#candidates th:first-child > div {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+
+        table#candidates td:last-child > div,
+        table#candidates th:last-child > div {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+
+
     </style>
     <!-- 2. Подключаем скрипт -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
@@ -799,16 +847,19 @@ if (auth()->user()){
             $('#candidates_filter').addClass('float-right')
             $('#candidates th').eq(0).html('<span class="d-none d-sm-inline">Position</span><span class="d-inline-block d-sm-none">#</span>')
             $('#candidates tr').each((i, el) => {
-                const country = $(el).find('td').eq(1).text().trim();
+                if ($(el).find('td').eq(1).find('span').length < 2) {
+                    const country = $(el).find('td').eq(1).text().trim();
 
-                const code = Object.keys(countries).find(
-                    key => countries[key] === country
-                ) || '';
+                    const code = Object.keys(countries).find(
+                        key => countries[key] === country
+                    ) || '';
 
-                $(el).find('td').eq(1).html(
-                    '<span class="d-none d-sm-inline">' + country + '</span>' +
-                    '<span class="d-inline-block d-sm-none">' + code.toUpperCase() + '</span>'
-                );
+                    $(el).find('td').eq(1).html(
+                        '<span class="d-none d-sm-inline">' + country + '</span>' +
+                        '<span class="d-inline-block d-sm-none">' + code.toUpperCase() + '</span>'
+                    );
+                }
+
             });
             const classes = ['d-none d-sm-block col-5', 'col-12 col-sm-7']
             $('#candidates_wrapper .row:last-child > div').each((i, el) => {
@@ -817,11 +868,16 @@ if (auth()->user()){
                     .addClass(classes[i]);
             });
             $('#candidates_paginate').addClass('d-flex justify-content-center justify-content-sm-end')
-            $('#candidates_paginate a').each((i, a) => {
-                $(a).addClass('button mx-1')
-                if ($(a).parent().hasClass('active')) {
-                    $(a).removeClass('page-link')
-                    $(a).addClass('bg-black')
+            // $('#candidates_paginate a').each((i, a) => {
+            //     $(a).addClass('button mx-1')
+            //     if ($(a).parent().hasClass('active')) {
+            //         $(a).removeClass('page-link')
+            //         $(a).addClass('bg-black')
+            //     }
+            // })
+            $('#candidates td,#candidates th').each((i, cell) => {
+                if (!$($(cell).html()).hasClass('textarea')) {
+                    $(cell).html('<div class="textarea roww">' + $(cell).html() + '</div>')
                 }
             })
         });
