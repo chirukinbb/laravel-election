@@ -24,9 +24,7 @@
                     @php
                         $config = [
                             'format' => 'YYYY-MM-DD',
-                            'dayViewHeaderFormat' => 'MMM YYYY',
-                            'minDate' => "js:moment().startOf('month')",
-                            'maxDate' => "js:moment().endOf('month')",
+                            'dayViewHeaderFormat' => 'MMM YYYY','minDate' => "js:moment().startOf('day')",
                             'daysOfWeekDisabled' => [0, 6],
                         ];
                     @endphp
@@ -40,7 +38,7 @@
                     </x-adminlte-input-date>
                 </div>
                 <div class="col-6">
-                    <x-adminlte-input-date name="date_end" label="Start Date"
+                    <x-adminlte-input-date name="date_end" label="End Date"
                                            :config="$config" placeholder="Choose a day...">
                         <x-slot name="appendSlot">
                             <div class="input-group-text bg-dark">

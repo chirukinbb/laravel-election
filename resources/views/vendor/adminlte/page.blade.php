@@ -50,9 +50,36 @@
         @endif
 
     </div>
+
+    @if(session('success'))
+        <div aria-live="polite" aria-atomic="true"
+             style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+
+            <div class="toast" id="successToast" role="alert"
+                 data-delay="3000" data-autohide="true">
+
+                <div class="toast-header">
+                    <strong class="mr-auto text-success">SUCCESS</strong>
+                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="toast-body">
+                    {{ session('success') }}
+                </div>
+
+            </div>
+        </div>
+    @endif
 @stop
 
 @section('adminlte_js')
     @stack('js')
     @yield('js')
+    <script>
+        $(document).ready(function () {
+            $('#successToast').toast('show');
+        });
+    </script>
 @stop

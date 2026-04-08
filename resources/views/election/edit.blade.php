@@ -2,10 +2,10 @@
 
 @section('plugins.TempusDominusBs4', true)
 
-@section('title','Create Election')
+@section('title','Edit Election')
 
 @section('content_header')
-    <h2>Create Election</h2>
+    <h2>Edit Election</h2>
 @endsection
 
 @section('content')
@@ -42,7 +42,7 @@
                     </x-adminlte-input-date>
                 </div>
                 <div class="col-6">
-                    <x-adminlte-input-date name="date_end" label="Start Date"
+                    <x-adminlte-input-date name="date_end" label="End Date"
                                            :config="$config" placeholder="Choose a day..."
                                            value="{{$election->date_end}}">
                         <x-slot name="appendSlot">

@@ -28,7 +28,7 @@ Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums
 
         Route::post('store', [\App\Http\Controllers\ElectionController::class, 'store'])->name('store');
         Route::patch('update/{election:id}', [\App\Http\Controllers\ElectionController::class, 'update'])->name('update');
-        Route::delete('delete/{election:id}', [\App\Http\Controllers\ElectionController::class, 'delete'])->name('delete');
+        Route::get('delete/{election:id}', [\App\Http\Controllers\ElectionController::class, 'delete'])->name('delete');
 
         Route::prefix('{election:id}/candidate')->as('candidate:')->group(function () {
             Route::get('list', [\App\Http\Controllers\CandidateController::class, 'index'])->name('list');
@@ -37,7 +37,7 @@ Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums
 
             Route::post('store', [\App\Http\Controllers\CandidateController::class, 'store'])->name('store');
             Route::patch('update/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'update'])->name('update');
-            Route::delete('delete/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'delete'])->name('delete');
+            Route::get('delete/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'delete'])->name('delete');
         });
     });
 
