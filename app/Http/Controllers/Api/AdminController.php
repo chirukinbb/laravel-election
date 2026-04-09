@@ -8,6 +8,7 @@ use App\Enums\VoteStatusEnum;
 use App\Events\CandidateApproved;
 use App\Events\CandidateMerged;
 use App\Events\CandidateRejected;
+use App\Events\UpdateCandidates;
 use App\Events\VoteApproved;
 use App\Events\VoteFlagged;
 use App\Events\VoteRejected;
@@ -64,6 +65,9 @@ class AdminController extends Controller
 
         // Broadcast the candidate approval event
         event(new CandidateApproved($candidate));
+
+        // Broadcast update candidates for widget
+        event(new UpdateCandidates($candidate->election));
 
         return response()->json([
             'success' => true,
@@ -141,6 +145,7 @@ class AdminController extends Controller
 
             // Broadcast the candidate merge event
             event(new CandidateMerged($sourceCandidate, $targetCandidate));
+            event(new UpdateCandidates($targetCandidate->election));
 
             return response()->json([
                 'success' => true,
@@ -201,7 +206,7 @@ class AdminController extends Controller
     {
         $validated = $request->validated();
 
-        $vote = Vote::find($validated['vote_id']);
+        $vote = Vote::with(['candidate.election'])->find($validated['vote_id']);
 
         if (!$vote) {
             return response()->json([
@@ -215,7 +220,10 @@ class AdminController extends Controller
         ]);
 
         // Broadcast the vote approval event
-        broadcast(new VoteApproved($vote));
+        event(new VoteApproved($vote));
+
+        // Broadcast update candidates for widget
+        event(new UpdateCandidates($vote->candidate->election));
 
         return response()->json([
             'success' => true,

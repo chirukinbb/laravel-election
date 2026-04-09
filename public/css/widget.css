@@ -16037,13 +16037,12 @@ button.dropdown-toggle::after {
 .textarea {
     line-height: 1.25 !important;
     font-family: 'Inter', sans-serif !important;
-
+}
 
 /* квадрат */
 .radio-box {
     width: 25px;
     aspect-ratio: 1;
-    border: 1px solid #444;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -16051,36 +16050,18 @@ button.dropdown-toggle::after {
 
 /* иконка скрыта по умолчанию */
 .radio-box svg {
-    width: 16px;
-    height: 16px;
-    opacity: 0;
-}
-
-
-/* квадрат */
-.radio-box {
     width: 25px;
-    aspect-ratio: 1;
-    border: 1px solid #444;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    height: 25px;
 }
 
-/* иконка скрыта по умолчанию */
-.radio-box svg {
-    width: 16px;
-    height: 16px;
-    opacity: 0;
+.radio-box .svg1 {
+    display: none;
 }
 
-/* ✅ когда активен */
-.radio input:checked + .radio-box {
-    border: none;
+td:has(input:checked) .radio-box .svg1 {
+    display: block;
 }
 
-/* показываем иконку */
-.radio input:checked + .radio-box svg {
-    opacity: 1;
+td:has(input:checked) .radio-box .svg2 {
+    display: none;
 }
-

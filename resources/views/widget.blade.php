@@ -243,33 +243,6 @@ if (auth()->user()){
             letter-spacing: -0.03em; /* Як в оригіналі для щільності заголовків */
         }
 
-        /* квадрат */
-        .radio-box {
-            width: 25px;
-            aspect-ratio: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* иконка скрыта по умолчанию */
-        .radio-box svg {
-            width: 25px;
-            height: 25px;
-        }
-
-        .radio-box .svg1 {
-            display: none;
-        }
-
-        td:has(input:checked) .radio-box .svg1 {
-            display: block;
-        }
-
-        td:has(input:checked) .radio-box .svg2 {
-            display: none;
-        }
-
 
         table#candidates tr,
         table#candidates td,
@@ -573,12 +546,74 @@ if (auth()->user()){
 
 @section('adminlte_js')
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://unpkg.com/laravel-echo/dist/echo.iife.js"></script>
+    <script>
+        @auth()
+        const apiToken = '{{auth()->user()->createToken(\App\Enums\RoleEnum::USER->name)->plainTextToken}}';
+        @endauth
+
+        const updateCandidatesTable = (candidates) => {
+            // Sort by votes_count descending
+            candidates.sort((a, b) => (b.votes_count || 0) - (a.votes_count || 0));
+
+            // Calculate position (rank) based on votes
+            candidates.forEach((candidate, index) => {
+                candidate.position = index + 1;
+            });
+
+            // Clear existing rows and add new ones
+            const table = $('#candidates').DataTable();
+            table.clear();
+
+            candidates.forEach(function (candidate) {
+                const position = '#' + candidate.position;
+                const country = candidate.country || '-';
+                const name = candidate.name || '-';
+                const voteCell = `<span class="opacity-0">1</span>
+<div class="radio-box position-absolute">
+<svg width="25px" height="25px" viewBox="0 0 16 16" version="1.1" class="svg1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
+<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+<g id="SVGRepo_iconCarrier">
+<path fill="#444" d="M14 6.2v7.8h-12v-12h10.5l1-1h-12.5v14h14v-9.8z"></path>
+<path fill="#444" d="M7.9 10.9l-4.2-4.2 1.5-1.4 2.7 2.8 6.7-6.7 1.4 1.4z"></path> </g></svg>
+
+<svg width="25px" height="25px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="svg2">
+  <rect x="2" y="2" width="12" height="12"
+        fill="none"
+        stroke="#444"
+        stroke-width="1.2"/>
+</svg>
+</div><input type="radio" class="d-none" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}">`;
+                const votes = candidate.votes_count
+                let row = [position, country, name, votes.toLocaleString(), voteCell]
+
+                @auth()
+                row.push(voteCell)
+                @endauth
+
+                table.row.add(row);
+            });
+
+            table.draw();
+        }
+
+        window.Echo = new Echo.default({
+            broadcaster: 'reverb',
+            key: '{{ env("VITE_REVERB_APP_KEY") }}',
+            wsHost: window.location.hostname,
+            wsPort: 8080,
+            wssPort: 8080,
+            forceTLS: false,
+            enabledTransports: ['ws', 'wss'],
+        });
+    </script>
     @stack('js')
     @yield('js')
 
     @auth()
         <script>
-            const apiToken = '{{auth()->user()->createToken(\App\Enums\RoleEnum::USER->name)->plainTextToken}}';
             document.getElementById('home').addEventListener('submit', function (e) {
                 e.preventDefault();
 
@@ -784,49 +819,7 @@ if (auth()->user()){
                 },
                 success: function (response) {
                     let candidates = response.data || [];
-
-                    // Sort by votes_count descending
-                    candidates.sort((a, b) => (b.votes_count || 0) - (a.votes_count || 0));
-
-                    // Calculate position (rank) based on votes
-                    candidates.forEach((candidate, index) => {
-                        candidate.position = index + 1;
-                    });
-
-                    // Clear existing rows and add new ones
-                    const table = $('#candidates').DataTable();
-                    table.clear();
-
-                    candidates.forEach(function (candidate) {
-                        const position = '#' + candidate.position;
-                        const country = candidate.country || '-';
-                        const name = candidate.name || '-';
-                        const voteCell = `<div class="radio-box">
-<svg width="25px" height="25px" viewBox="0 0 16 16" version="1.1" class="svg1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
-<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-<g id="SVGRepo_iconCarrier">
-<path fill="#444" d="M14 6.2v7.8h-12v-12h10.5l1-1h-12.5v14h14v-9.8z"></path>
-<path fill="#444" d="M7.9 10.9l-4.2-4.2 1.5-1.4 2.7 2.8 6.7-6.7 1.4 1.4z"></path> </g></svg>
-
-<svg width="25px" height="25px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="svg2">
-  <rect x="2" y="2" width="12" height="12"
-        fill="none"
-        stroke="#444"
-        stroke-width="1.2"/>
-</svg>
-</div><input type="radio" class="d-none" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}">`;
-                        const votes = candidate.votes_count
-                        let row = [position, country, name, votes.toLocaleString(), voteCell]
-
-                        @auth()
-                        row.push(voteCell)
-                        @endauth
-
-                        table.row.add(row);
-                    });
-
-                    table.draw();
+                    updateCandidatesTable(candidates)
                 },
                 error: function (xhr) {
                     console.error('Failed to load candidates:', xhr);
@@ -1006,7 +999,7 @@ if (auth()->user()){
         $(document).ready(function () {
 // Функция отправки высоты
             function sendHeight() {
-                window.parent.postMessage({height: $('body').outerHeight}, '*');
+                window.parent.postMessage({height: $('body').outerHeight()}, '*');
             }
 
 // Вызываем при загрузке и при изменении контента
@@ -1016,6 +1009,30 @@ if (auth()->user()){
 // Если контент динамический (например, список товаров подгрузился)
             const observer = new ResizeObserver(sendHeight);
             observer.observe(document.body);
+        });
+    </script>
+    <script>
+        // Real-time candidate updates via Laravel Reverb
+        $(document).ready(function () {
+            // Initialize Echo if not already available
+            if (typeof window.Echo === 'undefined') {
+                console.warn('Laravel Echo is not initialized - real-time updates disabled');
+                return;
+            }
+
+            // Listen for candidate updates on the widget channel
+            window.Echo.channel('widget')
+                .listen('.candidate.update', (data) => {
+                    console.log('Candidates updated:', data);
+
+                    // Rebuild the candidates table with new data
+                    updateCandidatesTable(data);
+
+                    // Send updated height to parent
+                    setTimeout(() => {
+                        window.parent.postMessage({height: $('body').outerHeight()}, '*');
+                    }, 100);
+                });
         });
     </script>
 @stop

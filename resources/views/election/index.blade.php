@@ -15,6 +15,7 @@
 
 @php
     $heads = [
+        ['label' => 'ID', 'width' => 5],
         'Name',
         ['label' => 'Start at', 'width' => 20],
         ['label' => 'End at', 'width' => 20],
@@ -38,6 +39,7 @@ $btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 " title="Candidat
 
     foreach ($elections as $item) {
         $data->push([
+            $item->id,
             $item->name,
             $item->date_start,
             $item->date_end,
