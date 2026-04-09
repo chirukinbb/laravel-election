@@ -5,6 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Enums\CandidateStatusEnum;
 use App\Enums\SettingKeyEnum;
 use App\Enums\VoteStatusEnum;
+use App\Events\CandidateApproved;
+use App\Events\CandidateMerged;
+use App\Events\CandidateRejected;
+use App\Events\VoteApproved;
+use App\Events\VoteFlagged;
+use App\Events\VoteRejected;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ApproveCandidateRequest;
 use App\Http\Requests\Api\ApproveVoteRequest;
@@ -56,6 +62,9 @@ class AdminController extends Controller
             'status' => CandidateStatusEnum::Approved->name,
         ]);
 
+        // Broadcast the candidate approval event
+        event(new CandidateApproved($candidate));
+
         return response()->json([
             'success' => true,
             'message' => 'Candidate approved successfully',
@@ -85,6 +94,9 @@ class AdminController extends Controller
         $candidate->update([
             'status' => CandidateStatusEnum::Rejected->name,
         ]);
+
+        // Broadcast the candidate rejection event
+        event(new CandidateRejected($candidate));
 
         return response()->json([
             'success' => true,
@@ -127,6 +139,9 @@ class AdminController extends Controller
 
             DB::commit();
 
+            // Broadcast the candidate merge event
+            event(new CandidateMerged($sourceCandidate, $targetCandidate));
+
             return response()->json([
                 'success' => true,
                 'message' => 'Candidates merged successfully',
@@ -166,6 +181,9 @@ class AdminController extends Controller
             'status' => VoteStatusEnum::Suspicious->name,
         ]);
 
+        // Broadcast the vote flagged event
+        event(new VoteFlagged($vote));
+
         return response()->json([
             'success' => true,
             'message' => 'Vote flagged as suspicious',
@@ -196,6 +214,9 @@ class AdminController extends Controller
             'status' => VoteStatusEnum::Verified->name,
         ]);
 
+        // Broadcast the vote approval event
+        broadcast(new VoteApproved($vote));
+
         return response()->json([
             'success' => true,
             'message' => 'Vote approved successfully',
@@ -225,6 +246,9 @@ class AdminController extends Controller
         $vote->update([
             'status' => VoteStatusEnum::Rejected->name,
         ]);
+
+        // Broadcast the vote rejection event
+        event(new VoteRejected($vote));
 
         return response()->json([
             'success' => true,

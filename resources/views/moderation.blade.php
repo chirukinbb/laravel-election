@@ -139,6 +139,19 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
 @endsection
 
 @section('js')
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://unpkg.com/laravel-echo/dist/echo.iife.js"></script>
+    <script>
+        window.Echo = new Echo.default({
+            broadcaster: 'reverb',
+            key: '{{ env("VITE_REVERB_APP_KEY") }}',
+            wsHost: window.location.hostname,
+            wsPort: 8080,
+            wssPort: 8080,
+            forceTLS: false,
+            enabledTransports: ['ws', 'wss'],
+        });
+    </script>
     <script>
         const apiToken = '{{auth()->user()->createToken(\App\Enums\RoleEnum::ADMIN->name)->plainTextToken}}';
 
@@ -153,18 +166,12 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                     data: {candidate_id},
                     headers: {
                         'Authorization': 'Bearer ' + apiToken
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            row.hide()
-                        }
                     }
                 });
             });
 
             // Candidate reject
             $('button.reject-candidate').on('click', function () {
-                const row = $(this).closest('tr')
                 const candidate_id = $(this).data('id');
                 $.ajax({
                     url: '{{route('admin.candidate.reject')}}',
@@ -172,37 +179,25 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                     data: {candidate_id},
                     headers: {
                         'Authorization': 'Bearer ' + apiToken
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            row.hide()
-                        }
                     }
                 });
             });
 
             // Vote approve
             $('button.approve-vote').on('click', function () {
-                const row = $(this).closest('tr')
                 const vote_id = $(this).data('id');
                 $.ajax({
-                    url: '{{route('admin.vote.reject')}}',
+                    url: '{{route('admin.vote.approve')}}',
                     type: 'POST',
                     data: {vote_id},
                     headers: {
                         'Authorization': 'Bearer ' + apiToken
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            row.hide()
-                        }
                     }
                 });
             });
 
             // Vote reject
             $('button.reject-vote').on('click', function () {
-                const row = $(this).closest('tr')
                 const vote_id = $(this).data('id');
                 $.ajax({
                     url: '{{route('admin.vote.reject')}}',
@@ -210,18 +205,12 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                     data: {vote_id},
                     headers: {
                         'Authorization': 'Bearer ' + apiToken
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            row.hide()
-                        }
                     }
                 });
             });
 
             // Vote flag suspicious
             $('button.flag-suspicious-candidate').on('click', function () {
-                const row = $(this).closest('tr')
                 const vote_id = $(this).data('id');
                 $.ajax({
                     url: '{{route('admin.vote.flag')}}',
@@ -229,11 +218,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                     data: {vote_id},
                     headers: {
                         'Authorization': 'Bearer ' + apiToken
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            row.hide()
-                        }
                     }
                 });
             });
@@ -246,7 +230,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
 
             $('button.merge-candidate').on('click', function () {
                 currentMergeCandidateId = $(this).data('id');
-                const row = $(this).closest('tr')
 
                 // Clear existing options
                 $('#merge_with').empty();
@@ -292,15 +275,173 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                     },
                     headers: {
                         'Authorization': 'Bearer ' + apiToken
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            $('#modalMin').modal('hide');
-                            row.hide()
-                        }
                     }
                 });
             });
         });
     </script>
+    <script>
+        // Real-time updates via Laravel Reverb
+        $(document).ready(function () {
+            // Initialize Echo if not already available
+            if (typeof window.Echo === 'undefined') {
+                console.error('Laravel Echo is not initialized');
+                return;
+            }
+
+            // Listen for vote approval events
+            window.Echo.channel('admin')
+                .listen('.vote.approved', (data) => {
+                    console.log('Vote approved:', data);
+
+                    // Find and remove the vote row from the table
+                    const voteRow = $(`button.approve-vote[data-id="${data.vote_id}"]`).closest('tr');
+                    if (voteRow.length) {
+                        voteRow.css('background-color', '#d4edda');
+                        voteRow.fadeOut(1000, function () {
+                            $(this).remove();
+
+                            // Update the DataTable if it exists
+                            if ($.fn.DataTable.isDataTable('#votes')) {
+                                $('#votes').DataTable().draw();
+                            }
+                        });
+
+                        showToast(`Vote for ${data.candidate_name} was approved`, 'success');
+                    }
+                })
+                .listen('.vote.rejected', (data) => {
+                    console.log('Vote rejected:', data);
+
+                    const voteRow = $(`button.approve-vote[data-id="${data.vote_id}"]`).closest('tr');
+                    if (voteRow.length) {
+                        voteRow.css('background-color', '#f8d7da');
+                        voteRow.fadeOut(1000, function () {
+                            $(this).remove();
+
+                            if ($.fn.DataTable.isDataTable('#votes')) {
+                                $('#votes').DataTable().draw();
+                            }
+                        });
+
+                        showToast(`Vote for ${data.candidate_name} was rejected`, 'error');
+                    }
+                })
+                .listen('.vote.flagged', (data) => {
+                    console.log('Vote flagged:', data);
+
+                    const voteRow = $(`button.approve-vote[data-id="${data.vote_id}"]`).closest('tr');
+                    if (voteRow.length) {
+                        voteRow.css('background-color', '#fff3cd');
+                        voteRow.fadeOut(1000, function () {
+                            $(this).remove();
+
+                            if ($.fn.DataTable.isDataTable('#votes')) {
+                                $('#votes').DataTable().draw();
+                            }
+                        });
+
+                        showToast(`Vote for ${data.candidate_name} was flagged as suspicious`, 'warning');
+                    }
+                })
+                .listen('.candidate.approved', (data) => {
+                    console.log('Candidate approved:', data);
+
+                    const candidateRow = $(`button.approve-candidate[data-id="${data.candidate_id}"]`).closest('tr');
+                    if (candidateRow.length) {
+                        candidateRow.css('background-color', '#d4edda');
+                        candidateRow.fadeOut(1000, function () {
+                            $(this).remove();
+
+                            if ($.fn.DataTable.isDataTable('#candidates')) {
+                                $('#candidates').DataTable().draw();
+                            }
+                        });
+
+                        showToast(`Candidate ${data.candidate_name} was approved`, 'success');
+                    }
+                })
+                .listen('.candidate.rejected', (data) => {
+                    console.log('Candidate rejected:', data);
+
+                    const candidateRow = $(`button.approve-candidate[data-id="${data.candidate_id}"]`).closest('tr');
+                    if (candidateRow.length) {
+                        candidateRow.css('background-color', '#f8d7da');
+                        candidateRow.fadeOut(1000, function () {
+                            $(this).remove();
+
+                            if ($.fn.DataTable.isDataTable('#candidates')) {
+                                $('#candidates').DataTable().draw();
+                            }
+                        });
+
+                        showToast(`Candidate ${data.candidate_name} was rejected`, 'error');
+                    }
+                })
+                .listen('.candidate.merged', (data) => {
+                    console.log('Candidate merged:', data);
+
+                    const sourceRow = $(`button.merge-candidate[data-id="${data.source_candidate_id}"]`).closest('tr');
+                    if (sourceRow.length) {
+                        sourceRow.css('background-color', '#d1ecf1');
+                        sourceRow.fadeOut(1000, function () {
+                            $(this).remove();
+
+                            if ($.fn.DataTable.isDataTable('#candidates')) {
+                                $('#candidates').DataTable().draw();
+                            }
+                        });
+
+                        showToast(`Candidate ${data.source_candidate_name} merged into ${data.target_candidate_name}`, 'info');
+                    }
+                });
+        });
+
+        // Toast notification helper
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: '#28a745',
+                error: '#dc3545',
+                warning: '#ffc107',
+                info: '#17a2b8'
+            };
+
+            const toast = $(`
+                <div style="
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${colors[type]};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    z-index: 9999;
+                    animation: slideIn 0.3s ease;
+                ">
+                    ${message}
+                </div>
+            `);
+
+            $('body').append(toast);
+
+            setTimeout(() => {
+                toast.fadeOut(500, function () {
+                    $(this).remove();
+                });
+            }, 3000);
+        }
+    </script>
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
 @endsection
