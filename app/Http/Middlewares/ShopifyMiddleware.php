@@ -18,14 +18,7 @@ class ShopifyMiddleware
         $signature = $request->input('signature');
 
         if ($shop && $timestamp && $signature) {
-            $data = [
-                'shop' => $shop,
-                'logged_in_customer_id' => $loggedCustomer,
-                'path_prefix' => $request->input('path_prefix'),
-                'timestamp' => $timestamp,
-            ];
-
-            if ($this->verifySignature($data, $signature)) {
+            if ($this->verifySignature($request)) {
                 if ($loggedCustomer) {
                     $user = User::firstOrCreate(
                         ['shopify_user_id' => $loggedCustomer],
@@ -44,10 +37,23 @@ class ShopifyMiddleware
         return $next($request);
     }
 
-    private function verifySignature(array $data, string $signature): bool
-    {
-        $hmac = hash_hmac('sha256', http_build_query($data), env('SHOPIFY_APP_KEY'));
 
-        return hash_equals($hmac, $signature);
+    private function verifySignature(Request $request): bool
+    {
+        $queryParameters = $request->query();
+        $signature = $queryParameters['signature'] ?? '';
+        unset($queryParameters['signature']);
+        ksort($queryParameters);
+        $preparedData = [];
+
+        foreach ($queryParameters as $key => $value) {
+            $val = is_array($value) ? implode(',', $value) : $value;
+            $preparedData[] = "$key=$val";
+        }
+
+        $message = implode('', $preparedData);
+        $computedHmac = hash_hmac('sha256', $message, env('SHOPIFY_APP_SECRET'));
+
+        return hash_equals($computedHmac, $signature);
     }
 }

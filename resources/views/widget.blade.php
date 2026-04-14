@@ -999,7 +999,15 @@ if (auth()->user()){
         $(document).ready(function () {
 // Функция отправки высоты
             function sendHeight() {
-                window.parent.postMessage({height: $('body').outerHeight()}, '*');
+                const height = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight,
+                    document.body.offsetHeight,
+                    document.documentElement.offsetHeight,
+                    document.body.clientHeight,
+                    document.documentElement.clientHeight
+                );
+                window.parent.postMessage({height}, '*');
             }
 
 // Вызываем при загрузке и при изменении контента
@@ -1014,6 +1022,15 @@ if (auth()->user()){
     <script>
         // Real-time candidate updates via Laravel Reverb
         $(document).ready(function () {
+            // Находим элемент по точному совпадению href
+            // const oldLink = document.querySelector('link[href="http://127.0.0.1:8000/vendor/adminlte/dist/css/adminlte.min.css"]');
+            //
+            // if (oldLink) {
+            //     oldLink.href = 'http://127.0.0.1:8000/vendor/adminlte/dist/css/adminlte.css';
+            // }
+
+            console.log(window.getComputedStyle(document.querySelector('textarea')))
+
             // Initialize Echo if not already available
             if (typeof window.Echo === 'undefined') {
                 console.warn('Laravel Echo is not initialized - real-time updates disabled');
@@ -1027,11 +1044,6 @@ if (auth()->user()){
 
                     // Rebuild the candidates table with new data
                     updateCandidatesTable(data);
-
-                    // Send updated height to parent
-                    setTimeout(() => {
-                        window.parent.postMessage({height: $('body').outerHeight()}, '*');
-                    }, 100);
                 });
         });
     </script>

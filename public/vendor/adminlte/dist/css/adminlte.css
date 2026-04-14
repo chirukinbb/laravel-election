@@ -1,15 +1,3 @@
-/*!
- *   AdminLTE v3.2.0
- *   Author: Colorlib
- *   Website: AdminLTE.io <https://adminlte.io>
- *   License: Open source - MIT <https://opensource.org/licenses/MIT>
- */
-/*!
- * Bootstrap v4.6.1 (https://getbootstrap.com/)
- * Copyright 2011-2021 The Bootstrap Authors
- * Copyright 2011-2021 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- */
 :root {
     --blue: #007bff;
     --indigo: #6610f2;
@@ -37,72 +25,35 @@
     --breakpoint-md: 768px;
     --breakpoint-lg: 992px;
     --breakpoint-xl: 1200px;
-    --font-family-sans-serif: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
+    /* font-family variables removed */
 }
 
 html {
-    font-family: sans-serif;
     line-height: 1.15;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
-    display: block;
-}
-
 body {
     margin: 0;
-    font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 1rem;
-    font-weight: 400;
     line-height: 1.5;
     color: #212529;
     text-align: left;
     background-color: #fff;
 }
 
-[tabindex="-1"]:focus:not(:focus-visible) {
-    outline: 0 !important;
+/* font-weight removed from dt, b, strong and other elements */
+dt {
 }
 
-hr {
-    box-sizing: content-box;
-    height: 0;
-    overflow: visible;
+b,
+strong {
 }
 
-h1, h2, h3, h4, h5, h6 {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-}
-
-p {
-    margin-top: 0;
-    margin-bottom: 1rem;
-}
-
-abbr[title],
-abbr[data-original-title] {
-    text-decoration: underline;
-    -webkit-text-decoration: underline dotted;
-    text-decoration: underline dotted;
-    cursor: help;
-    border-bottom: 0;
-    -webkit-text-decoration-skip-ink: none;
-    text-decoration-skip-ink: none;
-}
-
+/* font-style removed from address */
 address {
     margin-bottom: 1rem;
-    font-style: normal;
     line-height: inherit;
 }
 
