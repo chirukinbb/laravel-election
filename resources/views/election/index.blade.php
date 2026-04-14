@@ -34,10 +34,18 @@ $btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 " title="Delete"
 $btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 " title="Candidates" href="%s">
                    <i class="fa fa-lg fa-fw fa-users"></i>
                </a>';
+$btnReport = '<a class="btn btn-xs btn-default text-success mx-1 " title="Report" href="%s">
+                <i class="fa fa-lg fa-fw fa-file-pdf"></i>
+            </a>';
 
    $data=collect();
 
     foreach ($elections as $item) {
+        $reportPath = storage_path("app/election_{$item->id}_top50_report.pdf");
+        $reportButton = file_exists($reportPath) 
+            ? sprintf($btnReport, route('election:report', ['election' => $item])) 
+            : '';
+        
         $data->push([
             $item->id,
             $item->name,
@@ -46,6 +54,7 @@ $btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 " title="Candidat
             '<nobr>'.sprintf($btnEdit,route('election:edit',['election'=>$item])).
             sprintf($btnDetails,route('election:candidate:list',['election'=>$item])).
             sprintf($btnView,route('election:show',['election'=>$item])).
+            $reportButton.
             sprintf($btnDelete,route('election:delete',['election'=>$item])).'</nobr>'
 ]);
     }

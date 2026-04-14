@@ -49,4 +49,15 @@ class ElectionController extends Controller
 
         return redirect()->route('election:list')->with('success', 'Election was deleted!');
     }
+
+    public function report(Election $election)
+    {
+        $filePath = storage_path("app/election_{$election->id}_top50_report.pdf");
+
+        if (!file_exists($filePath)) {
+            abort(404, 'Report not found');
+        }
+
+        return response()->file($filePath);
+    }
 }

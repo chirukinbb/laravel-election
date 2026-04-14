@@ -25,6 +25,7 @@ Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums
         Route::get('create', [\App\Http\Controllers\ElectionController::class, 'create'])->name('create');
         Route::get('edit/{election:id}', [\App\Http\Controllers\ElectionController::class, 'edit'])->name('edit');
         Route::get('show/{election:id}', [\App\Http\Controllers\ElectionController::class, 'show'])->name('show');
+        Route::get('report/{election:id}', [\App\Http\Controllers\ElectionController::class, 'report'])->name('report');
 
         Route::post('store', [\App\Http\Controllers\ElectionController::class, 'store'])->name('store');
         Route::patch('update/{election:id}', [\App\Http\Controllers\ElectionController::class, 'update'])->name('update');
