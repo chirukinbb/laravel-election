@@ -288,11 +288,21 @@ if (auth()->user()){
             border-top-left-radius: 0 !important;
             border-bottom-left-radius: 0 !important;
         }
-
-
     </style>
     <!-- 2. Подключаем скрипт -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-{{env('GA_MEASUREMENT_ID')}}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-{{env('GA_MEASUREMENT_ID')}}');
+    </script>
 @stop
 
 @section('classes_body','container')
@@ -317,6 +327,16 @@ if (auth()->user()){
                     <span class="btn-text">Nominate</span>
                 </button>
             </li>
+            @guest()
+                <li class="nav-item " role="presentation">
+                    <button class="ml-2 button button--primary" is="hover-button" id="login" data-bs-toggle="tab"
+                            data-bs-target="#profile" type="button"
+                            role="tab" aria-controls="profile" aria-selected="false">
+                        <span class="btn-fill" data-fill></span>
+                        <span class="btn-text">Login</span>
+                    </button>
+                </li>
+            @endguest
         </ul>
         <div class="tab-content mt-3" id="myTabContent">
             <form class="tab-pane fade show active mb-5" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -529,10 +549,10 @@ if (auth()->user()){
                             <div class="field field--full">
                                 <label for="ContactSubmit-template--27983535997271__contact-form" class="sr-only">Send
                                     message</label>
-                                <button type="submit" id="ContactSubmit-template--27983535997271__contact-form"
+                                <button type="submit" id="sendCandidate"
                                         class="button button--primary button--fixed" is="hover-button">
                                     <span class="btn-fill" data-fill></span>
-                                    <span class="btn-text">Send message</span>
+                                    <span class="btn-text">Send Candidate</span>
                                 </button>
                             </div>
                         </div>
@@ -759,6 +779,7 @@ if (auth()->user()){
                         const vars = @json(collect($election->candidates)->map(fn(\App\Models\Candidate $candidate)=>$candidate->id));
                         $(selector + '-ts-control').val($(s).text())
                         if (vars.includes(Number(a))) {
+                            gtag('event', 'select_existing_candidate');
                             $('#home-tab').click()
                             $('input[value=' + a + ']').click()
                         }
@@ -874,6 +895,10 @@ if (auth()->user()){
                 }
             })
         });
+
+        $('body').on('search.dt', function () {
+            gtag('event', 'search_candidate');
+        })
 
         $('body').on('click', 'tr', function () {
             const input = $(this).find('input');
@@ -1045,6 +1070,14 @@ if (auth()->user()){
                     // Rebuild the candidates table with new data
                     updateCandidatesTable(data);
                 });
+
+            $('#login').on('click', function (e) {
+                e.preventDefault()
+                window.parent.postMessage({action: 'login'}, '*');
+            })
         });
     </script>
+    <x-google-analytics-event selector="#profile-tab" event-name="start_new_nomination"/>
+    <x-google-analytics-event selector="#sendCandidate" event-name="nomination_submitted"/>
 @stop
+
