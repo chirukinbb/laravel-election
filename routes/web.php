@@ -1,24 +1,10 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::get("/", function () {
-    return view("welcome");
-});
-
-// Authentication routes
-Route::get("/", [AuthController::class, "showLoginForm"])->name("login");
-Route::withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
-    ->post("/login", [AuthController::class, "login"])->name('signin');
-Route::withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
-    ->post("/register", [AuthController::class, "register"])->name('register');
-Route::withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
-    ->post("/logout", [AuthController::class, "logout"])->name("logout");
-
-Route::middleware(\Spatie\Permission\Middleware\RoleMiddleware::using(\App\Enums\RoleEnum::ADMIN->name))->group(function () {
-    Route::get("dashboard", [\App\Http\Controllers\DashboardController::class, 'index'])->name("dashboard");
-    Route::get("dashboard/candidates", [\App\Http\Controllers\DashboardController::class, 'getTopCandidates'])->name("dashboard.candidates");
+Route::middleware('verify.shopify')->group(function () {
+    Route::get("/", [\App\Http\Controllers\DashboardController::class, 'index'])->name("dashboard");
+    Route::get("dashboard", [\App\Http\Controllers\DashboardController::class, 'index'])->name("dashboard1");
 
     Route::prefix('election')->as('election:')->group(function () {
         Route::get('list', [\App\Http\Controllers\ElectionController::class, 'index'])->name('list');

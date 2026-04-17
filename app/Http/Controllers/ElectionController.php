@@ -33,7 +33,7 @@ class ElectionController extends Controller
     {
         Election::create($request->only('name', 'date_end', 'date_start'));
 
-        return redirect()->route('election:list')->with('success', 'Election was created!');
+        return redirect()->route('election:list', request()->all())->with('success', 'Election was created!');
     }
 
     public function update(Election $election, ElectionRequest $request)

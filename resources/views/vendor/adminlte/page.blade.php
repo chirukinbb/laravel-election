@@ -15,23 +15,15 @@
 @section('body')
     <div class="wrapper">
 
+        <s-app-nav>
+            <s-link href="/app" rel="home">Главная</s-link>
+            @each('adminlte::partials.sidebar.menu-item', $adminlte->menu('sidebar'), 'item')
+        </s-app-nav>
+
         {{-- Preloader Animation (fullscreen mode) --}}
         @if($preloaderHelper->isPreloaderEnabled())
             @include('adminlte::partials.common.preloader')
         @endif
-
-        {{-- Top Navbar --}}
-        @if($layoutHelper->isLayoutTopnavEnabled())
-            @include('adminlte::partials.navbar.navbar-layout-topnav')
-        @else
-            @include('adminlte::partials.navbar.navbar')
-        @endif
-
-        {{-- Left Main Sidebar --}}
-        @if(!$layoutHelper->isLayoutTopnavEnabled())
-            @include('adminlte::partials.sidebar.left-sidebar')
-        @endif
-
         {{-- Content Wrapper --}}
         @empty($iFrameEnabled)
             @include('adminlte::partials.cwrapper.cwrapper-default')
@@ -71,6 +63,10 @@
 
             </div>
         </div>
+
+        @if(\Osiset\ShopifyApp\Util::isMPAApplication())
+            @include('shopify-app::partials.token_handler')
+        @endif
     @endif
 @stop
 

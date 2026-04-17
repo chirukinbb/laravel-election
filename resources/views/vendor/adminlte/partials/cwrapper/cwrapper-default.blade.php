@@ -8,7 +8,7 @@
 @endif
 
 {{-- Default Content Wrapper --}}
-<div class="{{ $layoutHelper->makeContentWrapperClasses() }}">
+<div class="{{ $layoutHelper->makeContentWrapperClasses() }} m-0" style="background-color:#f7f7f7;">
 
     {{-- Preloader Animation (cwrapper mode) --}}
     @if($preloaderHelper->isPreloaderEnabled('cwrapper'))

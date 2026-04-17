@@ -129,6 +129,11 @@
                 ajax: {
                     url: '{{ route("dashboard.candidates") }}',
                     type: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer {{auth()->user()->createToken(\App\Enums\RoleEnum::ADMIN->name)->plainTextToken}}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     data: function (d) {
                         d.election_id = electionId;
                     },

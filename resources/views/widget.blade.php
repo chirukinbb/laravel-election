@@ -623,8 +623,10 @@ if (auth()->user()){
             broadcaster: 'reverb',
             key: '{{ env("VITE_REVERB_APP_KEY") }}',
             wsHost: window.location.hostname,
+            @if(env('APP_ENV') === 'local')
             wsPort: 8080,
             wssPort: 8080,
+            @endif
             forceTLS: false,
             enabledTransports: ['ws', 'wss'],
         });

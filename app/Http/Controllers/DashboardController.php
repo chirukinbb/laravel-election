@@ -95,7 +95,7 @@ class DashboardController extends Controller
             ], 400);
         }
 
-        $topCandidates = Candidate::where('election_id', $electionId)
+        $topCandidates = Candidate::where('election_id', $electionId)->whereStatus(CandidateStatusEnum::Approved->name)
             ->withCount(['votes' => function ($q) {
                 $q->whereStatus(VoteStatusEnum::Verified->name);
             }])

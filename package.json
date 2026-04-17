@@ -15,8 +15,10 @@
     "vite": "^7.0.7"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@vitejs/plugin-vue": "^6.0.5",
     "laravel-echo": "^2.3.1",
+    "mcp-ssh": "^1.0.1",
     "pusher-js": "^8.4.3",
     "vue": "^3.5.31",
     "vue-router": "^4.6.4"
