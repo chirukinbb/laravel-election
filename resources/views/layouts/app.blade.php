@@ -47,8 +47,10 @@
                 <div class="card-header bg-success text-white d-flex justify-content-between">
                     <h4 class="mb-0"><i class="bi bi-speedometer2"></i> @yield('title')</h4>
                     <div class="mt-4">
-                        <a href="{{route('dashboard')}}" class="btn btn-primary"><i class="bi bi-house"></i> Home</a>
-                        <a href="{{route('election:list')}}" class="btn btn-primary"><i class="bi bi-house"></i>
+                        <a href="{{route('dashboard',request()->all())}}" class="btn btn-primary"><i
+                                    class="bi bi-house"></i> Home</a>
+                        <a href="{{route('election:list',request()->all())}}" class="btn btn-primary"><i
+                                    class="bi bi-house"></i>
                             Election</a>
                     </div>
                 </div>

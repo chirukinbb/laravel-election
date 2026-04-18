@@ -31,7 +31,9 @@ class SettingsController extends Controller
             $this->settingsService->set($keyEnum, $value);
         }
 
-        return redirect()->route('settings')->with('success', 'Settings saved successfully');
+        return redirect()->route('settings', $request->only(
+            'embedded', 'host', 'id_token', 'shop', 'locale', 'token'
+        ))->with('success', 'Settings saved successfully');
     }
 
     private function getTypeByKey(string $key): string

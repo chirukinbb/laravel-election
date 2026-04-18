@@ -10,8 +10,9 @@
 
 @section('content')
     <x-adminlte-card>
-        <form action="{{route('election:candidate:store',compact('election'))}}" method="post">
+        <form action="{{route('election:candidate:store', compact('election'))}}" method="post">
             @csrf
+            <x-request-hidden-fields/>
             <div class="row mb-3">
                 <div class="col-6">
                     <label for="first_name" class="form-label">

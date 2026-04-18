@@ -14,6 +14,7 @@
             <form action="{{ route('settings.update') }}" method="POST">
                 @csrf
                 @method('PUT')
+                <x-request-hidden-fields/>
 
                 @foreach($settingKeys as $keyEnum)
                     <div class="form-group row mb-3">

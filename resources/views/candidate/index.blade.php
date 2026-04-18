@@ -8,7 +8,8 @@
     <div class="d-flex justify-content-between">
         <h2>Candidates</h2>
         <div>
-            <a href="{{route('election:candidate:create',compact('election'))}}" class="btn btn-primary">Create</a>
+            <a href="{{route('election:candidate:create',array_merge(compact('election'),request()->all()))}}"
+               class="btn btn-primary">Create</a>
         </div>
     </div>
 @endsection
@@ -35,8 +36,8 @@ $btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 " title="Delete"
             $item->first_name.' '.$item->last_name,
             config('election.countries.'.$item->country_code),
             $item->votes()->where('status',\App\Enums\VoteStatusEnum::Verified->name)->count(),
-            '<nobr>'.sprintf($btnEdit,route('election:candidate:edit',['candidate'=>$item,'election'=>$election])).
-            sprintf($btnDelete,route('election:candidate:delete',['candidate'=>$item,'election'=>$election])).'</nobr>'
+            '<nobr>'.sprintf($btnEdit,route('election:candidate:edit',array_merge(['candidate'=>$item,'election'=>$election],request()->all()))).
+            sprintf($btnDelete,route('election:candidate:delete',array_merge(['candidate'=>$item,'election'=>$election],request()->all()))).'</nobr>'
 ]);
     }
 

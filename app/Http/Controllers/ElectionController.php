@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ElectionRequest;
 use App\Models\Election;
+use Illuminate\Http\Request;
 
 class ElectionController extends Controller
 {
@@ -33,21 +34,28 @@ class ElectionController extends Controller
     {
         Election::create($request->only('name', 'date_end', 'date_start'));
 
-        return redirect()->route('election:list', request()->all())->with('success', 'Election was created!');
+        return redirect()->route('election:list', $request->only(
+            'embedded', 'host', 'id_token', 'shop', 'locale', 'token'
+        ))->with('success', 'Election was created!');
     }
 
     public function update(Election $election, ElectionRequest $request)
     {
         $election->update($request->only('name', 'date_end', 'date_start'));
 
-        return redirect()->route('election:list')->with('success', 'Election was updated!');
+        return redirect()->route('election:list', array_merge(
+            ['election' => $election],
+            $request->only('embedded', 'host', 'id_token', 'shop', 'locale', 'token')
+        ))->with('success', 'Election was updated!');
     }
 
-    public function delete(Election $election)
+    public function delete(Election $election, Request $request)
     {
         $election->delete();
 
-        return redirect()->route('election:list')->with('success', 'Election was deleted!');
+        return redirect()->route('election:list', $request->only(
+            'embedded', 'host', 'id_token', 'shop', 'locale', 'token'
+        ))->with('success', 'Election was deleted!');
     }
 
     public function report(Election $election)

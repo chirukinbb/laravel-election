@@ -52,7 +52,7 @@ foreach (
             $item->first_name.' '.$item->last_name,
             config('election.countries.'.$item->country_code),
             $item->votes()->where('status',\App\Enums\VoteStatusEnum::Verified->name)->count(),
-            '<nobr>'.sprintf($btnEdit,route('election:candidate:edit',['candidate'=>$item,'election'=>$item->election])).
+            '<nobr>'.sprintf($btnEdit,route('election:candidate:edit',array_merge(['candidate'=>$item,'election'=>$item->election],request()->all()))).
             sprintf($btnApprove,$item->id).sprintf($btnMerge,$item->id).
             sprintf($btnReject,$item->id).'</nobr>'
 ]);

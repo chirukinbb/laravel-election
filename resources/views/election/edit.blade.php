@@ -10,9 +10,10 @@
 
 @section('content')
     <x-adminlte-card>
-        <form action="{{route('election:update',compact('election'))}}" method="post">
+        <form action="{{route('election:update', compact('election'))}}" method="post">
             @csrf
             @method('PATCH')
+            <x-request-hidden-fields/>
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label><br>
                 <input type="text" class="form-control" id="name" name="name" value="{{$election->name}}">

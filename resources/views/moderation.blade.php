@@ -41,7 +41,7 @@ $btnMerge = '<button class="btn btn-xs btn-default text-primary mx-1 merge-candi
             $item->first_name.' '.$item->last_name,
             $item->election->name,
             $item->reason_for_nomination,
-            '<nobr>'.sprintf($btnEdit,route('election:candidate:edit',['candidate'=>$item,'election'=>$item->election])).
+            '<nobr>'.sprintf($btnEdit,route('election:candidate:edit',array_merge(['candidate'=>$item,'election'=>$item->election],request()->all()))).
             sprintf($btnApprove,$item->id).sprintf($btnMerge,$item->id).
             sprintf($btnReject,$item->id).'</nobr>'
 ]);

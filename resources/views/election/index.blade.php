@@ -34,7 +34,7 @@ $btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 " title="Delete"
 $btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 " title="Candidates" href="%s">
                    <i class="fa fa-lg fa-fw fa-users"></i>
                </a>';
-$btnReport = '<a class="btn btn-xs btn-default text-success mx-1 " title="Report" href="%s">
+$btnReport = '<a class="btn btn-xs btn-default text-success mx-1 " title="Report" href="%s" target="_blank">
                 <i class="fa fa-lg fa-fw fa-file-pdf"></i>
             </a>';
 
@@ -43,7 +43,7 @@ $btnReport = '<a class="btn btn-xs btn-default text-success mx-1 " title="Report
     foreach ($elections as $item) {
         $reportPath = storage_path("app/election_{$item->id}_top50_report.pdf");
         $reportButton = file_exists($reportPath) 
-            ? sprintf($btnReport, route('election:report', array_merge(['election' => $item,request()->all()])))
+            ? sprintf($btnReport, route('election:report', array_merge(['election' => $item],request()->all())))
             : '';
         
         $data->push([
@@ -51,11 +51,11 @@ $btnReport = '<a class="btn btn-xs btn-default text-success mx-1 " title="Report
             $item->name,
             $item->date_start,
             $item->date_end,
-            '<nobr>'.sprintf($btnEdit,route('election:edit',array_merge(['election' => $item,request()->all()]))).
-            sprintf($btnDetails,route('election:candidate:list',array_merge(['election' => $item,request()->all()]))).
-            sprintf($btnView,route('election:show',array_merge(['election' => $item,request()->all()]))).
+            '<nobr>'.sprintf($btnEdit,route('election:edit', array_merge(['election' => $item],request()->all()))).
+            sprintf($btnDetails,route('election:candidate:list',array_merge(['election'=>$item],request()->all()))).
+            sprintf($btnView,route('election:show',array_merge(['election'=>$item],request()->all()))).
             $reportButton.
-            sprintf($btnDelete,route('election:delete',array_merge(['election' => $item,request()->all()]))).'</nobr>'
+            sprintf($btnDelete,route('election:delete',array_merge(['election'=>$item],request()->all()))).'</nobr>'
 ]);
     }
 

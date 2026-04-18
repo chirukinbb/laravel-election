@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CandidateStatusEnum;
-use App\Events\UpdateCandidates;
 use App\Http\Requests\CandidateRequest;
 use App\Models\Candidate;
 use App\Models\Election;
@@ -43,9 +42,12 @@ class CandidateController extends Controller
             'status' => CandidateStatusEnum::Approved->name,
             'reason_for_nomination' => 'from admin'
         ]));
-        event(new UpdateCandidates($election));
+        //  event(new UpdateCandidates($election));
 
-        return redirect()->route('election:candidate:create', compact('election'))->with('success', 'Candidate was created!');
+        return redirect()->route('election:candidate:create', array_merge(
+            compact('election'),
+            $request->only('embedded', 'host', 'id_token', 'shop', 'locale', 'token')
+        ))->with('success', 'Candidate was created!');
     }
 
     public function update(Election $election, Candidate $candidate, CandidateRequest $request)
@@ -61,22 +63,27 @@ class CandidateController extends Controller
             'socials',
             'photo_url',
             'reason_for_nomination',
-            'status'
         ));
 
-        if ($request->post('status') === CandidateStatusEnum::Merged->name) {
+        if ($request->post('с_status') === CandidateStatusEnum::Merged->name) {
             $candidate->votes()->each(fn(Vote $vote) => $vote->update(['candidate_id' => $request->post('merge_with')]));
         }
-        event(new UpdateCandidates($election));
+        //   event(new UpdateCandidates($election));
 
-        return redirect()->route('election:candidate:list', compact('election'))->with('success', 'Candidate was updated!');
+        return redirect()->route('election:candidate:list', array_merge(
+            compact('election'),
+            $request->only('embedded', 'host', 'id_token', 'shop', 'locale', 'token')
+        ))->with('success', 'Candidate was updated!');
     }
 
-    public function delete(Election $election, Candidate $candidate)
+    public function delete(Election $election, Candidate $candidate, \Illuminate\Http\Request $request)
     {
         $candidate->delete();
-        event(new UpdateCandidates($election));
+        //  event(new UpdateCandidates($election));
 
-        return redirect()->route('election:candidate:list', compact('election'))->with('success', 'Candidate was deleted!');
+        return redirect()->route('election:candidate:list', array_merge(
+            compact('election'),
+            $request->only('embedded', 'host', 'id_token', 'shop', 'locale', 'token')
+        ))->with('success', 'Candidate was deleted!');
     }
 }
