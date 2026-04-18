@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CandidateStatusEnum;
+use App\Events\UpdateCandidates;
 use App\Http\Requests\CandidateRequest;
 use App\Models\Candidate;
 use App\Models\Election;
@@ -65,10 +66,10 @@ class CandidateController extends Controller
             'reason_for_nomination',
         ));
 
-        if ($request->post('с_status') === CandidateStatusEnum::Merged->name) {
+        if ($request->post('status') === CandidateStatusEnum::Merged->name) {
             $candidate->votes()->each(fn(Vote $vote) => $vote->update(['candidate_id' => $request->post('merge_with')]));
         }
-        //   event(new UpdateCandidates($election));
+        event(new UpdateCandidates($election));
 
         return redirect()->route('election:candidate:list', array_merge(
             compact('election'),
@@ -79,7 +80,7 @@ class CandidateController extends Controller
     public function delete(Election $election, Candidate $candidate, \Illuminate\Http\Request $request)
     {
         $candidate->delete();
-        //  event(new UpdateCandidates($election));
+        event(new UpdateCandidates($election));
 
         return redirect()->route('election:candidate:list', array_merge(
             compact('election'),

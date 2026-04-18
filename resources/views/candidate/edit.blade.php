@@ -159,21 +159,6 @@
                     <div class="form-text text-danger">{{$errors->get('reason_for_nomination')[0]}}</div>
                 @endif
             </div>
-            <div class="mb-3">
-                <label for="status" class="form-label">Status</label><br>
-                <select name="status" id="status" class="form-control">
-                    @foreach(\App\Enums\CandidateStatusEnum::cases() as $case)
-                        <option value="{{$case->name}}" @selected($case->name === $candidate->status)>{{$case->value}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="mb-3 d- merge-block">
-                <x-adminlte-select-bs id="merge_with" name="merge_with" label="Merge With" :config="$config">
-                    @foreach($election->candidates as $c)
-                        <option value="{{$c->id}}">{{$c->first_name}} {{$c->last_name}}</option>
-                    @endforeach
-                </x-adminlte-select-bs>
-            </div>
             <button class="btn btn-primary" type="submit">Update</button>
         </form>
     </x-adminlte-card>

@@ -37,6 +37,7 @@ Route::middleware('verify.shopify')->group(function () {
     Route::get('clean-logs', [\App\Http\Controllers\AntiFraudController::class, 'clean'])->name('clean');
 });
 
-Route::get('widget/{election:id}', function (\App\Models\Election $election) {
+Route::get('widget', function (Request $request) {
+    $election = \App\Models\Election::find($request->query('election_id'));
     return view('widget', compact('election'));
 })->middleware(\App\Http\Middlewares\ShopifyMiddleware::class);
