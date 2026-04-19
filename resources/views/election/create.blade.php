@@ -25,7 +25,8 @@
                     @php
                         $config = [
                             'format' => 'YYYY-MM-DD',
-                            'dayViewHeaderFormat' => 'MMM YYYY','minDate' => "js:moment().startOf('day')",
+                            'dayViewHeaderFormat' => 'MMM YYYY',
+                            'minDate' => "js:moment('{$minDate->format('YYYY-MM-DD')}')",
                             'daysOfWeekDisabled' => [0, 6],
                         ];
                     @endphp

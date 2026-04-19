@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::create([
+        $admin = User::create([
             'name' => 'Test Admin User',
             'email' => 'admin@example.com',
             'password' => Hash::make('000')
@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         ])->assignRole(Role::create(['name' => RoleEnum::USER->name]));
 
         $election = Election::create([
+            'user_id' => $admin->id,
             'name' => 'President of USA',
             'date_start' => '2025-03-22',
             'date_end' => '2025-03-24'

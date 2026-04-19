@@ -63,4 +63,9 @@ class User extends Authenticatable implements IShopModel
     {
         return $this->hasMany(Vote::class);
     }
+
+    public function elections(): HasMany
+    {
+        return $this->hasMany(Election::class);
+    }
 }

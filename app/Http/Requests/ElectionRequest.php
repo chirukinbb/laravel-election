@@ -10,7 +10,7 @@ class ElectionRequest extends FormRequest
     {
         return [
             'name' => 'required|min:10|max:50',
-            'date_start' => 'required|date|date_format:Y-m-d|before:date_end',
+            'date_start' => 'required|date|date_format:Y-m-d|after_or_equal:today|before:date_end',
             'date_end' => 'required|date|date_format:Y-m-d'
         ];
     }

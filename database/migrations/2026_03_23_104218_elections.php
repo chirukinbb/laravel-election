@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('elections', function (Blueprint $table) {
             $table->id();
 
+            $table->unsignedBigInteger('user_id');
             $table->string('name');
             $table->date('date_start');
             $table->date('date_end');

@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="shopify-api-key"
-          content="{{ \Osiset\ShopifyApp\Util::getShopifyConfig('api_key', $shopDomain ?? Auth::user()->name ) }}"/>
+          content="{{ \Osiset\ShopifyApp\Util::getShopifyConfig('api_key', $shopDomain ?? Auth::user()?->name ) }}"/>
 
     {{-- Custom Meta Tags --}}
     @yield('meta_tags')
@@ -53,7 +53,6 @@
             <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
             <link rel="stylesheet" href="{{ asset('vendor/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
             <link rel="stylesheet" href="{{ asset('vendor/adminlte/dist/css/adminlte.min.css') }}">
-            <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
 
             @if(config('adminlte.google_fonts.allowed', true))
                 <link rel="stylesheet"

@@ -6,7 +6,7 @@ Route::middleware('verify.shopify')->group(function () {
     Route::get("/", [\App\Http\Controllers\DashboardController::class, 'index'])->name("dashboard");
     Route::get("dashboard", [\App\Http\Controllers\DashboardController::class, 'index'])->name("dashboard1");
 
-    Route::prefix('election')->as('election:')->group(function () {
+    Route::prefix('election')->as('election:')->middleware('election.ownership')->group(function () {
         Route::get('list', [\App\Http\Controllers\ElectionController::class, 'index'])->name('list');
         Route::get('create', [\App\Http\Controllers\ElectionController::class, 'create'])->name('create');
         Route::get('edit/{election:id}', [\App\Http\Controllers\ElectionController::class, 'edit'])->name('edit');
@@ -37,7 +37,4 @@ Route::middleware('verify.shopify')->group(function () {
     Route::get('clean-logs', [\App\Http\Controllers\AntiFraudController::class, 'clean'])->name('clean');
 });
 
-Route::get('widget', function (Request $request) {
-    $election = \App\Models\Election::find($request->query('election_id'));
-    return view('widget', compact('election'));
-})->middleware(\App\Http\Middlewares\ShopifyMiddleware::class);
+Route::get('widget', [\App\Http\Controllers\WidgetController::class, 'index'])->middleware(\App\Http\Middlewares\ShopifyMiddleware::class);

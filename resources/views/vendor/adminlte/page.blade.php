@@ -6,6 +6,7 @@
 @section('adminlte_css')
     @stack('css')
     @yield('css')
+    <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
 @stop
 
 @section('classes_body', $layoutHelper->makeBodyClasses())

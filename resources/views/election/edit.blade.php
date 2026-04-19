@@ -27,8 +27,7 @@
                         $config = [
                             'format' => 'YYYY-MM-DD',
                             'dayViewHeaderFormat' => 'MMM YYYY',
-                            'minDate' => "js:moment().startOf('month')",
-                            'maxDate' => "js:moment().endOf('month')",
+                            'minDate' => "js:moment('{$minDate->format('Y-M-D')}')",
                             'daysOfWeekDisabled' => [0, 6],
                         ];
                     @endphp

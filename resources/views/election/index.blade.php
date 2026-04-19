@@ -17,6 +17,7 @@
     $heads = [
         ['label' => 'ID', 'width' => 5],
         'Name',
+        ['label' => 'Status', 'width' => 10],
         ['label' => 'Start at', 'width' => 20],
         ['label' => 'End at', 'width' => 20],
         ['label' => 'Actions', 'no-export' => true, 'width' => 5]
@@ -46,23 +47,47 @@ $btnReport = '<a class="btn btn-xs btn-default text-success mx-1 " title="Report
             ? sprintf($btnReport, route('election:report', array_merge(['election' => $item],request()->all())))
             : '';
         
+        // Determine available actions based on election status
+        $actions = '';
+        
+        if ($item->isUpcoming()) {
+            // Upcoming elections: can edit and delete
+            $actions .= sprintf($btnEdit, route('election:edit', array_merge(['election' => $item], request()->all())));
+            $actions .= sprintf($btnDelete, route('election:delete', array_merge(['election' => $item], request()->all())));
+        } elseif ($item->isOngoing() || $item->isEnded()) {
+            // Ongoing or ended elections: view only
+            // No edit or delete buttons
+        }
+        
+        // View and candidates buttons are always available
+        $actions .= sprintf($btnDetails, route('election:candidate:list', array_merge(['election' => $item], request()->all())));
+        $actions .= sprintf($btnView, route('election:show', array_merge(['election' => $item], request()->all())));
+        $actions .= $reportButton;
+        
+        // Status badge
+        $statusBadge = '';
+        if ($item->isUpcoming()) {
+            $statusBadge = '<span class="badge badge-info">Upcoming</span>';
+        } elseif ($item->isOngoing()) {
+            $statusBadge = '<span class="badge badge-success">Ongoing</span>';
+        } else {
+            $statusBadge = '<span class="badge badge-secondary">Ended</span>';
+        }
+        
         $data->push([
             $item->id,
             $item->name,
+            $statusBadge,
             $item->date_start,
             $item->date_end,
-            '<nobr>'.sprintf($btnEdit,route('election:edit', array_merge(['election' => $item],request()->all()))).
-            sprintf($btnDetails,route('election:candidate:list',array_merge(['election'=>$item],request()->all()))).
-            sprintf($btnView,route('election:show',array_merge(['election'=>$item],request()->all()))).
-            $reportButton.
-            sprintf($btnDelete,route('election:delete',array_merge(['election'=>$item],request()->all()))).'</nobr>'
-]);
+            '<nobr>' . $actions . '</nobr>'
+        ]);
     }
 
     $config = [
         'data' => $data->toArray(),
         'order' => [[1, 'asc']],
-        'columns' => [null, null, null, ['colspan' => 2]],
+        'columns' => [null, null, null, null, ['colspan' => 2]],
     ];
 @endphp
 

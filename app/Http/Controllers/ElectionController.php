@@ -10,19 +10,46 @@ class ElectionController extends Controller
 {
     public function index()
     {
-        $elections = Election::all();
+        $elections = Election::where('user_id', auth()->id())->get();
 
         return view('election.index', compact('elections'));
     }
 
     public function create()
     {
-        return view('election.create');
+        $minDate = now()->startOf('day');
+
+        $lastElection = Election::where('user_id', auth()->id())
+            ->orderBy('date_end', 'desc')
+            ->first();
+
+        if ($lastElection) {
+            $afterLastElection = \Carbon\Carbon::parse($lastElection->date_end)->addDay()->startOf('day');
+            if ($afterLastElection->gt($minDate)) {
+                $minDate = $afterLastElection;
+            }
+        }
+
+        return view('election.create', compact('minDate'));
     }
 
     public function edit(Election $election)
     {
-        return view('election.edit', compact('election'));
+        $minDate = now()->startOf('day');
+
+        $lastOtherElection = Election::where('user_id', auth()->id())
+            ->where('id', '!=', $election->id)
+            ->orderBy('date_end', 'desc')
+            ->first();
+
+        if ($lastOtherElection) {
+            $afterLastElection = \Carbon\Carbon::parse($lastOtherElection->date_end)->addDay()->startOf('day');
+            if ($afterLastElection->gt($minDate)) {
+                $minDate = $afterLastElection;
+            }
+        }
+
+        return view('election.edit', compact('election', 'minDate'));
     }
 
     public function show(Election $election)
@@ -32,7 +59,12 @@ class ElectionController extends Controller
 
     public function store(ElectionRequest $request)
     {
-        Election::create($request->only('name', 'date_end', 'date_start'));
+        Election::create([
+            'user_id' => auth()->id(),
+            'name' => $request->name,
+            'date_start' => $request->date_start,
+            'date_end' => $request->date_end
+        ]);
 
         return redirect()->route('election:list', $request->only(
             'embedded', 'host', 'id_token', 'shop', 'locale', 'token'
@@ -41,7 +73,11 @@ class ElectionController extends Controller
 
     public function update(Election $election, ElectionRequest $request)
     {
-        $election->update($request->only('name', 'date_end', 'date_start'));
+        $election->update([
+            'name' => $request->name,
+            'date_start' => $request->date_start,
+            'date_end' => $request->date_end
+        ]);
 
         return redirect()->route('election:list', array_merge(
             ['election' => $election],
