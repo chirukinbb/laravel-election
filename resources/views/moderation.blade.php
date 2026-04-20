@@ -144,10 +144,12 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
     <script>
         window.Echo = new Echo.default({
             broadcaster: 'reverb',
-            key: '{{ env("VITE_REVERB_APP_KEY") }}',
-            wsHost: window.location.hostname,
+            key: '{{ env("REVERB_APP_KEY") }}',
+            wsHost: '{{env('APP_DOMAIN')}}',
+            @if(env('APP_ENV') === 'local')
             wsPort: 8080,
             wssPort: 8080,
+            @endif
             forceTLS: false,
             enabledTransports: ['ws', 'wss'],
         });
@@ -170,7 +172,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 });
             });
 
-            // Candidate reject
             $('button.reject-candidate').on('click', function () {
                 const candidate_id = $(this).data('id');
                 $.ajax({
@@ -183,7 +184,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 });
             });
 
-            // Vote approve
             $('button.approve-vote').on('click', function () {
                 const vote_id = $(this).data('id');
                 $.ajax({
@@ -196,7 +196,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 });
             });
 
-            // Vote reject
             $('button.reject-vote').on('click', function () {
                 const vote_id = $(this).data('id');
                 $.ajax({
@@ -209,7 +208,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 });
             });
 
-            // Vote flag suspicious
             $('button.flag-suspicious-candidate').on('click', function () {
                 const vote_id = $(this).data('id');
                 $.ajax({
@@ -231,10 +229,8 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
             $('button.merge-candidate').on('click', function () {
                 currentMergeCandidateId = $(this).data('id');
 
-                // Clear existing options
                 $('#merge_with').empty();
 
-                // Dynamically load candidates from API
                 $.ajax({
                     url: '{{route('voting.candidates')}}',
                     type: 'GET',
@@ -258,10 +254,9 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 });
             });
 
-            // Handle merge button in modal footer
             $('#merge_btn').on('click', function () {
                 const merge_with = $('#merge_with').val();
-                console.log(merge_with, currentMergeCandidateId)
+
                 if (!merge_with || !currentMergeCandidateId) {
                     return;
                 }
@@ -281,27 +276,22 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
         });
     </script>
     <script>
-        // Real-time updates via Laravel Reverb
         $(document).ready(function () {
-            // Initialize Echo if not already available
+
             if (typeof window.Echo === 'undefined') {
                 console.error('Laravel Echo is not initialized');
                 return;
             }
 
-            // Listen for vote approval events
             window.Echo.channel('admin')
                 .listen('.vote.approved', (data) => {
-                    console.log('Vote approved:', data);
 
-                    // Find and remove the vote row from the table
                     const voteRow = $(`button.approve-vote[data-id="${data.vote_id}"]`).closest('tr');
                     if (voteRow.length) {
                         voteRow.css('background-color', '#d4edda');
                         voteRow.fadeOut(1000, function () {
                             $(this).remove();
 
-                            // Update the DataTable if it exists
                             if ($.fn.DataTable.isDataTable('#votes')) {
                                 $('#votes').DataTable().draw();
                             }
@@ -311,8 +301,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                     }
                 })
                 .listen('.vote.rejected', (data) => {
-                    console.log('Vote rejected:', data);
-
                     const voteRow = $(`button.approve-vote[data-id="${data.vote_id}"]`).closest('tr');
                     if (voteRow.length) {
                         voteRow.css('background-color', '#f8d7da');
@@ -345,8 +333,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                     }
                 })
                 .listen('.candidate.approved', (data) => {
-                    console.log('Candidate approved:', data);
-
                     const candidateRow = $(`button.approve-candidate[data-id="${data.candidate_id}"]`).closest('tr');
                     if (candidateRow.length) {
                         candidateRow.css('background-color', '#d4edda');
@@ -362,8 +348,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                     }
                 })
                 .listen('.candidate.rejected', (data) => {
-                    console.log('Candidate rejected:', data);
-
                     const candidateRow = $(`button.approve-candidate[data-id="${data.candidate_id}"]`).closest('tr');
                     if (candidateRow.length) {
                         candidateRow.css('background-color', '#f8d7da');
@@ -379,8 +363,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                     }
                 })
                 .listen('.candidate.merged', (data) => {
-                    console.log('Candidate merged:', data);
-
                     const sourceRow = $(`button.merge-candidate[data-id="${data.source_candidate_id}"]`).closest('tr');
                     if (sourceRow.length) {
                         sourceRow.css('background-color', '#d1ecf1');
@@ -397,7 +379,6 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 });
         });
 
-        // Toast notification helper
         function showToast(message, type = 'info') {
             const colors = {
                 success: '#28a745',

@@ -104,11 +104,9 @@ class VotingController extends Controller
     {
         $user = $request->user();
 
-        // Get IP address and hash it
         $ipAddress = $request->ip();
         $ipHash = hash('sha256', $ipAddress);
 
-        // Get browser fingerprint from request headers and hash it
         $fingerprintData = [
             'user_agent' => $request->userAgent(),
             'accept_language' => $request->header('Accept-Language'),
@@ -130,7 +128,6 @@ class VotingController extends Controller
             rejectLimit: (int)$this->settingsService->get(SettingKeyEnum::VoteRejectLimit)
         );
 
-        // Analyze vote for fraud
         $vote = $antiFraudService->analyzeVote([
             'candidate_id' => $request->input('candidate_id'),
             'user_id' => $user->id,

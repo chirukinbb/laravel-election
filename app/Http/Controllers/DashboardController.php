@@ -98,10 +98,10 @@ class DashboardController extends Controller
         }
 
         $topCandidates = Candidate::where('election_id', $electionId)->whereStatus(CandidateStatusEnum::Approved->name)
-            ->where('user_id', auth()->id())
             ->withCount(['votes' => function ($q) {
                 $q->whereStatus(VoteStatusEnum::Verified->name);
             }])
+            ->whereRelation('election', 'user_id', auth()->id())
             ->orderByDesc('votes_count')
             ->limit(50)
             ->get()

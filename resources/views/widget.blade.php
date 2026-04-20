@@ -621,8 +621,8 @@ if (auth()->user()){
 
         window.Echo = new Echo.default({
             broadcaster: 'reverb',
-            key: '{{ env("VITE_REVERB_APP_KEY") }}',
-            wsHost: window.location.hostname,
+            key: '{{ env("REVERB_APP_KEY") }}',
+            wsHost: '{{env('APP_DOMAIN')}}',
             @if(env('APP_ENV') === 'local')
             wsPort: 8080,
             wssPort: 8080,
@@ -772,8 +772,7 @@ if (auth()->user()){
                     ],
                     create: true,
                     createOnBlur: true,
-                    // Настройки отображения групп
-                    optgroupField: 'optgroup', // поле в options, которое указывает на группу
+                    optgroupField: 'optgroup',
                     optgroupLabelField: 'label',
                     optgroupValueField: 'value',
                     lockOptgroupOrder: true,
@@ -813,18 +812,16 @@ if (auth()->user()){
     </script>
     <script>
         $(document).ready(function () {
-            // 1. Store the raw HTML string from the template
             const socTemplate = $('#social').html();
-            const $container = $('#social-wrapper > div'); // The div where rows will be added
+            const $container = $('#social-wrapper > div');
 
             // 2. Add Row Event
             $('#add-social').on('click', function (e) {
                 e.preventDefault();
-                // Wrap the string in $(), then append it
+
                 $container.append($(socTemplate));
             });
 
-            // 3. Delete Row Event (using Event Delegation)
             $container.on('click', '.btn-delete', function (e) {
                 e.preventDefault();
                 $(this).closest('.row').remove();
@@ -833,7 +830,6 @@ if (auth()->user()){
     </script>
     <script>
         $(() => {
-            // Load candidates via AJAX
             $.ajax({
                 url: '{{ route("voting.candidates") }}',
                 method: 'GET',
@@ -884,13 +880,7 @@ if (auth()->user()){
                     .addClass(classes[i]);
             });
             $('#candidates_paginate').addClass('d-flex justify-content-center justify-content-sm-end')
-            // $('#candidates_paginate a').each((i, a) => {
-            //     $(a).addClass('button mx-1')
-            //     if ($(a).parent().hasClass('active')) {
-            //         $(a).removeClass('page-link')
-            //         $(a).addClass('bg-black')
-            //     }
-            // })
+
             $('#candidates td,#candidates th').each((i, cell) => {
                 if (!$($(cell).html()).hasClass('textarea')) {
                     $(cell).html('<div class="textarea roww">' + $(cell).html() + '</div>')
@@ -970,7 +960,6 @@ if (auth()->user()){
                 deactivate();
             });
 
-            // методы для табов
             button._activateFill = activate;
             button._deactivateFill = deactivate;
         });
@@ -984,13 +973,12 @@ if (auth()->user()){
                     e.preventDefault();
                     const target = this.getAttribute('data-bs-target');
 
-                    // ❗ деактивируем ВСЕ
                     tabButtons.forEach(btn => {
                         btn.classList.remove('active');
                         btn.setAttribute('aria-selected', 'false');
 
                         if (btn._deactivateFill) {
-                            btn._deactivateFill(); // ← анимация вверх
+                            btn._deactivateFill();
                         }
                     });
 
@@ -998,12 +986,11 @@ if (auth()->user()){
                         pane.classList.remove('show', 'active');
                     });
 
-                    // ✅ активируем текущую
                     this.classList.add('active');
                     this.setAttribute('aria-selected', 'true');
 
                     if (this._activateFill) {
-                        this._activateFill(); // ← фиксируем как hover
+                        this._activateFill();
                     }
 
                     const targetPane = document.querySelector(target);
@@ -1024,7 +1011,6 @@ if (auth()->user()){
     </script>
     <script>
         $(document).ready(function () {
-// Функция отправки высоты
             function sendHeight() {
                 const height = Math.max(
                     document.body.scrollHeight,
@@ -1037,39 +1023,22 @@ if (auth()->user()){
                 window.parent.postMessage({height}, '*');
             }
 
-// Вызываем при загрузке и при изменении контента
             window.addEventListener('load', sendHeight);
             window.addEventListener('resize', sendHeight);
 
-// Если контент динамический (например, список товаров подгрузился)
             const observer = new ResizeObserver(sendHeight);
             observer.observe(document.body);
         });
     </script>
     <script>
-        // Real-time candidate updates via Laravel Reverb
         $(document).ready(function () {
-            // Находим элемент по точному совпадению href
-            // const oldLink = document.querySelector('link[href="http://127.0.0.1:8000/vendor/adminlte/dist/css/adminlte.min.css"]');
-            //
-            // if (oldLink) {
-            //     oldLink.href = 'http://127.0.0.1:8000/vendor/adminlte/dist/css/adminlte.css';
-            // }
-
-            console.log(window.getComputedStyle(document.querySelector('textarea')))
-
-            // Initialize Echo if not already available
             if (typeof window.Echo === 'undefined') {
                 console.warn('Laravel Echo is not initialized - real-time updates disabled');
                 return;
             }
 
-            // Listen for candidate updates on the widget channel
             window.Echo.channel('widget')
                 .listen('.candidate.update', (data) => {
-                    console.log('Candidates updated:', data);
-
-                    // Rebuild the candidates table with new data
                     updateCandidatesTable(data);
                 });
 
