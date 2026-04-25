@@ -21,7 +21,7 @@ class WidgetController extends Controller
 
         // If no active election exists, return null response
         if (!$election) {
-            return response()->json(['error' => 'No active elections available'], 404);
+            return view('empty');
         }
 
         return view('widget', compact('election'));

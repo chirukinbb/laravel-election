@@ -27,8 +27,7 @@
                         $config = [
                             'format' => 'YYYY-MM-DD',
                             'dayViewHeaderFormat' => 'MMM YYYY',
-                            'minDate' => "js:moment('{$minDate->format('Y-m-d')}')",
-                            'daysOfWeekDisabled' => [0, 6],
+                            'minDate' => "js:moment('{$minDate->format('Y-m-d')}')"
                         ];
                     @endphp
                     <x-adminlte-input-date name="date_start" label="Start Date"
