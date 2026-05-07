@@ -12,6 +12,10 @@ class ShopifyMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
+        if (env('APP_ENV') === 'local') {
+            Auth::login(User::find(1));
+        }
+
         $shop = $request->input('shop');
         $loggedCustomer = $request->input('logged_in_customer_id');
         $timestamp = $request->input('timestamp');

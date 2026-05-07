@@ -586,7 +586,7 @@ return [
     */
     'frontend_type' => env('SHOPIFY_FRONTEND_TYPE', 'MPA'),
 
-    'iframe_ancestors' => '',
+    'iframe_ancestors' => env('APP_URL', '*'),
 
     /*
     |--------------------------------------------------------------------------

@@ -310,17 +310,20 @@ if (auth()->user()){
 @section('body')
     <div class="wrapper">
 
-        <ul class="nav nav-tabs d-flex justify-content-center border-0 my-5" id="myTab" role="tablist">
-            <li class="nav-item me-2" role="presentation">
-                <button class="button mr-2 button--primary" is="hover-button" id="home-tab" data-bs-toggle="tab"
+        <ul class="nav nav-tabs d-flex justify-content-center border-0 my-5 flex-column flex-sm-row justify-content-center align-items-center"
+            id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="button mr-0 button--primary w-100 mb-sm-0 mb-1 mr-sm-2" is="hover-button" id="home-tab"
+                        data-bs-toggle="tab"
                         data-bs-target="#home" type="button"
                         role="tab" aria-controls="home" aria-selected="true">
                     <span class="btn-fill" data-fill></span>
                     <span class="btn-text">Ballot paper</span>
                 </button>
             </li>
-            <li class="nav-item " role="presentation">
-                <button class="ml-2 button button--primary" is="hover-button" id="profile-tab" data-bs-toggle="tab"
+            <li class="nav-item" role="presentation">
+                <button class="ml-0 button button--primary  w-100 ml-sm-2" is="hover-button" id="profile-tab"
+                        data-bs-toggle="tab"
                         data-bs-target="#profile" type="button"
                         role="tab" aria-controls="profile" aria-selected="false">
                     <span class="btn-fill" data-fill></span>
@@ -328,8 +331,9 @@ if (auth()->user()){
                 </button>
             </li>
             @guest()
-                <li class="nav-item " role="presentation">
-                    <button class="ml-2 button button--primary" is="hover-button" id="login" data-bs-toggle="tab"
+                <li class="nav-item" role="presentation">
+                    <button class="ml-0 ml-sm-2 button button--primary mt-sm-0 mt-1 w-100" is="hover-button" id="login"
+                            data-bs-toggle="tab"
                             data-bs-target="#profile" type="button"
                             role="tab" aria-controls="profile" aria-selected="false">
                         <span class="btn-fill" data-fill></span>
@@ -352,8 +356,8 @@ if (auth()->user()){
                 </x-adminlte-datatable>
                 <input type="hidden" value="{{$election->id}}" name="election_id">
 
-                @auth()
-                    <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column">
+                @if($voted)
+                    <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column mt-2">
                         {!! NoCaptcha::display() !!}
                         <div class="errors-vote"></div>
                         <div class="field field--full">
@@ -366,7 +370,7 @@ if (auth()->user()){
                             </button>
                         </div>
                     </div>
-                @endauth
+                @endif
 
             </form>
 
@@ -542,7 +546,7 @@ if (auth()->user()){
                         </label>
                     </div>
 
-                    @auth()
+                    @if($voted)
                         <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column">
                             {!! NoCaptcha::display() !!}
                             <div class="errors-nominate"></div>
@@ -556,7 +560,7 @@ if (auth()->user()){
                                 </button>
                             </div>
                         </div>
-                    @endauth
+                    @endif
 
                 </div>
             </form>
@@ -652,12 +656,7 @@ if (auth()->user()){
                 })
                     .then(response => {
                         if (response.ok) {
-                            return response.json().then(data => {
-                                $('#candidates tr').each((i, tr) => {
-                                    $(tr).find('td:last-child, th:last-child').addClass('d-none');
-                                });
-                                $('form .action-zone').addClass('d-none')
-                            });
+                            window.location.reload()
                         }
 
                         if (response.status === 422) {
@@ -857,7 +856,19 @@ if (auth()->user()){
             });
             $('#candidates_length').addClass('float-left')
             $('#candidates_filter').addClass('float-right')
-            $('#candidates th').eq(0).html('<span class="d-none d-sm-inline">Position</span><span class="d-inline-block d-sm-none">#</span>')
+            $('#candidates th').eq(0).html('<span class="d-none d-md-inline">Position</span><span class="d-inline-block d-md-none">#</span>')
+            $('#candidates th').eq(1).html('<span class="d-none d-md-inline">Country</span><span class="d-inline-block d-md-none">' +
+                '<div class="opacity-0 mr-4">1</div><div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-start align-items-center">' +
+                '<svg viewBox="0 0 512 512" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" fill="#000000" height="30px"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><defs><style>.cls-1{fill:none;stroke:#2b2b2b;stroke-linecap:round;stroke-linejoin:round;stroke-width:13px;}</style></defs><title></title><circle class="cls-1" cx="279.51" cy="229.72" r="100.29"></circle><path class="cls-1" d="M279.51,129.43C251,150.21,232,187.35,232,229.71s19,79.52,47.54,100.3c28.54-20.78,47.54-57.92,47.54-100.3S308.05,150.21,279.51,129.43Z"></path><path class="cls-1" d="M279.51,416V363.44a133.72,133.72,0,0,1,0-267.44v33.43"></path><line class="cls-1" x1="321.3" x2="237.72" y1="416" y2="416"></line><line class="cls-1" x1="379.8" x2="179.22" y1="229.72" y2="229.72"></line></g></svg>' +
+                '</div></span>')
+            $('#candidates th').eq(3).html('<span class="d-none d-md-inline">Votes</span><span class="d-inline-block d-md-none">' +
+                '<div class="opacity-0 mr-4">1</div><div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-start align-items-center">' +
+                '<svg height="20px" fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 122.574 122.574" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M97.436,36.438H74.706l-5.326,5.326h24.761l8.155,16.35H20.28l8.155-16.35h22.153l-5.326-5.326H25.14L13.312,60.151 v62.423h95.951V60.151L97.436,36.438z M103.938,117.248h-85.3V63.441h85.3V117.248z"></path> <path d="M58.771,47.288H48.428l-1.065,3.195H75.39l-1.132-3.195H61.642l27.576-27.574c0.686-0.685,0.686-1.793,0-2.478 L72.495,0.513c-0.685-0.684-1.795-0.684-2.479,0L42.245,28.286c-0.685,0.684-0.685,1.793,0,2.477L58.771,47.288z M68.829,6.655 l-4.106,16.429l-16.356,4.034L68.829,6.655z M66.585,26.232c0.316-0.077,0.598-0.239,0.82-0.462 c0.221-0.221,0.381-0.5,0.459-0.814l4.824-19.294l12.812,12.813L60.206,43.768L47.401,30.964L66.585,26.232z"></path> <path d="M45.333,113.938c0.479,0.479,1.256,0.479,1.735,0L66.52,94.487c0.479-0.479,0.479-1.255,0-1.735L54.809,81.04 c-0.479-0.479-1.256-0.479-1.735,0l-19.452,19.451c-0.479,0.479-0.479,1.256,0,1.735L45.333,113.938z M52.241,85.342 l-2.876,11.506L37.91,99.673L52.241,85.342z M50.668,99.054c0.222-0.055,0.418-0.168,0.575-0.323 c0.154-0.155,0.267-0.351,0.322-0.57l3.377-13.513l8.975,8.973l-17.716,17.716l-8.967-8.968L50.668,99.054z"></path> <path d="M76.653,98.779c0.416,0.533,1.186,0.628,1.721,0.212l13.062-10.184c0.533-0.416,0.628-1.188,0.212-1.723L74.733,65.391 c-0.416-0.533-1.188-0.629-1.722-0.213L59.95,75.364c-0.533,0.416-0.628,1.188-0.212,1.722L76.653,98.779z M87.481,85.73 l-11.066-4.269L75.02,69.747L87.481,85.73z M72.429,68.746l1.64,13.74c0.026,0.226,0.114,0.437,0.25,0.609 c0.136,0.172,0.315,0.31,0.526,0.391l12.996,5.012l-10.008,7.806L62.427,76.544L72.429,68.746z"></path> </g> </g> </g></svg>' +
+                '</div></span>')
+            $('#candidates th').eq(4).html('<span class="d-none d-md-inline">Vote</span><span class="d-inline-block d-md-none">' +
+                '<div class="opacity-0 mr-4">1</div><div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-start align-items-center">' +
+                '<svg height="20px" fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 124.89 124.89" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M19.777,96.79h22.032l3.018-17.919H23.55L19.777,96.79z M27.04,83.17h12.701l-1.569,9.319H25.078L27.04,83.17z"></path> <polygon points="47.573,61.294 43.007,63.977 42.575,66.54 30.225,66.54 32.076,57.749 42.403,57.749 48.794,54.038 48.853,53.691 28.783,53.691 25.225,70.595 46.006,70.595 "></polygon> <polygon points="49.82,54.736 38.89,61.083 36.038,58.341 33.201,60.067 38.189,65.341 52.479,56.945 "></polygon> <path d="M123.956,18.278l-5.369-6.356c-1.409-1.668-3.904-1.878-5.574-0.469l-4.626,3.909l10.473,12.399l4.627-3.908 C125.156,22.442,125.365,19.946,123.956,18.278z"></path> <polygon points="104.115,43.174 99.49,47.056 114.496,108.96 6.878,108.96 22.775,43.388 71.445,43.388 78.117,37.979 18.52,37.979 0,114.37 121.375,114.37 "></polygon> <polygon points="106.351,17.082 64.062,52.803 74.537,65.204 98.283,45.144 98.3,45.129 103.521,40.718 116.824,29.48 "></polygon> <polygon points="55.404,70.847 71.82,66.868 61.969,55.204 "></polygon> </g> </g> </g></svg>' +
+                '</div></span>')
             $('#candidates tr').each((i, el) => {
                 if ($(el).find('td').eq(1).find('span').length < 2) {
                     const country = $(el).find('td').eq(1).text().trim();
@@ -867,13 +878,13 @@ if (auth()->user()){
                     ) || '';
 
                     $(el).find('td').eq(1).html(
-                        '<span class="d-none d-sm-inline">' + country + '</span>' +
-                        '<span class="d-inline-block d-sm-none">' + code.toUpperCase() + '</span>'
+                        '<span class="d-none d-md-inline">' + country + '</span>' +
+                        '<span class="d-inline-block d-md-none">' + code.toUpperCase() + '</span>'
                     );
                 }
 
             });
-            const classes = ['d-none d-sm-block col-5', 'col-12 col-sm-7']
+            const classes = ['mb-3 col-12 col-sm-5', 'col-12 col-sm-7']
             $('#candidates_wrapper .row:last-child > div').each((i, el) => {
                 $(el)
                     .removeClass('col-sm-12 col-md-5 col-md-7')
@@ -883,7 +894,7 @@ if (auth()->user()){
 
             $('#candidates td,#candidates th').each((i, cell) => {
                 if (!$($(cell).html()).hasClass('textarea')) {
-                    $(cell).html('<div class="textarea roww">' + $(cell).html() + '</div>')
+                    $(cell).html('<div class="textarea roww position-relative">' + $(cell).html() + '</div>')
                 }
             })
         });
@@ -893,9 +904,15 @@ if (auth()->user()){
         })
 
         $('body').on('click', 'tr', function () {
+            @auth()
+
+            e.preventDefault()
+            window.parent.postMessage({action: 'login'}, '*');
+            @else
             const input = $(this).find('input');
 
             input.prop('checked', true);
+            @endauth
         });
     </script>
     <script id="selectBS-customize">

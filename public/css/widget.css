@@ -15911,11 +15911,6 @@ moe
         font-size: 0;
     }
 
-    #candidates tr > th:last-child,
-    #candidates tr > td:last-child {
-        display: none;
-    }
-
     #candidates tr:has(input:checked) {
         background-color: #dae0e5;
     }
@@ -16064,4 +16059,14 @@ td:has(input:checked) .radio-box .svg1 {
 
 td:has(input:checked) .radio-box .svg2 {
     display: none;
+}
+
+#myTab > li {
+    width: 80%;
+}
+
+@media screen and (min-width: 578px) {
+    #myTab > li {
+        width: 25%;
+    }
 }
