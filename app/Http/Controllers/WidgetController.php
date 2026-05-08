@@ -62,7 +62,7 @@ class WidgetController extends Controller
         }
 
         $voted = Vote::where('candidate_id', 'in', collect($election->candidates)->map(fn(Candidate $candidate) => $candidate->id)->join(','))
-            ->where('user_id', $request->user()->id)
+            ->where('user_id', $request->user()?->id)
             ->exists();
 
         return view('widget', compact('election', 'voted'));

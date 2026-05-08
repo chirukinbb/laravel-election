@@ -358,6 +358,7 @@ if (auth()->user()){
                 </x-adminlte-datatable>
                 <input type="hidden" value="{{$election->id}}" name="election_id">
 
+                @if($voted)
                 <div class="field">
                     <input type="text" id="sharedlink" name="sharedlink"
                            class="input is-floating" value="https://e.con">
@@ -376,6 +377,7 @@ if (auth()->user()){
                         </svg>
                     </div>
                 </div>
+                @endif
 
                 @if(auth()->check() && !$voted)
                     <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column mt-2">
@@ -634,9 +636,7 @@ if (auth()->user()){
 
                 if (candidate.is_my) {
                     voteCell += `<input type="radio" class="d-none" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}" checked>`
-                    $('#sharedlink')
-                ..
-                    val(candidate.shared_link)
+                    $('#sharedlink').val(candidate.shared_link)
                 } else {
                     voteCell += `<input type="radio" class="d-none" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}">`
                 }
