@@ -318,9 +318,10 @@ if (auth()->user()){
                         data-bs-target="#home" type="button"
                         role="tab" aria-controls="home" aria-selected="true">
                     <span class="btn-fill" data-fill></span>
-                    <span class="btn-text">Ballot paper</span>
+                    <span class="btn-text">Ballot</span>
                 </button>
             </li>
+            @if(!$voted)
             <li class="nav-item" role="presentation">
                 <button class="ml-0 button button--primary  w-100 ml-sm-2" is="hover-button" id="profile-tab"
                         data-bs-toggle="tab"
@@ -330,6 +331,7 @@ if (auth()->user()){
                     <span class="btn-text">Nominate</span>
                 </button>
             </li>
+            @endif
             @guest()
                 <li class="nav-item" role="presentation">
                     <button class="ml-0 ml-sm-2 button button--primary mt-sm-0 mt-1 w-100" is="hover-button" id="login"
@@ -356,7 +358,26 @@ if (auth()->user()){
                 </x-adminlte-datatable>
                 <input type="hidden" value="{{$election->id}}" name="election_id">
 
-                @if($voted)
+                <div class="field">
+                    <input type="text" id="sharedlink" name="sharedlink"
+                           class="input is-floating" value="https://e.con">
+                    <label for="sharedlink" class="label is-floating">
+                        Shared Link
+                    </label>
+                    <div class="position-absolute copy-icon">
+                        <svg height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                      d="M19.5 16.5L19.5 4.5L18.75 3.75H9L8.25 4.5L8.25 7.5L5.25 7.5L4.5 8.25V20.25L5.25 21H15L15.75 20.25V17.25H18.75L19.5 16.5ZM15.75 15.75L15.75 8.25L15 7.5L9.75 7.5V5.25L18 5.25V15.75H15.75ZM6 9L14.25 9L14.25 19.5L6 19.5L6 9Z"
+                                      fill="#080341"></path>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+
+                @if(auth()->check() && !$voted)
                     <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column mt-2">
                         {!! NoCaptcha::display() !!}
                         <div class="errors-vote"></div>
@@ -546,7 +567,7 @@ if (auth()->user()){
                         </label>
                     </div>
 
-                    @if($voted)
+                    @if(auth()->check() && !$voted)
                         <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column">
                             {!! NoCaptcha::display() !!}
                             <div class="errors-nominate"></div>
@@ -594,7 +615,7 @@ if (auth()->user()){
                 const position = '#' + candidate.position;
                 const country = candidate.country || '-';
                 const name = candidate.name || '-';
-                const voteCell = `<span class="opacity-0">1</span>
+                let voteCell = `<span class="opacity-0">1</span>
 <div class="radio-box position-absolute">
 <svg width="25px" height="25px" viewBox="0 0 16 16" version="1.1" class="svg1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -609,13 +630,19 @@ if (auth()->user()){
         stroke="#444"
         stroke-width="1.2"/>
 </svg>
-</div><input type="radio" class="d-none" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}">`;
+</div>`;
+
+                if (candidate.is_my) {
+                    voteCell += `<input type="radio" class="d-none" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}" checked>`
+                    $('#sharedlink')
+                ..
+                    val(candidate.shared_link)
+                } else {
+                    voteCell += `<input type="radio" class="d-none" name="candidate_id" value="${candidate.id}" data-candidate="${candidate.id}">`
+                }
+
                 const votes = candidate.votes_count
                 let row = [position, country, name, votes.toLocaleString(), voteCell]
-
-                @auth()
-                row.push(voteCell)
-                @endauth
 
                 table.row.add(row);
             });
@@ -903,17 +930,17 @@ if (auth()->user()){
             gtag('event', 'search_candidate');
         })
 
+        @if(auth()->check() && !$voted)
         $('body').on('click', 'tr', function () {
             @auth()
-
-            e.preventDefault()
-            window.parent.postMessage({action: 'login'}, '*');
-            @else
             const input = $(this).find('input');
 
             input.prop('checked', true);
+            @else
+            window.parent.postMessage({action: 'login'}, '*');
             @endauth
         });
+        @endif
     </script>
     <script id="selectBS-customize">
         $('#country_code').on('rendered.bs.select', function (select) {
@@ -1067,5 +1094,11 @@ if (auth()->user()){
     </script>
     <x-google-analytics-event selector="#profile-tab" event-name="start_new_nomination"/>
     <x-google-analytics-event selector="#sendCandidate" event-name="nomination_submitted"/>
+    <script>
+        $('.copy-icon').on('click', async () => {
+            const link = $('#sharedlink').val()
+            await navigator.clipboard.writeText(link);
+        })
+    </script>
 @stop
 

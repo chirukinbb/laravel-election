@@ -19,7 +19,9 @@ class CandidateResource extends JsonResource
             'id' => $this->id,
             'name' => $this->first_name . ' ' . $this->last_name,
             'country' => config('election.countries.' . $this->country_code),
-            'votes_count' => $this->votes->where('status', VoteStatusEnum::Verified->name)->count()
+            'votes_count' => $this->votes->where('status', VoteStatusEnum::Verified->name)->count(),
+            'is_my' => $this->votes()->whereUserId(auth()->id())->exists(),
+            'shared_link' => env('PAGE_LINK') . '?vote_for=' . $this->id
         ];
     }
 }

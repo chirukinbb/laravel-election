@@ -16070,3 +16070,12 @@ td:has(input:checked) .radio-box .svg2 {
         width: 25%;
     }
 }
+
+.copy-icon {
+    top: 0;
+    right: 15px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
