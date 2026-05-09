@@ -37,4 +37,4 @@ Route::middleware('verify.shopify')->group(function () {
     Route::get('clean-logs', [\App\Http\Controllers\AntiFraudController::class, 'clean'])->name('clean');
 });
 
-Route::get('widget', [\App\Http\Controllers\WidgetController::class, 'index'])->middleware(\App\Http\Middlewares\ShopifyMiddleware::class);
+Route::get('widget', [\App\Http\Controllers\WidgetController::class, 'index'])->middleware('auth.proxy');

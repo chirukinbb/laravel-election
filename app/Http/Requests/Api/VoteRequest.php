@@ -12,7 +12,7 @@ class VoteRequest extends FormRequest
         return [
             'candidate_id' => 'required|exists:candidates,id',
             'election_id' => ['required', 'exists:elections,id', new ElectionRule($this->post('election_id'))],
-            'g-recaptcha-response' => 'required|recaptcha',
+            'g-recaptcha-response' => 'required|captcha',
         ];
     }
 

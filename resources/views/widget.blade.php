@@ -11,13 +11,9 @@
         ['label' => 'Position', 'width' => 3],
         ['label' => 'Country', 'width' => 10],
         ['label' => 'Name', 'width' => 67],
-        ['label' => 'Votes', 'width' => 10]
+        ['label' => 'Votes', 'width' => 10],
+        ['label' => 'Vote for', 'width' => 15]
     ];
-
-if (auth()->user()){
-    $heads = array_merge($heads,[
-        ['label' => 'Vote for', 'width' => 15]]);
-}
 
     $config = [
         'data' => [],
@@ -322,19 +318,20 @@ if (auth()->user()){
                 </button>
             </li>
             @if(!$voted)
-            <li class="nav-item" role="presentation">
-                <button class="ml-0 button button--primary  w-100 ml-sm-2" is="hover-button" id="profile-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#profile" type="button"
-                        role="tab" aria-controls="profile" aria-selected="false">
-                    <span class="btn-fill" data-fill></span>
-                    <span class="btn-text">Nominate</span>
-                </button>
-            </li>
+                <li class="nav-item" role="presentation">
+                    <button class="ml-0 button button--primary  w-100 ml-sm-2" is="hover-button" id="profile-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#profile" type="button"
+                            role="tab" aria-controls="profile" aria-selected="false">
+                        <span class="btn-fill" data-fill></span>
+                        <span class="btn-text">Nominate</span>
+                    </button>
+                </li>
             @endif
             @guest()
                 <li class="nav-item" role="presentation">
-                    <button class="ml-0 ml-sm-2 button button--primary mt-sm-0 mt-1 w-100" is="hover-button" id="login"
+                    <button class="ml-0 ml-sm-2 button button--primary mt-sm-0 mt-1 w-100 ml-0 ml-sm-2"
+                            is="hover-button" id="login"
                             data-bs-toggle="tab"
                             data-bs-target="#profile" type="button"
                             role="tab" aria-controls="profile" aria-selected="false">
@@ -359,24 +356,24 @@ if (auth()->user()){
                 <input type="hidden" value="{{$election->id}}" name="election_id">
 
                 @if($voted)
-                <div class="field">
-                    <input type="text" id="sharedlink" name="sharedlink"
-                           class="input is-floating" value="https://e.con">
-                    <label for="sharedlink" class="label is-floating">
-                        Shared Link
-                    </label>
-                    <div class="position-absolute copy-icon">
-                        <svg height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                            <g id="SVGRepo_iconCarrier">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                      d="M19.5 16.5L19.5 4.5L18.75 3.75H9L8.25 4.5L8.25 7.5L5.25 7.5L4.5 8.25V20.25L5.25 21H15L15.75 20.25V17.25H18.75L19.5 16.5ZM15.75 15.75L15.75 8.25L15 7.5L9.75 7.5V5.25L18 5.25V15.75H15.75ZM6 9L14.25 9L14.25 19.5L6 19.5L6 9Z"
-                                      fill="#080341"></path>
-                            </g>
-                        </svg>
+                    <div class="field">
+                        <input type="text" id="sharedlink" name="sharedlink"
+                               class="input is-floating" value="https://e.con">
+                        <label for="sharedlink" class="label is-floating">
+                            Shared Link
+                        </label>
+                        <div class="position-absolute copy-icon">
+                            <svg height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                          d="M19.5 16.5L19.5 4.5L18.75 3.75H9L8.25 4.5L8.25 7.5L5.25 7.5L4.5 8.25V20.25L5.25 21H15L15.75 20.25V17.25H18.75L19.5 16.5ZM15.75 15.75L15.75 8.25L15 7.5L9.75 7.5V5.25L18 5.25V15.75H15.75ZM6 9L14.25 9L14.25 19.5L6 19.5L6 9Z"
+                                          fill="#080341"></path>
+                                </g>
+                            </svg>
+                        </div>
                     </div>
-                </div>
                 @endif
 
                 @if(auth()->check() && !$voted)
@@ -930,7 +927,7 @@ if (auth()->user()){
             gtag('event', 'search_candidate');
         })
 
-        @if(auth()->check() && !$voted)
+        @if(!$voted)
         $('body').on('click', 'tr', function () {
             @auth()
             const input = $(this).find('input');

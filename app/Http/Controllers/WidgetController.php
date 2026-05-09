@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Candidate;
 use App\Models\Election;
 use App\Models\Vote;
 use App\Services\VoteService;
@@ -61,8 +60,10 @@ class WidgetController extends Controller
             return view('empty');
         }
 
-        $voted = Vote::where('candidate_id', 'in', collect($election->candidates)->map(fn(Candidate $candidate) => $candidate->id)->join(','))
-            ->where('user_id', $request->user()?->id)
+        $voted = Vote::where('user_id', $request->user()?->id)
+            ->whereHas('candidate', function ($query) use ($election) {
+                $query->where('election_id', $election->id);
+            })
             ->exists();
 
         return view('widget', compact('election', 'voted'));

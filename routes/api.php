@@ -19,7 +19,7 @@ Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->na
         Route::get('/top50', [\App\Http\Controllers\Api\VotingController::class, 'top50'])->name('voting.top50');
         Route::get('/countries', [\App\Http\Controllers\Api\VotingController::class, 'countries'])->name('voting.countries');
     });
-Route::get('/candidates', [\App\Http\Controllers\Api\VotingController::class, 'candidates'])->name('voting.candidates');
+Route::get('/candidates', [\App\Http\Controllers\Api\VotingController::class, 'candidates'])->middleware('web')->name('voting.candidates');
 
 // Admin Routes
 Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->name])
