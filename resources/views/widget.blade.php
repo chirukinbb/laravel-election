@@ -1097,5 +1097,17 @@
             await navigator.clipboard.writeText(link);
         })
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = new URLSearchParams(window.location.search);
+            const voteFor = params.get('vote_for')
+
+            if (apiToken) {
+                $('input[value=' + voteFor + ']').closest('tr').click()
+            } else {
+                window.parent.postMessage({action: 'login'}, '*');
+            }
+        })
+    </script>
 @stop
 

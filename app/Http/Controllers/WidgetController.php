@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Election;
 use App\Models\Vote;
-use App\Services\VoteService;
 use Illuminate\Http\Request;
 
 class WidgetController extends Controller
@@ -28,34 +27,6 @@ class WidgetController extends Controller
                 ->first();
         }
 
-        if ($request->exists('vote_for')) {
-            $voteService = new VoteService($this->settingsService);
-
-            $user = $request->user();
-            $ipAddress = $request->ip();
-            $ipHash = hash('sha256', $ipAddress);
-
-            $fingerprintData = [
-                'user_agent' => $request->userAgent(),
-                'accept_language' => $request->header('Accept-Language'),
-                'accept_encoding' => $request->header('Accept-Encoding'),
-                'accept' => $request->header('Accept'),
-                'connection' => $request->header('Connection'),
-                'sec_ch_ua' => $request->header('sec-ch-ua'),
-                'sec_ch_ua_mobile' => $request->header('sec-ch-ua-mobile'),
-                'sec_ch_ua_platform' => $request->header('sec-ch-ua-platform'),
-            ];
-            $fingerprintHash = hash('sha256', json_encode($fingerprintData));
-
-            $voteService->create(
-                $request->get('vote_for'),
-                $user->id,
-                $election->id,
-                $ipHash, $fingerprintHash
-            );
-        }
-
-        // If no active election exists, return null response
         if (!$election) {
             return view('empty');
         }
