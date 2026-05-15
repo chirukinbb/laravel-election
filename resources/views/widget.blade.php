@@ -306,10 +306,10 @@
 @section('body')
     <div class="wrapper">
 
-        <ul class="nav nav-tabs d-flex justify-content-center border-0 my-5 flex-column flex-sm-row justify-content-center align-items-center"
+        <ul class="nav nav-tabs d-flex justify-content-center border-0 my-5 flex-column flex-sm-row justify-content-center align-items-center gap-2"
             id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="button mr-0 button--primary w-100 mb-sm-0 mb-1 mr-sm-2" is="hover-button" id="home-tab"
+                <button class="button button--primary w-100" is="hover-button" id="home-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#home" type="button"
                         role="tab" aria-controls="home" aria-selected="true">
@@ -317,9 +317,9 @@
                     <span class="btn-text">Ballot</span>
                 </button>
             </li>
-            @if(!$voted)
+            @if(!$vote)
                 <li class="nav-item" role="presentation">
-                    <button class="ml-0 button button--primary  w-100 ml-sm-2" is="hover-button" id="profile-tab"
+                    <button class=" button button--primary  w-100" is="hover-button" id="profile-tab"
                             data-bs-toggle="tab"
                             data-bs-target="#profile" type="button"
                             role="tab" aria-controls="profile" aria-selected="false">
@@ -330,7 +330,7 @@
             @endif
             @guest()
                 <li class="nav-item" role="presentation">
-                    <button class="ml-0 ml-sm-2 button button--primary mt-sm-0 mt-1 w-100 ml-0 ml-sm-2"
+                    <button class="button button--primary w-100 "
                             is="hover-button" id="login"
                             data-bs-toggle="tab"
                             data-bs-target="#profile" type="button"
@@ -355,29 +355,41 @@
                 </x-adminlte-datatable>
                 <input type="hidden" value="{{$election->id}}" name="election_id">
 
-                @if($voted)
-                    <div class="field">
-                        <input type="text" id="sharedlink" name="sharedlink"
-                               class="input is-floating" value="https://e.con">
-                        <label for="sharedlink" class="label is-floating">
-                            Shared Link
-                        </label>
-                        <div class="position-absolute copy-icon">
-                            <svg height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                <g id="SVGRepo_iconCarrier">
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                          d="M19.5 16.5L19.5 4.5L18.75 3.75H9L8.25 4.5L8.25 7.5L5.25 7.5L4.5 8.25V20.25L5.25 21H15L15.75 20.25V17.25H18.75L19.5 16.5ZM15.75 15.75L15.75 8.25L15 7.5L9.75 7.5V5.25L18 5.25V15.75H15.75ZM6 9L14.25 9L14.25 19.5L6 19.5L6 9Z"
-                                          fill="#080341"></path>
-                                </g>
-                            </svg>
+                @if($vote)
+                    @if($vote->status === \App\Enums\VoteStatusEnum::Verified->name)
+                        <div class="field">
+                            <input type="text" id="sharedlink" name="sharedlink"
+                                   class="input is-floating" value="https://e.con">
+                            <label for="sharedlink" class="label is-floating">
+                                Shared Link
+                            </label>
+                            <div class="position-absolute copy-icon">
+                                <svg height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                    <g id="SVGRepo_iconCarrier">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M19.5 16.5L19.5 4.5L18.75 3.75H9L8.25 4.5L8.25 7.5L5.25 7.5L4.5 8.25V20.25L5.25 21H15L15.75 20.25V17.25H18.75L19.5 16.5ZM15.75 15.75L15.75 8.25L15 7.5L9.75 7.5V5.25L18 5.25V15.75H15.75ZM6 9L14.25 9L14.25 19.5L6 19.5L6 9Z"
+                                              fill="#080341"></path>
+                                    </g>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
+
+                    @else
+                        <div class="field">
+                            <input type="text" id="sharedlink" name="sharedlink"
+                                   class="input is-floating" value="Yor vote are moderate(status {{$vote->status}})"
+                                   disabled>
+                            <label for="sharedlink" class="label is-floating">
+                                Alert
+                            </label>
+                        </div>
+                    @endif
                 @endif
 
-                @if(auth()->check() && !$voted)
-                    <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column mt-2">
+                @if(auth()->check() && !$vote)
+                    <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column mt-2 justify-content-center align-items-center">
                         {!! NoCaptcha::display() !!}
                         <div class="errors-vote"></div>
                         <div class="field field--full">
@@ -386,7 +398,7 @@
                             <button type="submit" id="ContactSubmit-template--27983535997271__contact-form"
                                     class="button button--primary button--fixed" is="hover-button">
                                 <span class="btn-fill" data-fill></span>
-                                <span class="btn-text">Vote For</span>
+                                <span class="btn-text">Vote for This Nominee</span>
                             </button>
                         </div>
                     </div>
@@ -564,13 +576,16 @@
                             Reason for Nomination
                             <span class="text-danger">*</span>
                         </label>
+                        <div id="counter"
+                             class="bottom-0 small  d-flex justify-content-end p-1 position-absolute right-0">0/1000
+                        </div>
                     </div>
 
-                    @if(auth()->check() && !$voted)
-                        <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column">
+                    @if(auth()->check() && !$vote)
+                        <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column mt-2 justify-content-center align-items-center w-100">
                             {!! NoCaptcha::display() !!}
                             <div class="errors-nominate"></div>
-                            <div class="field field--full">
+                            <div class="field field--full" style="width: auto;">
                                 <label for="ContactSubmit-template--27983535997271__contact-form" class="sr-only">Send
                                     message</label>
                                 <button type="submit" id="sendCandidate"
@@ -592,6 +607,41 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script src="https://unpkg.com/laravel-echo/dist/echo.iife.js"></script>
+    <script id="cookies">
+        // Установить cookie
+        function setCookie(name, value, days) {
+            let expires = "";
+
+            if (days) {
+                let date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+
+            document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
+        }
+
+        // Получить cookie
+        function getCookie(name) {
+            let nameEQ = name + "=";
+            let cookies = document.cookie.split(";");
+
+            for (let i = 0; i < cookies.length; i++) {
+                let c = $.trim(cookies[i]);
+
+                if (c.indexOf(nameEQ) === 0) {
+                    return decodeURIComponent(c.substring(nameEQ.length));
+                }
+            }
+
+            return null;
+        }
+
+        // Удалить cookie
+        function deleteCookie(name) {
+            document.cookie = name + "=; Max-Age=-1; path=/";
+        }
+    </script>
     <script>
         @auth()
         const apiToken = '{{auth()->user()->createToken(\App\Enums\RoleEnum::USER->name)->plainTextToken}}';
@@ -680,7 +730,10 @@
                 })
                     .then(response => {
                         if (response.ok) {
-                            window.location.reload()
+                            response.json().then(data => {
+                                //   setCookie('vote',data.candidate_id)
+                                window.location.reload()
+                            })
                         }
 
                         if (response.status === 422) {
@@ -732,12 +785,7 @@
                     .then(response => {
                         if (response.ok) {
                             return response.json().then(data => {
-                                $('.errors-nominate').html('');
-                                $('#profile')[0].reset();
-                                if (typeof grecaptcha !== "undefined") {
-                                    grecaptcha.reset();
-                                }
-                                alert('Candidate suggestion submitted for review');
+                                set
                             });
                         }
 
@@ -927,7 +975,7 @@
             gtag('event', 'search_candidate');
         })
 
-        @if(!$voted)
+        @if(!$vote)
         $('body').on('click', 'tr', function () {
             @auth()
             const input = $(this).find('input');
@@ -1102,11 +1150,24 @@
             const params = new URLSearchParams(window.location.search);
             const voteFor = params.get('vote_for')
 
-            if (apiToken) {
-                $('input[value=' + voteFor + ']').closest('tr').click()
-            } else {
-                window.parent.postMessage({action: 'login'}, '*');
+            if (voteFor) {
+                if (apiToken) {
+                    $('input[value=' + voteFor + ']').closest('tr').click()
+                } else {
+                    window.parent.postMessage({action: 'login'}, '*');
+                }
             }
+
+            $('#reason_for_nomination').on('input', function () {
+                let value = $(this).val();
+
+                if (value.length > 1000) {
+                    value = value.slice(0, 1000);
+                    $(this).val(value);
+                }
+
+                $('#counter').text(value.length + '/1000');
+            });
         })
     </script>
 @stop

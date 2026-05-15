@@ -2,41 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Election;
-use App\Models\Vote;
+use App\Repositories\ElectionRepository;
+use App\Services\SettingsService;
 use Illuminate\Http\Request;
 
 class WidgetController extends Controller
 {
+    public function __construct(
+        SettingsService            $settingsService,
+        private ElectionRepository $electionRepository
+    )
+    {
+        parent::__construct($settingsService);
+    }
+
     /**
      * Display the widget with active election
      */
     public function index(Request $request)
     {
-        $shop = $request->input('shop');
-        $voted = true;
+        $shop = $request->input('shop') || '';
 
-        if (env('APP_ENV') === 'local') {
-            $election = Election::where('date_start', '<=', now())
-                ->where('date_end', '>=', now())
-                ->first();
-        } else {
-            $election = Election::where('date_start', '<=', now())
-                ->whereRelation('user', 'name', $shop)
-                ->where('date_end', '>=', now())
-                ->first();
-        }
+        $election = $this->electionRepository->getOngoingElection($shop);
 
         if (!$election) {
+            $election = $this->electionRepository->getLastElection($shop);
+
+            if ($election) {
+                $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
+
+                return view('result', compact('election', 'vote'));
+            }
+
             return view('empty');
         }
 
-        $voted = Vote::where('user_id', $request->user()?->id)
-            ->whereHas('candidate', function ($query) use ($election) {
-                $query->where('election_id', $election->id);
-            })
-            ->exists();
+        $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
 
-        return view('widget', compact('election', 'voted'));
+        return view('widget', compact('election', 'vote'));
     }
 }

@@ -3,10 +3,13 @@
 namespace App\Http\Requests\Api;
 
 use App\Rules\ElectionRule;
+use App\Traits\AntiFraud;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SuggestCandidateRequest extends FormRequest
 {
+    use AntiFraud;
+
     public function rules(): array
     {
         return [
@@ -21,7 +24,7 @@ class SuggestCandidateRequest extends FormRequest
             'socials.*' => 'nullable|string|max:255',
             'photo_url' => 'nullable|string|starts_with:https://',
             'reason_for_nomination' => 'required|min:50|max:1000',
-            'g-recaptcha-response' => 'required|recaptcha',
+            //      'g-recaptcha-response' => 'required|recaptcha',
             'election_id' => ['required', 'exists:elections,id', new ElectionRule($this->post('election_id'))],
         ];
     }

@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Http;
 
 class VotingController extends Controller
 {
+
     /**
      * Get list of approved candidates with pagination
      */
@@ -101,33 +102,13 @@ class VotingController extends Controller
     public function vote(VoteRequest $request): JsonResponse
     {
         $voteService = new VoteService($this->settingsService);
-
-        $user = $request->user();
-        $ipAddress = $request->ip();
-        $ipHash = hash('sha256', $ipAddress);
-
-        $fingerprintData = [
-            'user_agent' => $request->userAgent(),
-            'accept_language' => $request->header('Accept-Language'),
-            'accept_encoding' => $request->header('Accept-Encoding'),
-            'accept' => $request->header('Accept'),
-            'connection' => $request->header('Connection'),
-            'sec_ch_ua' => $request->header('sec-ch-ua'),
-            'sec_ch_ua_mobile' => $request->header('sec-ch-ua-mobile'),
-            'sec_ch_ua_platform' => $request->header('sec-ch-ua-platform'),
-        ];
-        $fingerprintHash = hash('sha256', json_encode($fingerprintData));
-
-        $voteService->create(
-            $request->get('candidate_id'),
-            $user->id,
-            $request->get('election_id'),
-            $ipHash, $fingerprintHash
+        $voteService->create($request->get('candidate_id'), $request->user()->id, $request->get('election_id'),
+            $request->ipHash(), $request->fingerprintHash()
         );
 
         return response()->json([
             'success' => true
-        ], 201);
+        ], 201)->cookie('vote', $request->get('candidate_id'));
     }
 
     /**
@@ -136,6 +117,8 @@ class VotingController extends Controller
     public function suggestCandidate(SuggestCandidateRequest $request): JsonResponse
     {
         $validated = $request->validated();
+
+        $voteService = new VoteService($this->settingsService);
 
         $candidate = Candidate::create([
             'election_id' => $validated['election_id'],
@@ -151,6 +134,10 @@ class VotingController extends Controller
             'reason_for_nomination' => $validated['reason_for_nomination'],
             'status' => CandidateStatusEnum::PendingReview->name,
         ]);
+
+        $voteService->create($request->get('candidate_id'), $request->user()->id, $request->get('election_id'),
+            $request->ipHash(), $request->fingerprintHash()
+        );
 
         return response()->json([
             'success' => true,

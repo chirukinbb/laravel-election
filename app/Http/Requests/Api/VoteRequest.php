@@ -3,16 +3,19 @@
 namespace App\Http\Requests\Api;
 
 use App\Rules\ElectionRule;
+use App\Traits\AntiFraud;
 use Illuminate\Foundation\Http\FormRequest;
 
 class VoteRequest extends FormRequest
 {
+    use AntiFraud;
+
     public function rules(): array
     {
         return [
             'candidate_id' => 'required|exists:candidates,id',
             'election_id' => ['required', 'exists:elections,id', new ElectionRule($this->post('election_id'))],
-            'g-recaptcha-response' => 'required|captcha',
+            //      'g-recaptcha-response' => 'required|captcha',
         ];
     }
 
