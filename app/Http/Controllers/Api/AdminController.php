@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\CandidateStatusEnum;
 use App\Enums\SettingKeyEnum;
 use App\Enums\VoteStatusEnum;
-use App\Events\CandidateApproved;
+use App\Events\CandidateBanded;
 use App\Events\CandidateMerged;
 use App\Events\CandidateRejected;
 use App\Events\UpdateCandidates;
@@ -64,7 +64,7 @@ class AdminController extends Controller
         ]);
 
         // Broadcast the candidate approval event
-        event(new CandidateApproved($candidate));
+        event(new CandidateBanded($candidate));
 
         // Broadcast update candidates for widget
         event(new UpdateCandidates($candidate->election));
@@ -382,5 +382,27 @@ class AdminController extends Controller
                 'last_page' => $suspiciousVotes->lastPage(),
             ],
         ]);
+    }
+
+    function bindWithElection(Request $request): JsonResponse
+    {
+        $request->validate([
+            'candidates' => 'required|array',
+            'election_id' => 'required|numeric'
+        ]);
+
+        Candidate::whereIn('id', $request->post('candidates'))->each(function (Candidate $candidate) use ($request) {
+            $candidate->update(['election_id' => $request->post('election_id')]);
+            Vote::create([
+                'candidate_id' => $candidate->id,
+                'user_id' => $candidate->proposed_by,
+                'status' => VoteStatusEnum::Verified->name,
+                'ip_hash' => '$ipHash',
+                'fingerprint_hash' => '$fingerprintHash',
+            ]);
+            event(new CandidateBanded($candidate));
+        });
+
+        return response()->json(true);
     }
 }

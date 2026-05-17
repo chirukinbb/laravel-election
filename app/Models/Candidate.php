@@ -20,7 +20,9 @@ class Candidate extends Model
         'socials',
         'photo_url',
         'reason_for_nomination',
-        'status'
+        'status',
+        'category',
+        'proposed_by'
     ];
 
     protected $casts = [

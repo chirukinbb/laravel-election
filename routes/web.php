@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('verify.shopify')->group(function () {
+Route::group([], function () {
     Route::get("/", [\App\Http\Controllers\DashboardController::class, 'index'])->name("dashboard");
     Route::get("dashboard", [\App\Http\Controllers\DashboardController::class, 'index'])->name("dashboard1");
 
@@ -28,6 +28,8 @@ Route::middleware('verify.shopify')->group(function () {
         });
     });
 
+    Route::get('candidates', [\App\Http\Controllers\CandidateController::class, 'unbounded'])->name('candidates');
+
     Route::get('moderation', [\App\Http\Controllers\ModerationController::class, 'index'])->name('moderation');
 
     Route::get('settings', [\App\Http\Controllers\SettingsController::class, 'index'])->name('settings');
@@ -37,4 +39,4 @@ Route::middleware('verify.shopify')->group(function () {
     Route::get('clean-logs', [\App\Http\Controllers\AntiFraudController::class, 'clean'])->name('clean');
 });
 
-Route::get('widget', [\App\Http\Controllers\WidgetController::class, 'index'])->middleware('auth.proxy');
+Route::get('widget', [\App\Http\Controllers\WidgetController::class, 'index']);//->middleware('auth.proxy');

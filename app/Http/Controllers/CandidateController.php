@@ -8,6 +8,7 @@ use App\Http\Requests\CandidateRequest;
 use App\Models\Candidate;
 use App\Models\Election;
 use App\Models\Vote;
+use Illuminate\Http\Request;
 
 class CandidateController extends Controller
 {
@@ -77,7 +78,7 @@ class CandidateController extends Controller
         ))->with('success', 'Candidate was updated!');
     }
 
-    public function delete(Election $election, Candidate $candidate, \Illuminate\Http\Request $request)
+    public function delete(Election $election, Candidate $candidate, Request $request)
     {
         $candidate->delete();
         event(new UpdateCandidates($election));
@@ -86,5 +87,13 @@ class CandidateController extends Controller
             compact('election'),
             $request->only('embedded', 'host', 'id_token', 'shop', 'locale', 'token')
         ))->with('success', 'Candidate was deleted!');
+    }
+
+    public function unbounded(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+    {
+        $candidates = Candidate::where('election_id', 0)->get();
+        $elections = Election::where('date_end', '>', now())->get();
+
+        return view('candidate.unbounded', compact('candidates', 'elections'));
     }
 }

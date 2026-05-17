@@ -310,6 +310,11 @@ return [
             'icon' => 'fas fa-fw fa-vote-yea', // Урна для голосования
         ],
         [
+            'text' => 'Candidates',
+            'url' => 'candidates',
+            'icon' => 'fas fa-fw fa-users', // Урна для голосования
+        ],
+        [
             'text' => 'Moderation Queue',
             'url' => 'moderation',
             'icon' => 'fas fa-fw fa-user-check', // Проверка пользователя/кандидата

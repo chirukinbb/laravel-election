@@ -570,6 +570,12 @@
                         <label for="photo_url" class="label is-floating">Photo URL</label>
                     </div>
                     <div class="field--full">
+                        <input type="text" class="input is-floating" id="category" name="category"
+                               placeholder="Category" required>
+                        <label for="category" class="label is-floating">Category
+                            <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="field--full">
                         <textarea class="textarea is-floating" id="reason_for_nomination" name="reason_for_nomination"
                                   rows="3" placeholder=""></textarea>
                         <label for="reason_for_nomination" class="label is-floating">
@@ -731,7 +737,6 @@
                     .then(response => {
                         if (response.ok) {
                             response.json().then(data => {
-                                //   setCookie('vote',data.candidate_id)
                                 window.location.reload()
                             })
                         }
@@ -785,7 +790,7 @@
                     .then(response => {
                         if (response.ok) {
                             return response.json().then(data => {
-                                set
+                                window.location.reload()
                             });
                         }
 

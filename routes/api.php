@@ -28,6 +28,7 @@ Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->na
         Route::post('/candidate/approve', [\App\Http\Controllers\Api\AdminController::class, 'approveCandidate'])->name('admin.candidate.approve');
         Route::post('/candidate/reject', [\App\Http\Controllers\Api\AdminController::class, 'rejectCandidate'])->name('admin.candidate.reject');
         Route::post('/candidate/merge', [\App\Http\Controllers\Api\AdminController::class, 'mergeCandidates'])->name('admin.candidate.merge');
+        Route::post('/candidate/bind', [\App\Http\Controllers\Api\AdminController::class, 'bindWithElection'])->name('admin.candidate.bind');
         Route::post('/vote/flag', [\App\Http\Controllers\Api\AdminController::class, 'flagVote'])->name('admin.vote.flag');
         Route::post('/vote/approve', [\App\Http\Controllers\Api\AdminController::class, 'approveVote'])->name('admin.vote.approve');
         Route::post('/vote/reject', [\App\Http\Controllers\Api\AdminController::class, 'rejectVote'])->name('admin.vote.reject');

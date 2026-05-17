@@ -118,10 +118,8 @@ class VotingController extends Controller
     {
         $validated = $request->validated();
 
-        $voteService = new VoteService($this->settingsService);
-
         $candidate = Candidate::create([
-            'election_id' => $validated['election_id'],
+            'election_id' => 0,
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'country_code' => $validated['country_code'],
@@ -133,11 +131,9 @@ class VotingController extends Controller
             'photo_url' => $validated['photo_url'] ?? null,
             'reason_for_nomination' => $validated['reason_for_nomination'],
             'status' => CandidateStatusEnum::PendingReview->name,
+            'category' => $validated['category'],
+            'proposed_by' => $request->user()->id
         ]);
-
-        $voteService->create($request->get('candidate_id'), $request->user()->id, $request->get('election_id'),
-            $request->ipHash(), $request->fingerprintHash()
-        );
 
         return response()->json([
             'success' => true,

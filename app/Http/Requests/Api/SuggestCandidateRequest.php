@@ -19,6 +19,7 @@ class SuggestCandidateRequest extends FormRequest
             'city' => 'nullable|string|max:255',
             'profession' => 'nullable|string|max:255',
             'role' => 'nullable|string|max:255',
+            'category' => 'required|string|max:255',
             'website' => 'nullable|url|max:255',
             'socials' => 'nullable|array',
             'socials.*' => 'nullable|string|max:255',
