@@ -129,21 +129,73 @@ $btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 " title="Delete"
         })
 
         window.Echo.channel('admin')
-            .listen('.vote.approved', (data) => {
+            .listen('.candidate.bounded', (data) => {
+                // Remove the bound candidate from the unbounded list
+                const candidateCheckbox = $(`input[name="candidates[]"][value="${data.candidate_id}"]`);
+                if (candidateCheckbox.length) {
+                    const candidateRow = candidateCheckbox.closest('tr');
+                    if (candidateRow.length) {
+                        candidateRow.css('background-color', '#d4edda');
+                        candidateRow.fadeOut(1000, function () {
+                            $(this).remove();
 
-                const voteRow = $(`button.approve-vote[data-id="${data.vote_id}"]`).closest('tr');
-                if (voteRow.length) {
-                    voteRow.css('background-color', '#d4edda');
-                    voteRow.fadeOut(1000, function () {
+                            if ($.fn.DataTable.isDataTable('#table2')) {
+                                $('#table2').DataTable().draw();
+                            }
+                        });
+
+                        showToast(`Candidate ${data.candidate_name} was bound to election ${data.election_name}`, 'success');
+                    }
+                }
+            })
+            .listen('.candidate.unbounded', (data) => {
+                const candidateRow = $(`button.approve-candidate[data-id="${data.candidate_id}"]`).closest('tr');
+                if (candidateRow.length) {
+                    candidateRow.css('background-color', '#d4edda');
+                    candidateRow.fadeOut(1000, function () {
                         $(this).remove();
 
-                        if ($.fn.DataTable.isDataTable('#votes')) {
-                            $('#votes').DataTable().draw();
+                        if ($.fn.DataTable.isDataTable('#candidates')) {
+                            $('#candidates').DataTable().draw();
                         }
                     });
 
-                    showToast(`Vote for ${data.candidate_name} was approved`, 'success');
+                    showToast(`Candidate ${data.candidate_name} was approved`, 'success');
                 }
-            })
+            });
+
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: '#28a745',
+                error: '#dc3545',
+                warning: '#ffc107',
+                info: '#17a2b8'
+            };
+
+            const toast = $(`
+                <div style="
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${colors[type]};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    z-index: 9999;
+                    animation: slideIn 0.3s ease;
+                ">
+                    ${message}
+                </div>
+            `);
+
+            $('body').append(toast);
+
+            setTimeout(() => {
+                toast.fadeOut(500, function () {
+                    $(this).remove();
+                });
+            }, 3000);
+        }
     </script>
 @endsection
