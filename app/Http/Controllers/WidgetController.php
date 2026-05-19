@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Candidate;
 use App\Repositories\ElectionRepository;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
@@ -38,7 +39,8 @@ class WidgetController extends Controller
         }
 
         $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
+        $candidate = Candidate::where('proposed_by', $election->id)->where('election_id', 0)->first();
 
-        return view('widget', compact('election', 'vote'));
+        return view('widget', compact('election', 'vote', 'candidate'));
     }
 }

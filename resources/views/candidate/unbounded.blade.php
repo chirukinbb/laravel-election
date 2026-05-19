@@ -124,6 +124,15 @@ $btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 " title="Delete"
                 data: {candidates, election_id: $('#bind_with').val()},
                 headers: {
                     'Authorization': 'Bearer {{auth()->user()->createToken(\App\Enums\RoleEnum::ADMIN->name)->plainTextToken}}'
+                },
+                success: function (response) {
+                    $('#modalMin').modal('hide');
+                    showToast('Candidates successfully bound to election', 'success');
+                    candidates = [];
+                },
+                error: function (xhr) {
+                    showToast('Error binding candidates. Please try again.', 'error');
+                    console.error('Bind error:', xhr);
                 }
             });
         })

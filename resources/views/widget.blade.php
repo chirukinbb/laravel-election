@@ -432,6 +432,18 @@
                     @endif
                 @endif
 
+                @if($candidate)
+                    <div class="field">
+                        <input type="text" id="sharedlink" name="sharedlink"
+                               class="input is-floating"
+                               value="Your candidate are moderate(status {{$candidate->status}})"
+                               disabled>
+                        <label for="sharedlink" class="label is-floating">
+                            Alert
+                        </label>
+                    </div>
+                @endif
+
                 @if(auth()->check() && !$vote)
                     <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column mt-2 justify-content-center align-items-center">
                         {!! NoCaptcha::display() !!}

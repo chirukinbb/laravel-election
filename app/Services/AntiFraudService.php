@@ -139,7 +139,7 @@ class AntiFraudService
         }
 
         if ($score >= $this->approveLimit) {
-            return VoteStatusEnum::Suspicious->name;
+            return VoteStatusEnum::Verified->name;
         }
 
         return VoteStatusEnum::Pending->name;
