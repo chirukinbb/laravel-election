@@ -305,6 +305,50 @@
 
 @section('body')
     <div class="wrapper">
+        @if($election->date_end && !$election->isEnded())
+            <div id="countdown-container" class="text-center mb-4">
+                <div class="countdown-timer p-3 rounded">
+                    <h5 class="mb-2" style="font-weight: 500;">Election Ends In:</h5>
+                    <div class="countdown-display d-flex justify-content-center gap-3">
+                        <div class="countdown-item text-center">
+                            <div class="countdown-value" id="countdown-days" style="font-size: 2rem; font-weight: 700;">
+                                00
+                            </div>
+                            <div class="countdown-label"
+                                 style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.9;">Days
+                            </div>
+                        </div>
+                        <div class="countdown-separator" style="font-size: 2rem; font-weight: 700;">:</div>
+                        <div class="countdown-item text-center">
+                            <div class="countdown-value" id="countdown-hours"
+                                 style="font-size: 2rem; font-weight: 700;">00
+                            </div>
+                            <div class="countdown-label"
+                                 style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.9;">Hours
+                            </div>
+                        </div>
+                        <div class="countdown-separator" style="font-size: 2rem; font-weight: 700;">:</div>
+                        <div class="countdown-item text-center">
+                            <div class="countdown-value" id="countdown-minutes"
+                                 style="font-size: 2rem; font-weight: 700;">00
+                            </div>
+                            <div class="countdown-label"
+                                 style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.9;">Minutes
+                            </div>
+                        </div>
+                        <div class="countdown-separator" style="font-size: 2rem; font-weight: 700;">:</div>
+                        <div class="countdown-item text-center">
+                            <div class="countdown-value" id="countdown-seconds"
+                                 style="font-size: 2rem; font-weight: 700;">00
+                            </div>
+                            <div class="countdown-label"
+                                 style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.9;">Seconds
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <ul class="nav nav-tabs d-flex justify-content-center border-0 my-5 flex-column flex-sm-row justify-content-center align-items-center gap-2"
             id="myTab" role="tablist">
@@ -379,7 +423,7 @@
                     @else
                         <div class="field">
                             <input type="text" id="sharedlink" name="sharedlink"
-                                   class="input is-floating" value="Yor vote are moderate(status {{$vote->status}})"
+                                   class="input is-floating" value="Your vote are moderate(status {{$vote->status}})"
                                    disabled>
                             <label for="sharedlink" class="label is-floating">
                                 Alert
@@ -1141,6 +1185,36 @@
                 window.parent.postMessage({action: 'login'}, '*');
             })
         });
+
+        // Countdown Timer
+        @if($election->date_end && !$election->isEnded())
+        (function () {
+            const endDate = new Date('{{ $election->date_end->format("Y-m-d") }} 23:59:59').getTime();
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = endDate - now;
+
+                if (distance < 0) {
+                    $('#countdown-container').html('<div class="alert alert-info text-center">Election has ended!</div>');
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                $('#countdown-days').text(String(days).padStart(2, '0'));
+                $('#countdown-hours').text(String(hours).padStart(2, '0'));
+                $('#countdown-minutes').text(String(minutes).padStart(2, '0'));
+                $('#countdown-seconds').text(String(seconds).padStart(2, '0'));
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        })();
+        @endif
     </script>
     <x-google-analytics-event selector="#profile-tab" event-name="start_new_nomination"/>
     <x-google-analytics-event selector="#sendCandidate" event-name="nomination_submitted"/>

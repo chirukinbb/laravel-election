@@ -15,22 +15,22 @@ class AnalyzeFraudScores extends Command
 
     private AntiFraudService $antiFraudService;
 
-    public function __construct(
-        private SettingsService $settingsService
-    )
+    public function __construct()
     {
         parent::__construct();
     }
 
     private function createAntiFraudService(): AntiFraudService
     {
+        $settingsService = app(SettingsService::class);
+
         return new AntiFraudService(
-            ipWeight: (int)$this->settingsService->get(SettingKeyEnum::ScoreIP),
-            fpWeight: (int)$this->settingsService->get(SettingKeyEnum::ScoreFP),
-            ipFreqWeight: (int)$this->settingsService->get(SettingKeyEnum::RateLimitIP),
-            fpFreqWeight: (int)$this->settingsService->get(SettingKeyEnum::RateLimitFP),
-            approveLimit: (int)$this->settingsService->get(SettingKeyEnum::VoteApproveLimit),
-            rejectLimit: (int)$this->settingsService->get(SettingKeyEnum::VoteRejectLimit)
+            ipWeight: (int)$settingsService->get(SettingKeyEnum::ScoreIP),
+            fpWeight: (int)$settingsService->get(SettingKeyEnum::ScoreFP),
+            ipFreqWeight: (int)$settingsService->get(SettingKeyEnum::RateLimitIP),
+            fpFreqWeight: (int)$settingsService->get(SettingKeyEnum::RateLimitFP),
+            approveLimit: (int)$settingsService->get(SettingKeyEnum::VoteApproveLimit),
+            rejectLimit: (int)$settingsService->get(SettingKeyEnum::VoteRejectLimit)
         );
     }
 
