@@ -11,10 +11,20 @@ use App\Models\GoogleCloudSetting;
 use App\Models\GoogleProject;
 use App\Models\User;
 use App\Models\Vote;
+use App\Repositories\CandidateRepository;
+use App\Services\SettingsService;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        SettingsService             $settingsService,
+        private CandidateRepository $candidateRepository
+    )
+    {
+        parent::__construct($settingsService);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -70,6 +80,8 @@ class DashboardController extends Controller
             $topCandidates = collect();
         }
 
+        $categories = $this->candidateRepository->getCategoryList();
+
         return view('dashboard', compact(
             'elections',
             'selectedElection',
@@ -78,6 +90,7 @@ class DashboardController extends Controller
             'approvedCandidates',
             'pendingCandidates',
             'conversion',
+            'categories',
             'topCandidates'
         ));
     }

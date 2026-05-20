@@ -24,24 +24,21 @@ class WidgetController extends Controller
     public function index(Request $request)
     {
         $shop = $request->input('shop') || '';
+        $electionId = $request->input('election') || '';
 
-        $election = $this->electionRepository->getOngoingElection($shop);
+        $election = $this->electionRepository->getById($shop, $electionId);
 
-        if (!$election) {
-            $election = $this->electionRepository->getLastElection($shop);
+        if ($election?->date_end > now()) {
+            $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
 
-            if ($election) {
-                $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
+            return view('result', compact('election', 'vote'));
+        } elseif ($election?->date_end > now() && $election?->date_start < now()) {
+            $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
+            $candidate = $this->candidateRepository->getMyModeratingCandidate($election->id, $request->user()->id);
 
-                return view('result', compact('election', 'vote'));
-            }
-
-            return view('empty');
+            return view('widget', compact('election', 'vote', 'candidate'));
         }
 
-        $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
-        $candidate = $this->candidateRepository->getMyModeratingCandidate($election->id, $request->user()->id);
-
-        return view('widget', compact('election', 'vote', 'candidate'));
+        return view('empty');
     }
 }

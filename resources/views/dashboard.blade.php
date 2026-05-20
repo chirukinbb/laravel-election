@@ -101,15 +101,35 @@
 
         </div>
 
-        <!-- Top 50 Candidates Table -->
-        <div class="row">
-            <div class="col-12">
-                <x-adminlte-card>
-                    <div class="table-responsive">
-                        <table id="topCandidatesTable" class="table table-striped table-bordered">
-                            <thead>
-                            <tr>
-                                <th>#</th>
+            <!-- Categories -->
+            <div class="row">
+                <div class="col-12">
+                    <x-adminlte-card title="Categories" theme="secondary" icon="fas fa-tags">
+                        <div class="d-flex flex-nowrap overflow-auto" style="gap: 1rem; padding-bottom: 0.5rem;">
+                            @forelse($categories as $category)
+                                <div class="flex-shrink-0">
+                                <span class="badge bg-secondary"
+                                      style="font-size: 0.9rem; padding: 0.5rem 1rem; white-space: nowrap;">
+                                    {{ $category }}
+                                </span>
+                                </div>
+                            @empty
+                                <p class="text-muted mb-0">No categories available</p>
+                            @endforelse
+                        </div>
+                    </x-adminlte-card>
+                </div>
+            </div>
+
+            <!-- Top 50 Candidates Table -->
+            <div class="row">
+                <div class="col-12">
+                    <x-adminlte-card>
+                        <div class="table-responsive">
+                            <table id="topCandidatesTable" class="table table-striped table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
                                 <th>Country</th>
                                 <th>Name</th>
                                 <th style="width: 10%">Votes</th>

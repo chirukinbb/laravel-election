@@ -22,4 +22,12 @@ class CandidateRepository
             ->where('election_id', $electionId)
             ->first();
     }
+
+    function getCategoryList(): \Illuminate\Database\Eloquent\Collection|array|\LaravelIdea\Helper\App\Models\_IH_Candidate_C
+    {
+        return $this->builder->whereNotNull('category')
+            ->select('category')
+            ->groupBy('category')
+            ->get()->map(fn(Candidate $candidate) => $candidate->category)->toArray();
+    }
 }
