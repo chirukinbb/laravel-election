@@ -26,17 +26,17 @@ class WidgetController extends Controller
         $shop = $request->input('shop') || '';
         $electionId = $request->input('election') || '';
 
-        $election = $this->electionRepository->getById($shop, $electionId);
+        $election = $this->electionRepository->getById((int)$electionId, $shop);
 
-        if ($election?->date_end > now()) {
-            $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
-
-            return view('result', compact('election', 'vote'));
-        } elseif ($election?->date_end > now() && $election?->date_start < now()) {
+        if ($election?->date_end > now() && $election?->date_start < now()) {
             $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
             $candidate = $this->candidateRepository->getMyModeratingCandidate($election->id, $request->user()->id);
 
             return view('widget', compact('election', 'vote', 'candidate'));
+        } elseif ($election?->date_end < now()) {
+            $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
+
+            return view('result', compact('election', 'vote'));
         }
 
         return view('empty');

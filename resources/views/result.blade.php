@@ -316,7 +316,7 @@
             @endforeach
         </x-adminlte-datatable>
 
-        @if($voted)
+        @if($vote)
             <h6 class="my-3">Your candidate <span class="candidate"></span> placed <span class="placed"></span> position
             </h6>
         @endif
