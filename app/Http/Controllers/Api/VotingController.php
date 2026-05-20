@@ -119,7 +119,7 @@ class VotingController extends Controller
         $validated = $request->validated();
 
         $candidate = Candidate::create([
-            'election_id' => 0,
+            'election_id' => $validated['election_id'],
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'country_code' => $validated['country_code'],

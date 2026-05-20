@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Candidate;
+use App\Repositories\CandidateRepository;
 use App\Repositories\ElectionRepository;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
@@ -10,8 +10,9 @@ use Illuminate\Http\Request;
 class WidgetController extends Controller
 {
     public function __construct(
-        SettingsService            $settingsService,
-        private ElectionRepository $electionRepository
+        SettingsService             $settingsService,
+        private ElectionRepository  $electionRepository,
+        private CandidateRepository $candidateRepository
     )
     {
         parent::__construct($settingsService);
@@ -39,7 +40,7 @@ class WidgetController extends Controller
         }
 
         $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
-        $candidate = Candidate::where('proposed_by', $election->id)->where('election_id', 0)->first();
+        $candidate = $this->candidateRepository->getMyModeratingCandidate($election->id, $request->user()->id);
 
         return view('widget', compact('election', 'vote', 'candidate'));
     }

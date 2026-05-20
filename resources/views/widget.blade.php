@@ -1187,9 +1187,12 @@
                 return;
             }
 
-            window.Echo.channel('widget')
+            window.Echo.channel('widget.{{ $election->id }}')
                 .listen('.candidate.update', (data) => {
-                    updateCandidatesTable(data);
+                    window.location.reload()
+                })
+                .listen('.vote.approved', (data) => {
+                    window.location.reload()
                 });
 
             $('#login').on('click', function (e) {

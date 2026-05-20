@@ -32,6 +32,7 @@ class VoteApproved implements ShouldBroadcastNow
     {
         return [
             new Channel('admin'),
+            new Channel('widget.' . $this->vote->candidate->election->id),
         ];
     }
 

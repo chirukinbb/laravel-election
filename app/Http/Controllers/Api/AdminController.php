@@ -5,13 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Enums\CandidateStatusEnum;
 use App\Enums\SettingKeyEnum;
 use App\Enums\VoteStatusEnum;
-use App\Events\CandidateBanded;
-use App\Events\CandidateMerged;
-use App\Events\CandidateRejected;
-use App\Events\UpdateCandidates;
-use App\Events\VoteApproved;
-use App\Events\VoteFlagged;
-use App\Events\VoteRejected;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ApproveCandidateRequest;
 use App\Http\Requests\Api\ApproveVoteRequest;
@@ -62,12 +55,13 @@ class AdminController extends Controller
         $candidate->update([
             'status' => CandidateStatusEnum::Approved->name,
         ]);
-
-        // Broadcast the candidate approval event
-        event(new CandidateBanded($candidate));
-
-        // Broadcast update candidates for widget
-        event(new UpdateCandidates($candidate->election));
+        Vote::create([
+            'candidate_id' => $candidate->id,
+            'user_id' => $candidate->proposed_by,
+            'status' => VoteStatusEnum::Verified->name,
+            'ip_hash' => '$ipHash',
+            'fingerprint_hash' => '$fingerprintHash',
+        ]);
 
         return response()->json([
             'success' => true,
@@ -99,9 +93,6 @@ class AdminController extends Controller
             'status' => CandidateStatusEnum::Rejected->name,
         ]);
 
-        // Broadcast the candidate rejection event
-        event(new CandidateRejected($candidate));
-
         return response()->json([
             'success' => true,
             'message' => 'Candidate rejected',
@@ -132,20 +123,10 @@ class AdminController extends Controller
         DB::beginTransaction();
 
         try {
-            // Transfer votes from source to target
-            Vote::where('candidate_id', $sourceCandidate->id)
-                ->update(['candidate_id' => $targetCandidate->id]);
-
-            // Mark source candidate as merged
-            $sourceCandidate->update([
-                'status' => CandidateStatusEnum::Merged->name,
-            ]);
+            // Use the model's mergeInto method which handles events
+            $sourceCandidate->mergeInto($targetCandidate);
 
             DB::commit();
-
-            // Broadcast the candidate merge event
-            event(new CandidateMerged($sourceCandidate, $targetCandidate));
-            event(new UpdateCandidates($targetCandidate->election));
 
             return response()->json([
                 'success' => true,
@@ -186,9 +167,6 @@ class AdminController extends Controller
             'status' => VoteStatusEnum::Suspicious->name,
         ]);
 
-        // Broadcast the vote flagged event
-        event(new VoteFlagged($vote));
-
         return response()->json([
             'success' => true,
             'message' => 'Vote flagged as suspicious',
@@ -206,7 +184,7 @@ class AdminController extends Controller
     {
         $validated = $request->validated();
 
-        $vote = Vote::with(['candidate.election'])->find($validated['vote_id']);
+        $vote = Vote::find($validated['vote_id']);
 
         if (!$vote) {
             return response()->json([
@@ -218,12 +196,6 @@ class AdminController extends Controller
         $vote->update([
             'status' => VoteStatusEnum::Verified->name,
         ]);
-
-        // Broadcast the vote approval event
-        event(new VoteApproved($vote));
-
-        // Broadcast update candidates for widget
-        event(new UpdateCandidates($vote->candidate->election));
 
         return response()->json([
             'success' => true,
@@ -254,9 +226,6 @@ class AdminController extends Controller
         $vote->update([
             'status' => VoteStatusEnum::Rejected->name,
         ]);
-
-        // Broadcast the vote rejection event
-        event(new VoteRejected($vote));
 
         return response()->json([
             'success' => true,
@@ -392,7 +361,10 @@ class AdminController extends Controller
         ]);
 
         Candidate::whereIn('id', $request->post('candidates'))->each(function (Candidate $candidate) use ($request) {
-            $candidate->update(['election_id' => $request->post('election_id')]);
+            $candidate->update([
+                'election_id' => $request->post('election_id'),
+                'status' => CandidateStatusEnum::Approved->name,
+            ]);
             Vote::create([
                 'candidate_id' => $candidate->id,
                 'user_id' => $candidate->proposed_by,
@@ -400,7 +372,6 @@ class AdminController extends Controller
                 'ip_hash' => '$ipHash',
                 'fingerprint_hash' => '$fingerprintHash',
             ]);
-            event(new CandidateBanded($candidate));
         });
 
         return response()->json(true);

@@ -30,7 +30,7 @@ class UpdateCandidates implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new Channel('widget'),
+            new Channel('widget.' . $this->election->id),
         ];
     }
 
