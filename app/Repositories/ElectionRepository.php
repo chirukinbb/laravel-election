@@ -39,4 +39,9 @@ class ElectionRepository
                 $query->where('election_id', $election->id);
             })->first();
     }
+
+    function getById(int $id, string $shop)
+    {
+        return $this->election->where('id', $id)->whereRelation('user', 'name', $shop)->first();
+    }
 }
