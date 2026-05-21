@@ -23,10 +23,13 @@ class WidgetController extends Controller
      */
     public function index(Request $request)
     {
-        $shop = $request->input('shop') || '';
-        $electionId = $request->input('election') || '';
+        $shop = $request->input('shop');
+        $electionId = $request->input('election');
 
         $election = $this->electionRepository->getById((int)$electionId, $shop);
+
+        if (is_null($election))
+            return view('empty');
 
         if ($election?->date_end > now() && $election?->date_start < now()) {
             $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
@@ -38,7 +41,5 @@ class WidgetController extends Controller
 
             return view('result', compact('election', 'vote'));
         }
-
-        return view('empty');
     }
 }
