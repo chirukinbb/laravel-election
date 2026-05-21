@@ -521,7 +521,7 @@
                     <div class="field--full">
                         <label class="label">Socials</label>
 
-                        <div class="social-block mb-3" id="social-wrapper">
+                        <div class="social-block mb-3 gap-2 d-flex flex-column" id="swwr">
 
                             <!-- FIRST ROW -->
                             <div class="social-row flex flex-wrap gap-4d5 md:gap-3 row w-100 m-0 p-0">
@@ -529,7 +529,8 @@
                                 <div class="field1">
                                     <select
                                             class="select is-floating"
-                                            name="social_types[]"
+                                            name="socials[]"
+                                            id="social_select_1" required
                                     >
                                         <option value="" selected disabled></option>
 
@@ -539,8 +540,14 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                    <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
+                                         viewBox="0 0 24 24" stroke="currentColor" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M6 15L12 9L18 15"></path>
+                                    </svg>
 
-                                    <label class="label is-floating">
+                                    <label class="label is-floating" for="social_select_1">
                                         Network
                                     </label>
                                 </div>
@@ -551,9 +558,10 @@
                                             name="socials[]"
                                             class="input is-floating"
                                             placeholder="Link"
+                                            id="social_input_1"
                                     >
 
-                                    <label class="label is-floating">
+                                    <label class="label is-floating" for="social_input_1">
                                         Link
                                     </label>
                                 </div>
@@ -590,7 +598,7 @@
                                 <div class="field1">
                                     <select
                                             class="select is-floating"
-                                            name="social_types[]"
+                                            name="socials[]" required
                                     >
                                         <option value="" selected disabled></option>
 
@@ -600,6 +608,12 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                    <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
+                                         viewBox="0 0 24 24" stroke="currentColor" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M6 15L12 9L18 15"></path>
+                                    </svg>
 
                                     <label class="label is-floating">
                                         Network
@@ -684,6 +698,8 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script src="https://unpkg.com/laravel-echo/dist/echo.iife.js"></script>
+
+
     <script id="cookies">
         // Установить cookie
         function setCookie(name, value, days) {
@@ -959,19 +975,48 @@
     </script>
     <script>
         $(document).ready(function () {
-            const socTemplate = $('#social').html();
-            const $container = $('#social-wrapper > div');
+            let socialCounter = 0;
+            const socTemplate = $('#social-template').html();
+            const $container = $('#swwr');
 
-            // 2. Add Row Event
+            // Initialize counter based on existing rows
+            socialCounter = $('#swwr .social-row').length;
+
+            // Add Row Event
             $('#add-social').on('click', function (e) {
                 e.preventDefault();
 
-                $container.append($(socTemplate));
+                socialCounter++;
+                const uniqueId = 'social_' + socialCounter;
+
+                // Clone the template
+                const $newRow = $($(socTemplate));
+
+                // Set unique IDs for select and input
+                const $select = $newRow.find('select');
+                const $input = $newRow.find('input');
+                const $labels = $newRow.find('label');
+
+                $select.attr('id', 'social_select_' + uniqueId);
+                $input.attr('id', 'social_input_' + uniqueId);
+
+                // Update label 'for' attributes to match new IDs
+                $labels.each(function () {
+                    const $label = $(this);
+                    if ($label.text().trim() === 'Network') {
+                        $label.attr('for', 'social_select_' + uniqueId);
+                    } else if ($label.text().trim() === 'Link') {
+                        $label.attr('for', 'social_input_' + uniqueId);
+                    }
+                });
+
+                $container.append($newRow);
             });
 
+            // Delete Row Event (using event delegation)
             $container.on('click', '.btn-delete', function (e) {
                 e.preventDefault();
-                $(this).closest('.row').remove();
+                $(this).closest('.social-row').remove();
             });
         });
     </script>

@@ -88,7 +88,7 @@
             </div>
             <div class="mb-3">
                 <label for="socials" class="form-label">Socials</label><br>
-                <div class="social-block mb-3" id="social-wrapper">
+                <div class="social-block mb-3" id="sww">
                     <div class="row mb-1">
                         <div class="col-4">
                             <select name="socials[]" id="socials" class="form-control">
@@ -146,7 +146,7 @@
         $(document).ready(function () {
             // 1. Store the raw HTML string from the template
             const socTemplate = $('#social').html();
-            const $container = $('#social-wrapper'); // The div where rows will be added
+            const $container = $('#sww'); // The div where rows will be added
 
             // 2. Add Row Event
             $('#add-social').on('click', function (e) {

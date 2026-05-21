@@ -93,7 +93,7 @@
             </div>
             <div class="mb-3">
                 <label for="socials" class="form-label">Socials</label><br>
-                <div class="social-block mb-3" id="social-wrapper">
+                <div class="social-block mb-3" id="sww">
                     @if($candidate->socials)
                         @for($i = 0; $i < count($candidate->socials); $i += 2)
                             <div class="row mb-1 social-row">
@@ -170,7 +170,7 @@
         $(document).ready(function () {
             // 1. Store the raw HTML string from the template
             const socTemplate = $('#social').html();
-            const $container = $('#social-wrapper'); // The div where rows will be added
+            const $container = $('#sww'); // The div where rows will be added
 
             // 2. Add Row Event
             $('#add-social').on('click', function (e) {
