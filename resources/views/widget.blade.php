@@ -516,110 +516,125 @@
                         <input type="text" class="input is-floating" id="website" name="website" placeholder="Website">
                         <label for="website" class="label is-floating">Website</label>
                     </div>
+
+
                     <div class="field--full">
-                        <label for="socials" class="label">Socials</label>
+                        <label class="label">Socials</label>
+
                         <div class="social-block mb-3" id="social-wrapper">
-                            <div class="flex flex-wrap gap-4d5 md:gap-3 raw">
-                                <div class="flex flex-wrap gap-4d5 md:gap-3 row w-100 m-0 p-0">
-                                    <div class="field1">
-                                        <select class="select is-floating"
-                                                id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
-                                                name="contact[Subject]" required="">
-                                            <option value="" disabled="" selected=""></option>
-                                            @foreach(config('election.socials') as $i => $social)
-                                                <option value="{{$i}}">{{$social}}</option>
-                                            @endforeach
-                                        </select>
-                                        <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
-                                             viewBox="0 0 24 24" stroke="currentColor" fill="none"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M6 15L12 9L18 15"></path>
-                                        </svg>
-                                        <label class="label is-floating"
-                                               for="ContactFormInput-template--27983535997271__contact-form-custom_field-2">Network</label>
-                                    </div>
-                                    <div class="field2">
-                                        <input type="text" name="socials[]" class="input is-floating"
-                                               placeholder="Link">
-                                        <label for="" class="label is-floating">Link</label>
-                                    </div>
-                                    <div class="field3">
-                                        <button class="rounded-circle border border-2 border-black h-100 btn-delete"
-                                                style="aspect-ratio: 1">
-                                            <svg fill="#000000" height="20px" width="64px" version="1.1" id="Layer_1"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.00 512.00"
-                                                 xml:space="preserve" transform="matrix(1, 0, 0, -1, 0, 0)rotate(0)"
-                                                 stroke="#000000" stroke-width="0.00512"><g id="SVGRepo_bgCarrier"
-                                                                                            stroke-width="0"></g>
-                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
-                                                   stroke-linejoin="round" stroke="#CCCCCC" stroke-width="2.048"></g>
-                                                <g id="SVGRepo_iconCarrier">
-                                                    <g>
-                                                        <g>
-                                                            <polygon
-                                                                    points="512,59.076 452.922,0 256,196.922 59.076,0 0,59.076 196.922,256 0,452.922 59.076,512 256,315.076 452.922,512 512,452.922 315.076,256 "></polygon>
-                                                        </g>
-                                                    </g>
-                                                </g></svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="button button--primary" type="submit" id="add-social">
-                            <span class="btn-" data-fill></span>
-                            <span class="btn-text">Add Row</span>
-                        </button>
-                        <template id="social">
-                            <div class="flex flex-wrap gap-4d5 md:gap-3 row w-100 m-0 p-0">
+
+                            <!-- FIRST ROW -->
+                            <div class="social-row flex flex-wrap gap-4d5 md:gap-3 row w-100 m-0 p-0">
+
                                 <div class="field1">
-                                    <select class="select is-floating"
-                                            id="ContactFormInput-template--27983535997271__contact-form-custom_field-2"
-                                            name="contact[Subject]" required="">
-                                        <option value="" disabled="" selected=""></option>
+                                    <select
+                                            class="select is-floating"
+                                            name="social_types[]"
+                                    >
+                                        <option value="" selected disabled></option>
+
                                         @foreach(config('election.socials') as $i => $social)
-                                            <option value="{{$i}}">{{$social}}</option>
+                                            <option value="{{ $i }}">
+                                                {{ $social }}
+                                            </option>
                                         @endforeach
                                     </select>
-                                    <svg class="icon icon-chevron-up icon-sm absolute pointer-events-none"
-                                         viewBox="0 0 24 24" stroke="currentColor" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M6 15L12 9L18 15"></path>
-                                    </svg>
-                                    <label class="label is-floating"
-                                           for="ContactFormInput-template--27983535997271__contact-form-custom_field-2">Network</label>
+
+                                    <label class="label is-floating">
+                                        Network
+                                    </label>
                                 </div>
+
                                 <div class="field2">
-                                    <input type="text" name="socials[]" class="input is-floating" placeholder="Link">
-                                    <label for="" class="label is-floating">Link</label>
+                                    <input
+                                            type="text"
+                                            name="socials[]"
+                                            class="input is-floating"
+                                            placeholder="Link"
+                                    >
+
+                                    <label class="label is-floating">
+                                        Link
+                                    </label>
                                 </div>
+
                                 <div class="field3">
-                                    <button class="rounded-circle border border-2 border-black h-100 btn-delete"
-                                            style="aspect-ratio: 1">
-                                        <svg fill="#000000" height="20px" width="64px" version="1.1" id="Layer_1"
-                                             xmlns="http://www.w3.org/2000/svg"
-                                             xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.00 512.00"
-                                             xml:space="preserve" transform="matrix(1, 0, 0, -1, 0, 0)rotate(0)"
-                                             stroke="#000000" stroke-width="0.00512"><g id="SVGRepo_bgCarrier"
-                                                                                        stroke-width="0"></g>
-                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"
-                                               stroke="#CCCCCC" stroke-width="2.048"></g>
-                                            <g id="SVGRepo_iconCarrier">
-                                                <g>
-                                                    <g>
-                                                        <polygon
-                                                                points="512,59.076 452.922,0 256,196.922 59.076,0 0,59.076 196.922,256 0,452.922 59.076,512 256,315.076 452.922,512 512,452.922 315.076,256 "></polygon>
-                                                    </g>
-                                                </g>
-                                            </g></svg>
+                                    <button
+                                            type="button"
+                                            class="rounded-circle border border-2 border-black h-100 btn-delete"
+                                            style="aspect-ratio:1"
+                                    >
+                                        ✕
                                     </button>
                                 </div>
+
                             </div>
+                        </div>
+
+                        <!-- ADD BUTTON -->
+                        <button
+                                type="button"
+                                class="button button--primary"
+                                id="add-social"
+                        >
+        <span class="btn-text">
+            Add Row
+        </span>
+                        </button>
+
+                        <!-- TEMPLATE -->
+                        <template id="social-template">
+
+                            <div class="social-row flex flex-wrap gap-4d5 md:gap-3 row w-100 m-0 p-0">
+
+                                <div class="field1">
+                                    <select
+                                            class="select is-floating"
+                                            name="social_types[]"
+                                    >
+                                        <option value="" selected disabled></option>
+
+                                        @foreach(config('election.socials') as $i => $social)
+                                            <option value="{{ $i }}">
+                                                {{ $social }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    <label class="label is-floating">
+                                        Network
+                                    </label>
+                                </div>
+
+                                <div class="field2">
+                                    <input
+                                            type="text"
+                                            name="socials[]"
+                                            class="input is-floating"
+                                            placeholder="Link"
+                                    >
+
+                                    <label class="label is-floating">
+                                        Link
+                                    </label>
+                                </div>
+
+                                <div class="field3">
+                                    <button
+                                            type="button"
+                                            class="rounded-circle border border-2 border-black h-100 btn-delete"
+                                            style="aspect-ratio:1"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+
+                            </div>
+
                         </template>
                     </div>
+
+
                     <div class="field--full">
                         <input type="text" class="input is-floating" id="photo_url" name="photo_url"
                                placeholder="Photo URL">
@@ -653,7 +668,7 @@
                                 <button type="submit" id="sendCandidate"
                                         class="button button--primary button--fixed" is="hover-button">
                                     <span class="btn-fill" data-fill></span>
-                                    <span class="btn-text">Send Candidate</span>
+                                    <span class="btn-text">Submit Candidate</span>
                                 </button>
                             </div>
                         </div>
