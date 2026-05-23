@@ -377,8 +377,8 @@
                     <button class="button button--primary w-100 "
                             is="hover-button" id="login"
                             data-bs-toggle="tab"
-                            data-bs-target="#profile" type="button"
-                            role="tab" aria-controls="profile" aria-selected="false">
+                            data-bs-target="#profil" type="button"
+                            role="tab" aria-controls="profil" aria-selected="false">
                         <span class="btn-fill" data-fill></span>
                         <span class="btn-text">Login</span>
                     </button>
@@ -688,6 +688,17 @@
                         </div>
                     @endif
 
+                    @if(!auth()->check())
+                        <div class="action-zone gap-4d5 md:gap-6 flex flex-wrap flex-column mt-2 justify-content-center align-items-center w-100">
+                            <div class="field field--full" style="width: auto;">
+                                <button type="button" id="sendCandidateNAth"
+                                        class="button button--primary button--fixed" is="hover-button">
+                                    <span class="btn-fill" data-fill></span>
+                                    <span class="btn-text">Submit Candidate</span>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </form>
         </div>
@@ -807,6 +818,53 @@
 
     @auth()
         <script>
+            // Restore cookie values to form fields if user hasn't voted
+            @if(!$vote)
+            document.addEventListener('DOMContentLoaded', function () {
+                const formFields = ['first_name', 'last_name', 'country_code', 'city', 'profession', 'role', 'website', 'photo_url', 'category', 'reason_for_nomination'];
+
+                // Restore simple fields
+                formFields.forEach(field => {
+                    const cookieValue = getCookie(field);
+                    if (cookieValue) {
+                        const input = document.getElementById(field);
+                        if (input) {
+                            input.value = cookieValue;
+                        }
+                    }
+                    deleteCookie(field);
+                });
+
+                // Restore socials data
+                const socialsCookie = getCookie('socials');
+                if (socialsCookie) {
+                    try {
+                        const socialsData = JSON.parse(socialsCookie);
+                        const socialRows = document.querySelectorAll('#swwr .social-row');
+
+                        socialsData.forEach((social, index) => {
+                            if (socialRows[index]) {
+                                const select = socialRows[index].querySelector('select[name="socials[]"]');
+                                const input = socialRows[index].querySelector('input[name="socials[]"]');
+
+                                if (select) select.value = social.network;
+                                if (input) input.value = social.link;
+                            }
+                        });
+                    } catch (e) {
+                        console.error('Error parsing socials cookie:', e);
+                    }
+                }
+
+                // Update counter for reason_for_nomination
+                const reasonTextarea = document.getElementById('reason_for_nomination');
+                if (reasonTextarea && reasonTextarea.value) {
+                    $('#counter').text(reasonTextarea.value.length + '/1000');
+                }
+            });
+            @endif
+        </script>
+        <script>
             document.getElementById('home').addEventListener('submit', function (e) {
                 e.preventDefault();
 
@@ -856,6 +914,43 @@
                             grecaptcha.reset();
                         }
                     });
+            });
+        </script>
+        <script>
+            document.getElementById('sendCandidateNAth').addEventListener('click', function (e) {
+                console.log('sendCandidateNAth')
+                e.preventDefault();
+                let formData = new FormData($('#profile')[0]);
+
+                // Save form values to cookies
+                const formFields = ['first_name', 'last_name', 'country_code', 'city', 'profession', 'role', 'website', 'photo_url', 'category', 'reason_for_nomination'];
+
+                formFields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        setCookie(field, value, 30); // Save for 30 days
+                        console.log('setCookie', field, value)
+                    }
+                });
+
+                // Save socials data
+                const socialsSelects = document.querySelectorAll('select[name="socials[]"]');
+                const socialsInputs = document.querySelectorAll('input[name="socials[]"]');
+                const socialsData = [];
+
+                for (let i = 0; i < socialsSelects.length; i++) {
+                    const network = socialsSelects[i].value;
+                    const link = socialsInputs[i] ? socialsInputs[i].value : '';
+                    if (network && link) {
+                        socialsData.push({network, link});
+                    }
+                }
+
+                if (socialsData.length > 0) {
+                    setCookie('socials', JSON.stringify(socialsData), 30);
+                }
+
+                window.parent.postMessage({action: 'login'}, '*');
             });
         </script>
         <script>
@@ -912,6 +1007,50 @@
             });
         </script>
     @endauth
+
+    <script>
+        const sendCandidateNAthBtn = document.getElementById('sendCandidateNAth');
+        if (sendCandidateNAthBtn) {
+            sendCandidateNAthBtn.addEventListener('click', function (e) {
+                console.log('sendCandidateNAth clicked');
+                e.preventDefault();
+                let formData = new FormData($('#profile')[0]);
+
+                // Save form values to cookies
+                const formFields = ['first_name', 'last_name', 'country_code', 'city', 'profession', 'role', 'website', 'photo_url', 'category', 'reason_for_nomination'];
+
+                formFields.forEach(field => {
+                    const value = formData.get(field);
+                    if (value) {
+                        setCookie(field, value, 30); // Save for 30 days
+                        console.log('setCookie', field, value);
+                    }
+                });
+
+                // Save socials data
+                const socialsSelects = document.querySelectorAll('select[name="socials[]"]');
+                const socialsInputs = document.querySelectorAll('input[name="socials[]"]');
+                const socialsData = [];
+
+                for (let i = 0; i < socialsSelects.length; i++) {
+                    const network = socialsSelects[i].value;
+                    const link = socialsInputs[i] ? socialsInputs[i].value : '';
+                    if (network && link) {
+                        socialsData.push({network, link});
+                    }
+                }
+
+                if (socialsData.length > 0) {
+                    setCookie('socials', JSON.stringify(socialsData), 30);
+                }
+
+                // Send postMessage to trigger login
+                window.parent.postMessage({action: 'login'}, '*');
+
+                console.log('Form data saved to cookies:', socialsData);
+            });
+        }
+    </script>
 
     <script id="tom-selector-init">
         $(['#first_name', '#last_name']).each((i, selector) => {

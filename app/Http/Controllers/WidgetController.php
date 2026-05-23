@@ -32,12 +32,12 @@ class WidgetController extends Controller
             return view('empty');
 
         if ($election?->date_end > now() && $election?->date_start < now()) {
-            $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
-            $candidate = $this->candidateRepository->getMyModeratingCandidate($election->id, $request->user()->id);
+            $vote = $this->electionRepository->getUserVote($election, $request->user()?->id ?? 0);
+            $candidate = $this->candidateRepository->getMyModeratingCandidate($election->id, $request->user()?->id ?? 0);
 
             return view('widget', compact('election', 'vote', 'candidate'));
         } elseif ($election?->date_end < now()) {
-            $vote = $this->electionRepository->getUserVote($election, $request->user()->id);
+            $vote = $this->electionRepository->getUserVote($election, $request->user()?->id ?? 0);
 
             return view('result', compact('election', 'vote'));
         }
