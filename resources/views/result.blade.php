@@ -451,5 +451,26 @@
         });
         @endif
     </script>
+    <script>
+        $(document).ready(function () {
+            function sendHeight() {
+                const height = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight,
+                    document.body.offsetHeight,
+                    document.documentElement.offsetHeight,
+                    document.body.clientHeight,
+                    document.documentElement.clientHeight
+                );
+                window.parent.postMessage({height}, '*');
+            }
+
+            window.addEventListener('load', sendHeight);
+            window.addEventListener('resize', sendHeight);
+
+            const observer = new ResizeObserver(sendHeight);
+            observer.observe(document.body);
+        });
+    </script>
 @stop
 
