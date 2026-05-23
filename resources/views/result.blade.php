@@ -439,7 +439,7 @@
             gtag('event', 'search_candidate');
         })
 
-        @if(!$voted)
+        @if(!$vote)
         $('body').on('click', 'tr', function () {
             @auth()
             const input = $(this).find('input');
