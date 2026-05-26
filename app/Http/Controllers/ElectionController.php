@@ -19,35 +19,12 @@ class ElectionController extends Controller
     {
         $minDate = now()->startOf('day');
 
-        $lastElection = Election::where('user_id', auth()->id())
-            ->orderBy('date_end', 'desc')
-            ->first();
-
-        if ($lastElection) {
-            $afterLastElection = \Carbon\Carbon::parse($lastElection->date_end)->addDay()->startOf('day');
-            if ($afterLastElection->gt($minDate)) {
-                $minDate = $afterLastElection;
-            }
-        }
-
         return view('election.create', compact('minDate'));
     }
 
     public function edit(Election $election)
     {
         $minDate = now()->startOf('day');
-
-        $lastOtherElection = Election::where('user_id', auth()->id())
-            ->where('id', '!=', $election->id)
-            ->orderBy('date_end', 'desc')
-            ->first();
-
-        if ($lastOtherElection) {
-            $afterLastElection = \Carbon\Carbon::parse($lastOtherElection->date_end)->addDay()->startOf('day');
-            if ($afterLastElection->gt($minDate)) {
-                $minDate = $afterLastElection;
-            }
-        }
 
         return view('election.edit', compact('election', 'minDate'));
     }
