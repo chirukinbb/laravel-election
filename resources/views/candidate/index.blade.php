@@ -28,17 +28,26 @@ $btnEdit = '<a class="btn btn-xs btn-default text-primary mx-1 " title="Edit" hr
 $btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 " title="Delete" href="%s">
                   <i class="fa fa-lg fa-fw fa-trash"></i>
               </a>';
+$btnProposedBy = '<a class="btn btn-xs btn-default text-info mx-1 " title="Proposed By" href="%s">
+                  <i class="fa fa-lg fa-fw fa-user"></i>
+              </a>';
 
    $data=collect();
 
     foreach ($election->candidates as $item) {
+        $actions = sprintf($btnEdit,route('election:candidate:edit',array_merge(['candidate'=>$item,'election'=>$election],request()->all()))).
+            sprintf($btnDelete,route('election:candidate:delete',array_merge(['candidate'=>$item,'election'=>$election],request()->all())));
+        
+        if ($item->proposed_by) {
+            $actions .= sprintf($btnProposedBy, route('election:candidate:proposedBy', array_merge(['candidate'=>$item,'election'=>$election],request()->all())));
+        }
+        
         $data->push([
             $item->first_name.' '.$item->last_name,
             config('election.countries.'.$item->country_code),
             $item->votes()->where('status',\App\Enums\VoteStatusEnum::Verified->name)->count(),
-            '<nobr>'.sprintf($btnEdit,route('election:candidate:edit',array_merge(['candidate'=>$item,'election'=>$election],request()->all()))).
-            sprintf($btnDelete,route('election:candidate:delete',array_merge(['candidate'=>$item,'election'=>$election],request()->all()))).'</nobr>'
-]);
+            '<nobr>'.$actions.'</nobr>'
+        ]);
     }
 
     $config = [

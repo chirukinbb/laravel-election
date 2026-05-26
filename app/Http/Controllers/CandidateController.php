@@ -94,4 +94,14 @@ class CandidateController extends Controller
 
         return view('candidate.unbounded', compact('candidates', 'elections'));
     }
+
+    function proposedBy(Election $election, Candidate $candidate)
+    {
+        $user = $candidate->proposedBy;
+
+        if (is_null($user))
+            return redirect()->route('election:candidate:list', compact('election'))->with('error', 'User not found!');
+
+        return view('candidate.proposedBy', compact('user'));
+    }
 }

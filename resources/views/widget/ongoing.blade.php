@@ -475,7 +475,7 @@
                     <div class="field">
                         <input type="text" placeholder=" Last Name" id="last_name" name="last_name"
                                class="input is-floating">
-                        <label for="first_name" class="label is-floating" id="last_name-ts-label">
+                        <label for="last_name" class="label is-floating" id="last_name-ts-label">
                             Last Name
                             <span class="text-danger">*</span>
                         </label>
@@ -670,6 +670,30 @@
                         <div id="counter"
                              class="bottom-0 small  d-flex justify-content-end p-1 position-absolute right-0">0/1000
                         </div>
+                    </div>
+
+                    <h4 class="text-center w-100">About yourself</h4>
+
+                    <div class="field">
+                        <input type="text" placeholder="First Name" id="my_first_name" name="my_first_name"
+                               class="input is-floating" required>
+                        <label for="my_first_name" class="label is-floating">
+                            First Name
+                            <span class="text-danger">*</span>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <input type="text" placeholder=" Last Name" id="my_last_name" name="my_last_name"
+                               class="input is-floating" required>
+                        <label for="my_last_name" class="label is-floating" id="last_name-ts-label">
+                            Last Name
+                            <span class="text-danger">*</span>
+                        </label>
+                    </div>
+                    <div class="field--full">
+                        <input type="email" class="input is-floating" id="email" name="email" required
+                               placeholder="Email ">
+                        <label for="email" class="label is-floating">Email <span class="text-danger">*</span></label>
                     </div>
 
                     @if(auth()->check() && !$vote)

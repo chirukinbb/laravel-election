@@ -10,6 +10,7 @@ use App\Events\UpdateCandidates;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Candidate extends Model
 {
@@ -87,5 +88,10 @@ class Candidate extends Model
         if ($this->election) {
             event(new UpdateCandidates($this->election));
         }
+    }
+
+    public function proposedBy(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'proposed_by');
     }
 }

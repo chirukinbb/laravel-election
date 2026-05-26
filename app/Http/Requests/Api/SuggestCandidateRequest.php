@@ -27,6 +27,9 @@ class SuggestCandidateRequest extends FormRequest
             'reason_for_nomination' => 'required|min:50|max:1000',
             'g-recaptcha-response' => 'required|captcha',
             'election_id' => ['required', 'exists:elections,id', new ElectionRule($this->post('election_id'))],
+            'my_first_name' => 'required|string|max:255',
+            'my_last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
         ];
     }
 

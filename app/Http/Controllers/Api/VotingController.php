@@ -135,6 +135,12 @@ class VotingController extends Controller
             'proposed_by' => $request->user()->id
         ]);
 
+        $request->user()->update([
+            'first_name' => $validated['my_first_name'],
+            'last_name' => $validated['my_last_name'],
+            'email' => $validated['email'],
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Candidate suggestion submitted for review',

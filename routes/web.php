@@ -21,6 +21,7 @@ Route::middleware('verify.shopify')->group(function () {
             Route::get('list', [\App\Http\Controllers\CandidateController::class, 'index'])->name('list');
             Route::get('create', [\App\Http\Controllers\CandidateController::class, 'create'])->name('create');
             Route::get('edit/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'edit'])->name('edit');
+            Route::get('proposedBy/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'proposedBy'])->name('proposedBy');
 
             Route::post('store', [\App\Http\Controllers\CandidateController::class, 'store'])->name('store');
             Route::patch('update/{candidate:id}', [\App\Http\Controllers\CandidateController::class, 'update'])->name('update');
