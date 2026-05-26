@@ -55,6 +55,7 @@ class AdminController extends Controller
         $candidate->update([
             'status' => CandidateStatusEnum::Approved->name,
         ]);
+
         Vote::create([
             'candidate_id' => $candidate->id,
             'user_id' => $candidate->proposed_by,

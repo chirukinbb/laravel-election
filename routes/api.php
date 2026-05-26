@@ -14,7 +14,7 @@ Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->na
         Route::get('/candidates/search', [\App\Http\Controllers\Api\VotingController::class, 'searchCandidates'])->name('voting.candidates.search');
         Route::get('/candidates/{id}', [\App\Http\Controllers\Api\VotingController::class, 'candidate'])->name('voting.candidate');
         Route::post('/vote', [\App\Http\Controllers\Api\VotingController::class, 'vote'])->name('voting.vote');
-        Route::post('/candidate/suggest', [\App\Http\Controllers\Api\VotingController::class, 'suggestCandidate'])->name('voting.candidate.suggest');
+        Route::post('/candidate/suggest', [\App\Http\Controllers\Api\VotingController::class, 'suggestCandidate'])->name('voting.candidate.suggest')->middleware('pending.candidates');
         Route::post('/verify-captcha', [\App\Http\Controllers\Api\VotingController::class, 'verifyCaptcha'])->name('voting.verify-captcha');
         Route::get('/top50', [\App\Http\Controllers\Api\VotingController::class, 'top50'])->name('voting.top50');
         Route::get('/countries', [\App\Http\Controllers\Api\VotingController::class, 'countries'])->name('voting.countries');

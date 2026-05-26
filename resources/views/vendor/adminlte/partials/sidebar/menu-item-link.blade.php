@@ -1,1 +1,1 @@
-<s-link href="{{ $item['href'] }}" rel="{{ $item['href'] }}">{{ $item['text'] }}</s-link>
+<a href="{{ $item['href'] }}" rel="{{ $item['href'] }}">{{ $item['text'] }}</a>

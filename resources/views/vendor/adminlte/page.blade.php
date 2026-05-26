@@ -16,10 +16,9 @@
 @section('body')
     <div class="wrapper">
 
-        <s-app-nav>
-            <s-link href="/app" rel="home">Главная</s-link>
+        <ul>
             @each('adminlte::partials.sidebar.menu-item', $adminlte->menu('sidebar'), 'item')
-        </s-app-nav>
+        </ul>
 
         {{-- Preloader Animation (fullscreen mode) --}}
         @if($preloaderHelper->isPreloaderEnabled())

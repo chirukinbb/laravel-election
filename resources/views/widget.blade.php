@@ -361,7 +361,7 @@
                     <span class="btn-text">Ballot</span>
                 </button>
             </li>
-            @if(!$vote)
+            @if(!$vote && is_null($candidate))
                 <li class="nav-item" role="presentation">
                     <button class=" button button--primary  w-100" is="hover-button" id="profile-tab"
                             data-bs-toggle="tab"
