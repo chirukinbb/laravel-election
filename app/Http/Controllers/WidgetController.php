@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Election;
 use App\Repositories\CandidateRepository;
 use App\Repositories\ElectionRepository;
 use App\Services\SettingsService;
@@ -27,20 +26,18 @@ class WidgetController extends Controller
         $shop = $request->input('shop');
         $electionId = $request->input('election');
 
-        $election = Election::find(1);// $this->electionRepository->getById((int)$electionId, $shop);
+        $election = $this->electionRepository->getById((int)$electionId, $shop);
 
         if (is_null($election))
             return view('empty');
 
-        if ($election?->date_end > now() && $election?->date_start < now()) {
-            $vote = $this->electionRepository->getUserVote($election, $request->user()?->id ?? 0);
-            $candidate = $this->candidateRepository->getMyModeratingCandidate($election->id, $request->user()?->id ?? 0);
+        $vote = $this->electionRepository->getUserVote($election, $request->user()?->id ?? 0);
+        $candidate = $this->candidateRepository->getMyModeratingCandidate($election->id, $request->user()?->id ?? 0);
 
+        if ($election?->date_end > now() && $election?->date_start < now()) {
             return view('widget.ongoing', compact('election', 'vote', 'candidate'));
         } elseif ($election?->date_end < now()) {
-            $vote = $this->electionRepository->getUserVote($election, $request->user()?->id ?? 0);
-
-            return view('result', compact('election', 'vote'));
-        }
+            return view('widget.result', compact('election', 'vote'));
+        } else return view('widget.upcoming', compact('election', 'vote', 'candidate'));
     }
 }
