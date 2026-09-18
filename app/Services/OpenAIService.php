@@ -3,15 +3,18 @@
 namespace App\Services;
 
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use OpenAI;
-use OpenAI\Client;
+use OpenAI\Client as OpenAIClient;
 
 
 class OpenAIService
 {
-    protected Client $client;
+    protected OpenAIClient $client;
+    protected Client $guzzleClient;
     protected string $model;
 
     public function __construct()
@@ -29,6 +32,14 @@ class OpenAIService
             ->withApiKey($apiKey)
             ->withBaseUri($baseUrl)
             ->make();
+
+        $this->guzzleClient = new Client([
+            'base_uri' => $baseUrl,
+            'headers' => [
+                'Authorization' => "Bearer {$apiKey}",
+                'Content-Type' => 'application/json',
+            ],
+        ]);
     }
 
     /**
@@ -259,7 +270,6 @@ class OpenAIService
     {
         $apiKey = config('services.openai.api_key');
         $model = config('services.openai.model', 'openai/gpt-4o');
-        $apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
         if (!$apiKey) {
             throw new Exception('OpenRouter API key is not configured');
@@ -294,44 +304,13 @@ class OpenAIService
         ];
 
         try {
-            // Initialize cURL
-            $ch = curl_init($apiUrl);
-
-            // Set cURL options
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS => json_encode($requestBody),
-                CURLOPT_TIMEOUT => 120,
-                CURLOPT_HTTPHEADER => [
-                    'Authorization: Bearer ' . $apiKey,
-                    'Content-Type: application/json',
-                ],
+            // Make request using Guzzle
+            $response = $this->guzzleClient->post('v1/chat/completions', [
+                'json' => $requestBody,
             ]);
 
-            // Execute request
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $error = curl_error($ch);
-
-            curl_close($ch);
-
-            // Check for cURL errors
-            if ($error) {
-                throw new Exception('cURL error: ' . $error);
-            }
-
-            // Check HTTP status
-            if ($httpCode !== 200) {
-                throw new Exception("HTTP error: {$httpCode} - {$response}");
-            }
-
-            // Parse response
-            $data = json_decode($response, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception('JSON parse error: ' . json_last_error_msg());
-            }
+            // Get response body
+            $data = json_decode($response->getBody()->getContents(), true);
 
             if (!isset($data['choices'][0]['message']['content'])) {
                 throw new Exception('Invalid response structure from OpenRouter');
@@ -353,6 +332,14 @@ class OpenAIService
                 'tokens_used' => $usage['total_tokens'] ?? null,
                 'filename' => $filename,
             ];
+
+        } catch (GuzzleException $e) {
+            Log::error('OpenRouter Guzzle request failed', [
+                'error' => $e->getMessage(),
+                'filename' => $filename,
+                'code' => $e->getCode(),
+            ]);
+            throw new Exception('OpenRouter API request failed: ' . $e->getMessage(), $e->getCode(), $e);
 
         } catch (Exception $e) {
             Log::error('OpenRouter API call failed', [

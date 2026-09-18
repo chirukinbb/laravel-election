@@ -84,3 +84,15 @@
         </div>
     </form>
 @stop
+
+
+@section('auth_footer')
+    <div class="btn-group">
+        <a href="{{ route('redirect-to-provider', ['provider' => 'google']) }}" class="btn btn-block btn-default">
+            Google
+        </a>
+        <a href="{{ route('redirect-to-provider', ['provider' => 'apple']) }}" class="btn btn-block btn-default">
+            Apple
+        </a>
+    </div>
+@stop

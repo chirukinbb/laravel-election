@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('shopify_user_id')->unique()->nullable();
             $table->string('password')->nullable();
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
 

@@ -9,17 +9,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Osiset\ShopifyApp\Contracts\ShopModel as IShopModel;
 use Osiset\ShopifyApp\Traits\ShopModel;
 use Spatie\Permission\Traits\HasRoles;
 
 // 1. Импортируем
 
-class User extends Authenticatable implements IShopModel
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasApiTokens;
-    use ShopModel;
     use SoftDeletes;
 
     // 2. Подключаем трейт

@@ -40,4 +40,26 @@ return [
         'secret' => env('GOOGLE_RECAPTCHA_SECRET'),
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'api_url' => env('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
+        'model' => env('OPENAI_MODEL', 'gpt-4o'), // gpt-4o, gpt-4-vision-preview, gpt-4-turbo
+        'max_tokens' => env('OPENAI_MAX_TOKENS', 2000),
+    ],
+
+    'openrouter' => [
+        'api_key' => env('OPENROUTER_API_KEY'),
+        'model' => env('OPENROUTER_MODEL', 'openai/gpt-4o'),
+    ],
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'apple' => [
+        'client_id' => env('APPLE_CLIENT_ID'),
+        'client_secret' => env('APPLE_CLIENT_SECRET'),
+        'redirect' => env('APPLE_REDIRECT_URI'),
+    ],
 ];

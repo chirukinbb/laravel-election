@@ -308,17 +308,22 @@ return [
             'text' => 'Elections',
             'url' => 'election/list',
             'icon' => 'fas fa-fw fa-vote-yea', // Урна для голосования
+            'submenu' => [
+                [
+                    'text' => 'List Elections',
+                    'url' => 'election/list'
+                ],
+                [
+                    'text' => 'Moderation Queue',
+                    'url' => 'moderation'
+                ],
+                [
+                    'text' => 'Anti-Fraud Logs',
+                    'url' => 'logs',
+                ],
+            ]
         ],
-        [
-            'text' => 'Moderation Queue',
-            'url' => 'moderation',
-            'icon' => 'fas fa-fw fa-user-check', // Проверка пользователя/кандидата
-        ],
-        [
-            'text' => 'Anti-Fraud Logs',
-            'url' => 'logs',
-            'icon' => 'fas fa-fw fa-shield-alt', // Щит (защита/логи безопасности)
-        ],
+
         [
             'text' => 'Settings',
             'url' => 'settings',
