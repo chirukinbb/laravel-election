@@ -27,11 +27,11 @@ RUN apt-get update && apt-get install -y \
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Copy existing application directory
+## Copy existing application directory
 COPY . .
-
-# Expose port 8000 for Laravel development server
+#
+## Expose port 8000 for Laravel development server
 EXPOSE 8000
-
-# Set entrypoint
+#
+## Set entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

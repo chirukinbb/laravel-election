@@ -303,31 +303,14 @@ return [
             'text' => 'Dashboard',
             'url' => 'dashboard',
             'icon' => 'fas fa-fw fa-tachometer-alt', // Спидометр/панель управления
-        ],
-        [
-            'text' => 'Elections',
-            'url' => 'election/list',
-            'icon' => 'fas fa-fw fa-vote-yea', // Урна для голосования
-            'submenu' => [
-                [
-                    'text' => 'List Elections',
-                    'url' => 'election/list'
-                ],
-                [
-                    'text' => 'Moderation Queue',
-                    'url' => 'moderation'
-                ],
-                [
-                    'text' => 'Anti-Fraud Logs',
-                    'url' => 'logs',
-                ],
-            ]
+            'key' => 'dashboard'
         ],
 
         [
             'text' => 'Settings',
             'url' => 'settings',
             'icon' => 'fas fa-fw fa-cogs', // Шестеренки
+            'key' => 'settings'
         ],
     ],
 
