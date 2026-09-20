@@ -2,72 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\CandidateStatusEnum;
-use App\Enums\VoteStatusEnum;
 use App\Events\DashboardWidgetEvent;
-use App\Models\Candidate;
-use App\Repositories\CandidateRepository;
-use App\Services\SettingsService;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function __construct(
-        SettingsService             $settingsService,
-        private CandidateRepository $candidateRepository
-    )
-    {
-        parent::__construct($settingsService);
-    }
-
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
         $dashboard = new  DashboardWidgetEvent();
 
         event($dashboard);
 
         return view('dashboard', compact('dashboard'));
-    }
-
-    /**
-     * Get top candidates via API for AJAX loading
-     */
-    public function getTopCandidates(Request $request)
-    {
-        $electionId = $request->input('election_id');
-
-        if (!$electionId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Election ID is required',
-                'data' => []
-            ], 400);
-        }
-
-        $topCandidates = Candidate::where('election_id', $electionId)->whereStatus(CandidateStatusEnum::Approved->name)
-            ->withCount(['votes' => function ($q) {
-                $q->whereStatus(VoteStatusEnum::Verified->name);
-            }])
-            ->whereRelation('election', 'user_id', auth()->id())
-            ->orderByDesc('votes_count')
-            ->limit(50)
-            ->get()
-            ->map(function ($candidate, $index) {
-                return [
-                    'rank' => $index + 1,
-                    'country' => config('election.countries.' . $candidate->country_code, $candidate->country_code),
-                    'name' => $candidate->first_name . ' ' . $candidate->last_name,
-                    'votes' => number_format($candidate->votes_count, 0, '.', ',')
-                ];
-            });
-
-        return response()->json([
-            'success' => true,
-            'data' => $topCandidates
-        ]);
     }
 
     /**

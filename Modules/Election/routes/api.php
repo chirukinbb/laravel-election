@@ -21,6 +21,7 @@ Route::get('/candidates', [VotingController::class, 'candidates'])->middleware('
 // Admin Routes
 Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->name])
     ->prefix('admin')->group(function () {
+        Route::get("/dashboard/candidates", [AdminController::class, 'getTopCandidates'])->name("dashboard.candidates");
         Route::post('/candidate/approve', [AdminController::class, 'approveCandidate'])->name('admin.candidate.approve');
         Route::post('/candidate/reject', [AdminController::class, 'rejectCandidate'])->name('admin.candidate.reject');
         Route::post('/candidate/merge', [AdminController::class, 'mergeCandidates'])->name('admin.candidate.merge');

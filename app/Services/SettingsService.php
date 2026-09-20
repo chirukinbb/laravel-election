@@ -22,7 +22,7 @@ class SettingsService
         }
     }
 
-    public function get(SettingKeyEnum $key): ?string
+    public function get(\UnitEnum $key): ?string
     {
         return $this->settings[$key->key()] ?? null;
     }

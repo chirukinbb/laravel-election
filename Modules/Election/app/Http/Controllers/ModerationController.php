@@ -21,6 +21,6 @@ class ModerationController extends Controller
             ->whereRelation('candidate', fn($query) => $query->whereRelation('election', 'user_id', auth()->id()))
             ->get();
 
-        return view('moderation', compact('candidates', 'votes'));
+        return view('election::moderation', compact('candidates', 'votes'));
     }
 }

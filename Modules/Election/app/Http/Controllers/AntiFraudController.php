@@ -17,7 +17,7 @@ class AntiFraudController extends Controller
 
         $content = File::get($path);
 
-        return view('logs', ['logs' => explode("\n", $content)]);
+        return view('election::logs', ['logs' => explode("\n", $content)]);
     }
 
     public function clean()

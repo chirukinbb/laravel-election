@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Osiset\ShopifyApp\Traits\ShopModel;
+use Modules\Election\Models\Election;
+use Modules\Election\Models\Vote;
 use Spatie\Permission\Traits\HasRoles;
 
 // 1. Импортируем

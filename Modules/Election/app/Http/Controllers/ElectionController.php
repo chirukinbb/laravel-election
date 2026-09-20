@@ -13,26 +13,26 @@ class ElectionController extends Controller
     {
         $elections = Election::where('user_id', auth()->id())->get();
 
-        return view('election.index', compact('elections'));
+        return view('election::election.index', compact('elections'));
     }
 
     public function create()
     {
         $minDate = now()->startOf('day');
 
-        return view('election.create', compact('minDate'));
+        return view('election::election.create', compact('minDate'));
     }
 
     public function edit(Election $election)
     {
         $minDate = now()->startOf('day');
 
-        return view('election.edit', compact('election', 'minDate'));
+        return view('election::election.edit', compact('election', 'minDate'));
     }
 
     public function show(Election $election)
     {
-        return view('election.show', compact('election'));
+        return view('election::election .show', compact('election'));
     }
 
     public function store(ElectionRequest $request)

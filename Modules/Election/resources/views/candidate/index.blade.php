@@ -45,7 +45,7 @@ $btnProposedBy = '<a class="btn btn-xs btn-default text-info mx-1 " title="Propo
         $data->push([
             $item->first_name.' '.$item->last_name,
             config('election.countries.'.$item->country_code),
-            $item->votes()->where('status',\App\Enums\VoteStatusEnum::Verified->name)->count(),
+            $item->votes()->where('status',\Modules\Election\Enums\VoteStatusEnum::Verified->name)->count(),
             '<nobr>'.$actions.'</nobr>'
         ]);
     }

@@ -13,17 +13,17 @@ class CandidateController extends Controller
 {
     public function index(Election $election)
     {
-        return view('candidate.index', compact('election'));
+        return view('election::candidate.index', compact('election'));
     }
 
     public function create(Election $election)
     {
-        return view('candidate.create', compact('election'));
+        return view('election::candidate.create', compact('election'));
     }
 
     public function edit(Election $election, Candidate $candidate)
     {
-        return view('candidate.edit', compact('election', 'candidate'));
+        return view('election::candidate.edit', compact('election', 'candidate'));
     }
 
     public function store(Election $election, CandidateRequest $request)
@@ -93,7 +93,7 @@ class CandidateController extends Controller
         $candidates = Candidate::where('election_id', 0)->get();
         $elections = Election::where('date_end', '>', now())->get();
 
-        return view('candidate.unbounded', compact('candidates', 'elections'));
+        return view('election::candidate.unbounded', compact('candidates', 'elections'));
     }
 
     function proposedBy(Election $election, Candidate $candidate)
@@ -103,6 +103,6 @@ class CandidateController extends Controller
         if (is_null($user))
             return redirect()->route('election:candidate:list', compact('election'))->with('error', 'User not found!');
 
-        return view('candidate.proposedBy', compact('user'));
+        return view('election::candidate.proposedBy', compact('user'));
     }
 }

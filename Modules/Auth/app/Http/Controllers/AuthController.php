@@ -16,6 +16,11 @@ class AuthController extends Controller
         return view("auth::login");
     }
 
+    public function showRegisterForm(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+    {
+        return view("auth::register");
+    }
+
     // Handle login request with static credentials (demo only)
     public function login(Request $request): \Illuminate\Http\RedirectResponse
     {

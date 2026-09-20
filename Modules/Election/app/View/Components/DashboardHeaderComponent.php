@@ -2,9 +2,9 @@
 
 namespace Modules\Election\View\Components;
 
-use App\Models\Election;
 use Illuminate\View\Component;
 use Illuminate\View\View;
+use Modules\Election\Models\Election;
 
 class DashboardHeaderComponent extends Component
 {

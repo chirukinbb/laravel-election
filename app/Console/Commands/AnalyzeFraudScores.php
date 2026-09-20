@@ -3,10 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Enums\SettingKeyEnum;
-use App\Models\Vote;
-use App\Services\AntiFraudService;
 use App\Services\SettingsService;
 use Illuminate\Console\Command;
+use Modules\Election\Services\AntiFraudService;
 
 class AnalyzeFraudScores extends Command
 {

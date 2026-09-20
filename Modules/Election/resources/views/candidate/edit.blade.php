@@ -190,7 +190,7 @@
         $(document).ready(function () {
             $('.merge-block').addClass('d-none')
             $('#status').on('change', function () {
-                if (this.value === '{{\App\Enums\CandidateStatusEnum::Merged->name}}')
+                if (this.value === '{{\Modules\Election\Enums\CandidateStatusEnum::Merged->name}}')
                     $('.merge-block').removeClass('d-none')
                 else
                     $('.merge-block').addClass('d-none')

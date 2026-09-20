@@ -2,14 +2,14 @@
 
 namespace Modules\Election\View\Components;
 
-use App\Enums\CandidateStatusEnum;
-use App\Enums\VoteStatusEnum;
-use App\Models\Candidate;
-use App\Models\Election;
 use App\Models\User;
-use App\Models\Vote;
 use Illuminate\View\Component;
 use Illuminate\View\View;
+use Modules\Election\Enums\CandidateStatusEnum;
+use Modules\Election\Enums\VoteStatusEnum;
+use Modules\Election\Models\Candidate;
+use Modules\Election\Models\Election;
+use Modules\Election\Models\Vote;
 use Modules\Election\Repositories\CandidateRepository;
 
 class DashboardWidgetsComponent extends Component

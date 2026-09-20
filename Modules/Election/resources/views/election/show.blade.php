@@ -36,11 +36,11 @@ $btnMerge = '<button class="btn btn-xs btn-default text-primary mx-1 merge-candi
 foreach (
     $election->candidates()
         ->whereHas('votes', function ($q) {
-            $q->where('status', \App\Enums\VoteStatusEnum::Verified->name);
+            $q->where('status', \Modules\Election\Enums\VoteStatusEnum::Verified->name);
         })
         ->withCount([
             'votes as approved_votes_count' => function ($q) {
-                $q->where('status', \App\Enums\VoteStatusEnum::Verified->name);
+                $q->where('status', \Modules\Election\Enums\VoteStatusEnum::Verified->name);
             }
         ])
         ->orderByDesc('approved_votes_count')
@@ -51,7 +51,7 @@ foreach (
             $place+1,
             $item->first_name.' '.$item->last_name,
             config('election.countries.'.$item->country_code),
-            $item->votes()->where('status',\App\Enums\VoteStatusEnum::Verified->name)->count(),
+            $item->votes()->where('status',\Modules\Election\Enums\VoteStatusEnum::Verified->name)->count(),
             '<nobr>'.sprintf($btnEdit,route('election:candidate:edit',array_merge(['candidate'=>$item,'election'=>$item->election],request()->all()))).
             sprintf($btnApprove,$item->id).sprintf($btnMerge,$item->id).
             sprintf($btnReject,$item->id).'</nobr>'

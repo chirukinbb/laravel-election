@@ -163,7 +163,7 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 const row = $(this).closest('tr')
                 const candidate_id = $(this).data('id');
                 $.ajax({
-                    url: '{{route('admin.candidate.approve')}}',
+                    url: '{{route('api.admin.candidate.approve')}}',
                     type: 'POST',
                     data: {candidate_id},
                     headers: {
@@ -175,7 +175,7 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
             $('button.reject-candidate').on('click', function () {
                 const candidate_id = $(this).data('id');
                 $.ajax({
-                    url: '{{route('admin.candidate.reject')}}',
+                    url: '{{route('api.admin.candidate.reject')}}',
                     type: 'POST',
                     data: {candidate_id},
                     headers: {
@@ -187,7 +187,7 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
             $('button.approve-vote').on('click', function () {
                 const vote_id = $(this).data('id');
                 $.ajax({
-                    url: '{{route('admin.vote.approve')}}',
+                    url: '{{route('api.admin.vote.approve')}}',
                     type: 'POST',
                     data: {vote_id},
                     headers: {
@@ -199,7 +199,7 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
             $('button.reject-vote').on('click', function () {
                 const vote_id = $(this).data('id');
                 $.ajax({
-                    url: '{{route('admin.vote.reject')}}',
+                    url: '{{route('api.admin.vote.reject')}}',
                     type: 'POST',
                     data: {vote_id},
                     headers: {
@@ -211,7 +211,7 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
             $('button.flag-suspicious-candidate').on('click', function () {
                 const vote_id = $(this).data('id');
                 $.ajax({
-                    url: '{{route('admin.vote.flag')}}',
+                    url: '{{route('api.admin.vote.flag')}}',
                     type: 'POST',
                     data: {vote_id},
                     headers: {
@@ -232,7 +232,7 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 $('#merge_with').empty();
 
                 $.ajax({
-                    url: '{{route('voting.candidates')}}',
+                    url: '{{route('api.voting.candidates')}}',
                     type: 'GET',
                     headers: {
                         'Authorization': 'Bearer ' + apiToken
@@ -262,7 +262,7 @@ $btnFlagSuspicious = '<button class="btn btn-xs btn-default text-warning mx-1 fl
                 }
 
                 $.ajax({
-                    url: '{{route('admin.candidate.merge')}}',
+                    url: '{{route('api.admin.candidate.merge')}}',
                     type: 'POST',
                     data: {
                         source_candidate_id: currentMergeCandidateId,

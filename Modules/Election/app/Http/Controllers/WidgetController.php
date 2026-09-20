@@ -5,6 +5,8 @@ namespace Modules\Election\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Modules\Election\Repositories\CandidateRepository;
+use Modules\Election\Repositories\ElectionRepository;
 
 class WidgetController extends Controller
 {
