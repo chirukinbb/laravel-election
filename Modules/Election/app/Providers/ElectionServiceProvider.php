@@ -2,8 +2,11 @@
 
 namespace Modules\Election\Providers;
 
+use App\Events\DashboardWidgetEvent;
 use Illuminate\Support\Facades\Event;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
+use Modules\Election\View\Components\DashboardHeaderComponent;
+use Modules\Election\View\Components\DashboardWidgetsComponent;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class ElectionServiceProvider extends ModuleServiceProvider
@@ -68,7 +71,12 @@ class ElectionServiceProvider extends ModuleServiceProvider
                             'url' => route('logs')
                         ],
                     ]
-                ],);
+                ]);
+        });
+
+        Event::listen(DashboardWidgetEvent::class, function (DashboardWidgetEvent $event) {
+            $event->addHeader((new DashboardHeaderComponent())->render());
+            $event->addWidget((new DashboardWidgetsComponent())->render());
         });
     }
 }

@@ -4,13 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\CandidateStatusEnum;
 use App\Enums\VoteStatusEnum;
+use App\Events\DashboardWidgetEvent;
 use App\Models\Candidate;
-use App\Models\Election;
-use App\Models\GoogleApiKey;
-use App\Models\GoogleCloudSetting;
-use App\Models\GoogleProject;
-use App\Models\User;
-use App\Models\Vote;
 use App\Repositories\CandidateRepository;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
@@ -30,69 +25,11 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
-        $elections = Election::orderBy('date_start', 'desc')
-            ->where('user_id', auth()->id())
-            ->get();
+        $dashboard = new  DashboardWidgetEvent();
 
-        $electionId = $request->get('election');
-        if ($electionId) {
-            $selectedElection = $elections->firstWhere('id', $electionId) ?: $elections->first();
-        } else {
-            $selectedElection = $elections->first();
-        }
+        event($dashboard);
 
-        if ($selectedElection) {
-            $totalVotes = Vote::whereHas('candidate', function ($q) use ($selectedElection) {
-                $q->where('election_id', $selectedElection->id);
-            })->whereStatus(VoteStatusEnum::Verified->name)->count();
-
-            $suspiciousVotes = Vote::whereHas('candidate', function ($q) use ($selectedElection) {
-                $q->where('election_id', $selectedElection->id);
-            })->whereStatus(VoteStatusEnum::Suspicious->name)->count();
-
-            $approvedCandidates = Candidate::where('election_id', $selectedElection->id)
-                ->whereStatus(CandidateStatusEnum::Approved->name)->count();
-
-            $pendingCandidates = Candidate::where('election_id', $selectedElection->id)
-                ->whereStatus(CandidateStatusEnum::PendingReview->name)->count();
-
-            $usersWithVotes = User::whereHas('votes', function ($q) use ($selectedElection) {
-                $q->whereHas('candidate', function ($q2) use ($selectedElection) {
-                    $q2->where('election_id', $selectedElection->id);
-                });
-            })->whereNotNull('shopify_user_id')->count();
-
-            $conversion = $usersWithVotes > 0 ? $totalVotes * 100 / $usersWithVotes : 0;
-
-            $topCandidates = Candidate::where('election_id', $selectedElection->id)
-                ->withCount(['votes' => function ($q) {
-                    $q->whereStatus(VoteStatusEnum::Verified->name);
-                }])
-                ->orderByDesc('votes_count')
-                ->limit(50)
-                ->get();
-        } else {
-            $totalVotes = 0;
-            $suspiciousVotes = 0;
-            $approvedCandidates = 0;
-            $pendingCandidates = 0;
-            $conversion = 0;
-            $topCandidates = collect();
-        }
-
-        $categories = $this->candidateRepository->getCategoryList();
-
-        return view('dashboard', compact(
-            'elections',
-            'selectedElection',
-            'totalVotes',
-            'suspiciousVotes',
-            'approvedCandidates',
-            'pendingCandidates',
-            'conversion',
-            'categories',
-            'topCandidates'
-        ));
+        return view('dashboard', compact('dashboard'));
     }
 
     /**
