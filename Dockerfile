@@ -35,3 +35,4 @@ EXPOSE 8000
 #
 ## Set entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+#ENTRYPOINT ["sleep", "infinity"]

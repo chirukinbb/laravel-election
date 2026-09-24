@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Modules\Election\Enums\CandidateStatusEnum;
 
 return new class extends Migration {
     public function up()
@@ -21,8 +22,8 @@ return new class extends Migration {
             $table->string('socials')->nullable();
             $table->string('photo_url')->nullable();
             $table->string('reason_for_nomination');
-            $table->enum('status', collect(\App\Enums\CandidateStatusEnum::cases())->map(fn($case) => $case->name)->toArray())
-                ->default(\App\Enums\CandidateStatusEnum::PendingReview->name);
+            $table->enum('status', collect(CandidateStatusEnum::cases())->map(fn($case) => $case->name)->toArray())
+                ->default(CandidateStatusEnum::PendingReview->name);
             $table->string('category')->nullable();
             $table->unsignedBigInteger('proposed_by')->default(0);
 

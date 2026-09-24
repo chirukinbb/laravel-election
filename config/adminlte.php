@@ -274,7 +274,7 @@ return [
     | Here we can enable the Laravel Asset Bundling option for the admin panel.
     | Currently, the next modes are supported: 'mix', 'vite' and 'vite_js_only'.
     | When using 'vite_js_only', it's expected that your CSS is imported using
-    | JavaScript. Typically, in your application's 'resources/js/app.js' file.
+    | JavaScript. Typically, in your application's 'resources/js/app.tsx' file.
     | If you are not using any of these, leave it as 'false'.
     |
     | For detailed instructions you can look the asset bundling section here:
@@ -284,7 +284,7 @@ return [
 
     'laravel_asset_bundling' => false,
     'laravel_css_path' => 'css/app.css',
-    'laravel_js_path' => 'js/app.js',
+    'laravel_js_path' => 'js/app.tsx',
 
     /*
     |--------------------------------------------------------------------------

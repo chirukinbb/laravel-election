@@ -1,37 +1,87 @@
-version: '3.3'
+version: '3.8'
 
 services:
+  # ---------------------------------------------------------------------------
+  # Laravel App (PHP-FPM / Artisan)
+  # ---------------------------------------------------------------------------
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: laravel-election-dev
+    container_name: laravel-tou-app
+    restart: unless-stopped
+    working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
+      # Exclude the local node_modules folder from the mount (owned by the node service)
+      - /var/www/html/node_modules
       - vendor-data:/var/www/html/vendor
       - composer-cache:/root/.composer/cache
-    ports:
-      - "8000:8000"
-      - "8080:8080"
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
-      # Настройки подключения к MySQL (переопределяют .env)
       - DB_CONNECTION=mysql
       - DB_HOST=db
       - DB_PORT=3306
       - DB_DATABASE=laravel_election
       - DB_USERNAME=laravel_user
       - DB_PASSWORD=secret
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # Inertia SSR settings
+      - INERTIA_SSR_ENABLED=true
+      - INERTIA_SSR_URL=http://node:13714
     networks:
       - laravel-network
     depends_on:
-      - db
-    restart: unless-stopped
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
+  # ---------------------------------------------------------------------------
+  # Nginx Web Server
+  # ---------------------------------------------------------------------------
+  web:
+    image: nginx:alpine
+    container_name: laravel-tou-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - laravel-network
+    depends_on:
+      - app
+
+  # ---------------------------------------------------------------------------
+  # Node.js (Vite Dev Server + Inertia SSR)
+  # ---------------------------------------------------------------------------
+  node:
+    image: node:22
+    container_name: laravel-tou-node
+    restart: unless-stopped
+    working_dir: /var/www/html
+    ports:
+      - "5173:5173"   # Vite dev server (HMR)
+      - "13714:13714" # Inertia SSR server
+    volumes:
+      - ./:/var/www/html
+      - node-modules:/var/www/html/node_modules
+    command: sh /var/www/html/infra/node/entrypoint.sh
+    networks:
+      - laravel-network
+    depends_on:
+      - app
+
+  # ---------------------------------------------------------------------------
+  # Database (MySQL 8.0)
+  # ---------------------------------------------------------------------------
   db:
     image: mysql:8.0
-    container_name: laravel-election-db
+    container_name: laravel-tou-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: laravel_election
@@ -39,7 +89,7 @@ services:
       MYSQL_PASSWORD: secret
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - "3306:3306"   # проброс порта наружу (опционально)
+      - "3306:3306"
     volumes:
       - db-data:/var/lib/mysql
     networks:
@@ -48,12 +98,28 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 10s
       retries: 5
-      interval: 10s
+      interval: 5s
+
+  # ---------------------------------------------------------------------------
+  # Redis Cache & Queues
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:alpine
+    container_name: laravel-tou-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - laravel-network
 
 volumes:
   vendor-data:
   composer-cache:
-  db-data:   # том для хранения данных MySQL
+  node-modules:
+  db-data:
+  redis-data:
 
 networks:
   laravel-network:

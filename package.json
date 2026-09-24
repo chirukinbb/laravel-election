@@ -3,11 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "vite",
     "build": "vite build",
-    "dev": "vite"
+    "build:ssr": "vite build --ssr"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
+    "@vitejs/plugin-react": "^5.2.0",
     "axios": "^1.13.6",
     "concurrently": "^9.0.1",
     "laravel-vite-plugin": "^2.0.0",
@@ -15,11 +17,16 @@
     "vite": "^7.0.7"
   },
   "dependencies": {
+    "@inertiajs/react": "^3.7.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-vue": "^6.0.5",
     "laravel-echo": "^2.3.1",
     "mcp-ssh": "^1.0.1",
     "pusher-js": "^8.4.3",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "vue": "^3.5.31",
     "vue-router": "^4.6.4"
   }
