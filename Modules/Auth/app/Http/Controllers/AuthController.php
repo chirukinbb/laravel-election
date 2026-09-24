@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Socialite;
+use Modules\Auth\Services\UserService;
 
 class AuthController extends Controller
 {
@@ -43,11 +45,11 @@ class AuthController extends Controller
     {
         $request->validate([
             "email" => "required|email|unique:users,email",
-            "name" => "required",
-            "password" => "required|confirmed",
+            "name" => "required"
         ]);
 
-        Auth::login(User::create($request->only('email', 'password', 'name')));
+        $password = Str::random(12);
+        (new UserService())->signup($request->name, $request->email, $password);
 
         return redirect()->intended("/dashboard");
     }

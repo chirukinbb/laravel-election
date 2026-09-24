@@ -1,4 +1,5 @@
 {
   "Auth": true,
-  "Election": true
+  "Election": true,
+  "Profile": true
 }

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+use Spatie\Permission\Middleware\RoleMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([])
@@ -20,9 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'abilities' => CheckAbilities::class,
-            'ability' => CheckForAnyAbility::class,
-            'election.ownership' => CheckElectionOwnership::class,
-            'pending.candidates' => CheckPendingCandidates::class,
+            'role' => RoleMiddleware::class,
+            'ability' => CheckForAnyAbility::class
         ]);
         $middleware->validateCsrfTokens(except: [
             '*',
