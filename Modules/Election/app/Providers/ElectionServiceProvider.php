@@ -2,6 +2,7 @@
 
 namespace Modules\Election\Providers;
 
+use App\Events\CinematicMenuEvent;
 use App\Events\DashboardWidgetEvent;
 use Illuminate\Support\Facades\Event;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
@@ -77,6 +78,34 @@ class ElectionServiceProvider extends ModuleServiceProvider
         Event::listen(DashboardWidgetEvent::class, function (DashboardWidgetEvent $event) {
             $event->addHeader((new DashboardHeaderComponent())->render());
             $event->addWidget((new DashboardWidgetsComponent())->render());
+        });
+
+        Event::listen(CinematicMenuEvent::class, function (CinematicMenuEvent $event) {
+            $event->add([
+                'key' => 'tree',
+                'label' => 'Tree',
+                'url' => '/#tree',
+                'children' => [
+                    ['label' => 'Engravings', 'url' => '/engravings'],
+                    ['label' => 'Golden Leaves', 'url' => '/golden-leaves'],
+                    ['label' => 'Human Handprint', 'url' => '/human-handprint'],
+                ]
+            ]);
+            $event->add([
+                'key' => 'story',
+                'label' => 'Story',
+                'url' => '/story',
+            ]);
+            $event->add([
+                'key' => 'voting',
+                'label' => 'Voting',
+                'url' => '/voting',
+            ]);
+            $event->add([
+                'key' => 'about',
+                'label' => 'About',
+                'url' => '/about',
+            ]);
         });
     }
 }

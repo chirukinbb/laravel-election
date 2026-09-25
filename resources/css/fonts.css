@@ -1,0 +1,57 @@
+/* GFS Didot */
+@font-face {
+    font-family: "GFS Didot";
+    src: url("/fonts/tou/GFSDidot.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Karsten Thin */
+@font-face {
+    font-family: "Karsten";
+    src: url("/fonts/tou/Karsten-Thin.otf") format("opentype");
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Montserrat Light */
+@font-face {
+    font-family: "Montserrat";
+    src: url("/fonts/tou/Montserrat-Light.ttf") format("truetype");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Montserrat Regular */
+@font-face {
+    font-family: "Montserrat";
+    src: url("/fonts/tou/Montserrat-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Назначаем CSS-переменные, как это делал next/font */
+:root {
+    --font-tou-home-display: "GFS Didot", "Times New Roman", serif;
+    --font-tou-display: "Karsten", "Times New Roman", serif;
+    --font-tou-interface: "Montserrat", "Arial", sans-serif;
+}
+
+.font-didot {
+    --font-tou-home-display: "GFS Didot", "Times New Roman", serif;
+    font-family: var(--font-tou-home-display);
+}
+
+.font-karsten {
+    --font-tou-display: "Karsten", "Times New Roman", serif;
+    font-family: var(--font-tou-display);
+}
+
+.font-montserrat {
+    --font-tou-interface: "Montserrat", "Arial", sans-serif;
+    font-family: var(--font-tou-interface);
+}

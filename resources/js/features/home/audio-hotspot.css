@@ -1,0 +1,63 @@
+.audio-hotspot {
+  --hotspot-x: 0px;
+  --hotspot-y: 0px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%) translate(var(--hotspot-x), var(--hotspot-y));
+  box-shadow: none;
+  transition: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.audio-hotspot:hover {
+  box-shadow: none;
+}
+.audio-hotspot:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 5px;
+}
+.hotspot-ring,
+.hotspot-core {
+  grid-area: 1 / 1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hotspot-ring {
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgb(255 255 255 / 65%);
+  transition:
+    width 240ms ease,
+    height 240ms ease;
+}
+.hotspot-core {
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  box-shadow: none;
+}
+.audio-hotspot[data-magnetic-active="true"] .hotspot-ring,
+.audio-hotspot:focus-visible .hotspot-ring {
+  width: 40px;
+  height: 40px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .audio-hotspot:hover .hotspot-ring {
+    width: 40px;
+    height: 40px;
+  }
+}
+.audio-hotspot[data-reduced-motion="true"] .hotspot-ring {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-ring {
+    transition: none;
+  }
+}

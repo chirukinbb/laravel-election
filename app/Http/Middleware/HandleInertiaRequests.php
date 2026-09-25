@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Events\CinematicMenuEvent;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -31,6 +32,9 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $menuEvent = new CinematicMenuEvent();
+        event($menuEvent);
+
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
@@ -38,6 +42,9 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
+            ],
+            'navigation' => [
+                'menu' => $menuEvent->items,
             ],
         ]);
     }

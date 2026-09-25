@@ -1,0 +1,251 @@
+.voting-map {
+  --map-gold: #aa8549;
+  --map-ink: #172132;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--map-ink);
+}
+
+.voting-map__continents {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+  padding-block: 4px 18px;
+}
+
+.voting-map button {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.voting-map__continents button {
+  min-height: 36px;
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease;
+}
+
+.voting-map__continents button[aria-pressed="true"] {
+  border-color: var(--map-gold);
+  color: #89682f;
+}
+
+.voting-map__viewport {
+  position: relative;
+  width: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+}
+
+.voting-map__viewport[data-dragging="true"],
+.voting-map__viewport[data-dragging="true"] .voting-map__country {
+  cursor: grabbing;
+}
+
+.voting-map__viewport svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.voting-map__land {
+  transform-origin: 0 0;
+  transition: transform 800ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.voting-map__viewport[data-dragging="true"] .voting-map__land {
+  transition: none;
+}
+
+.voting-map__country {
+  cursor: pointer;
+  outline: none;
+}
+
+.voting-map__country path,
+.voting-map__territory {
+  fill: #d4d5d5;
+  stroke: #fff;
+  stroke-width: 0.8px;
+  vector-effect: non-scaling-stroke;
+  transition:
+    fill 220ms ease,
+    opacity 220ms ease;
+}
+
+.voting-map__territory {
+  fill: #e1e2e2;
+  pointer-events: none;
+}
+
+.voting-map__country[data-dimmed="true"] path,
+.voting-map__country[data-dimmed="true"] .voting-map__marker {
+  fill: #e8e9e9;
+}
+
+.voting-map__country[data-dimmed="true"] {
+  pointer-events: none;
+}
+
+.voting-map__country:hover path,
+.voting-map__country:focus-visible path {
+  fill: #c5b28d;
+}
+
+.voting-map__country[data-selected="true"] path,
+.voting-map__country[data-selected="true"] .voting-map__marker {
+  fill: var(--map-gold);
+}
+
+.voting-map__marker {
+  fill: #bfc2c3;
+  stroke: #fff;
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.voting-map__marker-hit {
+  fill: transparent;
+  stroke: none;
+}
+
+.voting-map__country:hover .voting-map__marker,
+.voting-map__country:focus-visible .voting-map__marker {
+  fill: var(--map-gold);
+}
+
+.voting-map__country:focus-visible path,
+.voting-map__country:focus-visible .voting-map__marker {
+  stroke: var(--map-ink);
+  stroke-width: 1.5px;
+}
+
+.voting-map__footer {
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 50px;
+  padding-top: 12px;
+}
+
+.voting-map__controls {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+  align-items: center;
+}
+
+.voting-map__controls button {
+  display: grid;
+  min-width: 40px;
+  min-height: 44px;
+  padding: 8px;
+  place-content: center;
+  border: 0;
+  background: transparent;
+  font-size: 22px;
+  transition: color 200ms ease;
+}
+
+.voting-map__controls button:disabled {
+  color: #a6a8ab;
+  cursor: default;
+}
+
+.voting-map__controls .voting-map__reset {
+  margin-left: 8px;
+  padding-inline: 18px;
+  border-left: 1px solid #d7d9dc;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.voting-map__caption {
+  margin: 0;
+  color: #677284;
+  font-size: 9px;
+  letter-spacing: 0.09em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.voting-map__message {
+  display: grid;
+  height: 100%;
+  padding: 24px;
+  place-content: center;
+  color: #677284;
+  font-size: 13px;
+  text-align: center;
+}
+
+.voting-map__message button {
+  padding: 12px;
+  border: 1px solid #c1c5ca;
+  background: transparent;
+}
+
+.voting-map button:focus-visible {
+  outline: 1px solid var(--map-gold);
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .voting-map {
+    height: auto;
+  }
+  .voting-map__continents {
+    gap: 3px 14px;
+    padding-bottom: 8px;
+  }
+
+  .voting-map__continents button {
+    min-height: 40px;
+    font-size: 9px;
+  }
+
+  .voting-map__viewport {
+    flex: 0 0 auto;
+    aspect-ratio: 1000 / 720;
+  }
+
+  .voting-map__footer {
+    flex-basis: 92px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .voting-map__caption {
+    width: 100%;
+    min-height: 24px;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voting-map__land,
+  .voting-map__country path,
+  .voting-map__continents button {
+    transition: none;
+  }
+}

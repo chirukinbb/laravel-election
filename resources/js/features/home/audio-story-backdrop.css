@@ -1,0 +1,75 @@
+.scene-plate.audio-story-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  background: transparent;
+  transition: opacity 1.1s ease;
+}
+.scene-plate.audio-story-backdrop[data-active="true"] {
+  opacity: 1;
+  transition-duration: 180ms;
+}
+.audio-story-backdrop__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+.audio-story-backdrop__video,
+.audio-story-backdrop__night {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+.audio-story-backdrop__video[data-visible="true"],
+.audio-story-backdrop__night[data-visible="true"] {
+  opacity: 1;
+}
+/* The completed clip remains the visual source. A decoded matching poster is
+   needed above it only when playback fails or reduced motion skips the clip. */
+.audio-story-backdrop[data-state="settled"]
+  .audio-story-backdrop__video[data-visible="true"]
+  + .audio-story-backdrop__night {
+  opacity: 0;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .scene-plate.audio-story-backdrop {
+    transform: scale(1.04);
+  }
+}
+@media (max-aspect-ratio: 1/1) {
+  .scene-plate.audio-story-backdrop::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(#08172a, #0c2038 38%, #14253b 70%, #101c2b);
+    opacity: 0;
+  }
+  .audio-story-backdrop__media {
+    inset: auto;
+    width: auto;
+    height: min(72svh, 110vw);
+    top: 50%;
+    left: 48%;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+    mask-image: linear-gradient(transparent, #000 4%, #000 94%, transparent);
+  }
+  .scene-plate.audio-story-backdrop[data-state="playing"]::before {
+    opacity: 1;
+    transition: opacity 4s linear;
+  }
+  .scene-plate.audio-story-backdrop[data-state="settled"]::before,
+  .scene-plate.audio-story-backdrop[data-state="fallback"]::before {
+    opacity: 1;
+    transition: opacity 180ms ease;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-plate.audio-story-backdrop,
+  .audio-story-backdrop__media {
+    transition: none;
+  }
+}

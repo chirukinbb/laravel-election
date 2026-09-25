@@ -301,14 +301,14 @@ return [
     'menu' => [
         [
             'text' => 'Dashboard',
-            'url' => 'dashboard',
+            'url' => 'admin/dashboard',
             'icon' => 'fas fa-fw fa-tachometer-alt', // Спидометр/панель управления
             'key' => 'dashboard'
         ],
 
         [
             'text' => 'Settings',
-            'url' => 'settings',
+            'url' => 'admin/settings',
             'icon' => 'fas fa-fw fa-cogs', // Шестеренки
             'key' => 'settings'
         ],

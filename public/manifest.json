@@ -1,0 +1,63 @@
+{
+  "version": "cinematic-home-v001",
+  "home": {
+    "poster": "/media/tou/home-transition-start.webp",
+    "posterSrcSet": "/media/tou/home-transition-start-small.webp 1280w, /media/tou/home-transition-start.webp 1920w",
+    "containsUi": false,
+    "source": "Home-to-Explore camera transition — first encoded frame",
+    "video": null,
+    "status": "INTEGRATED"
+  },
+  "turn": {
+    "video": "/media/tou/home-to-explore.mp4",
+    "videoSmall": "/media/tou/home-to-explore-small.mp4",
+    "reverseVideo": "/media/tou/home-to-explore-reverse.mp4",
+    "reverseVideoSmall": "/media/tou/home-to-explore-reverse-small.mp4",
+    "duration": 4.041667,
+    "frameRate": 24,
+    "status": "INTEGRATED",
+    "source": "Seedance 2_5 - Generate a seamless 4-second cinematic camera transition between the two supplied Tre.mp4"
+  },
+  "reveal": {
+    "poster": "/media/tou/home-transition-end.webp",
+    "posterSrcSet": "/media/tou/home-transition-end-small.webp 1280w, /media/tou/home-transition-end.webp 1920w",
+    "containsUi": false,
+    "source": "Home-to-Explore camera transition — last encoded frame",
+    "video": null,
+    "status": "INTEGRATED"
+  },
+  "night": {
+    "poster": "/media/tou/reveal-night.webp",
+    "posterSrcSet": "/media/tou/reveal-night-small.webp 1280w, /media/tou/reveal-night.webp 1926w",
+    "containsUi": false,
+    "video": null,
+    "status": "INTEGRATED"
+  },
+  "audioTransition": {
+    "video": "/media/tou/day-to-night.mp4",
+    "videoSmall": "/media/tou/day-to-night-small.mp4",
+    "webm": "/media/tou/day-to-night.webm",
+    "webmSmall": "/media/tou/day-to-night-small.webm",
+    "duration": 4.041667,
+    "status": "INTEGRATED",
+    "source": "Seedance 2_5 - Generate a seamless 4-second cinematic DAY-TO-NIGHT transition for Tree of Unity usin.mp4",
+    "reverseStatus": "WAITING_OWNER_VIDEO"
+  },
+  "audioStory": {
+    "audio": null,
+    "captions": null,
+    "language": "en",
+    "status": "WAITING_REFERENCES"
+  },
+  "ambient": { "audio": "/media/tou/ambient.mp3", "status": "INTEGRATED" },
+  "goldTransition": { "video": null, "status": "WAITING_REFERENCES" },
+  "tree": {
+    "model": "/media/tou/tree-web.glb",
+    "status": "INTEGRATED",
+    "source": "Unity_Tree_v2_leaf2_assembled_v2_web.glb",
+    "interfaceStatus": "TECHNICAL_PREVIEW_ONLY"
+  },
+  "logo": "/media/tou/logo-gold.svg",
+  "logoBlack": "/media/tou/logo-gold.svg",
+  "notes": "Home and Explore share the owner-supplied camera clip, responsive seek-optimized H.264 exports and matching endpoint posters; prepare with scripts/prepare-home-transition.mjs. Audio Story uses the owner-supplied day-to-night clip, responsive VP9/H.264 exports and a clean final-frame night poster; prepare with scripts/prepare-audio-transition.mjs. Night-to-day footage, narration and leaf-match transition await owner production. Current runtime videos, models and ambient MP3 are included in the shared repository snapshot."
+}

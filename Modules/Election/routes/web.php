@@ -7,7 +7,7 @@ use Modules\Election\Http\Controllers\ElectionController;
 use Modules\Election\Http\Controllers\ModerationController;
 use Modules\Election\Http\Controllers\WidgetController;
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')->prefix('admin')->group(function () {
     Route::prefix('election')->as('election:')->group(function () {
         Route::get('list', [ElectionController::class, 'index'])->name('list');
         Route::get('create', [ElectionController::class, 'create'])->name('create');

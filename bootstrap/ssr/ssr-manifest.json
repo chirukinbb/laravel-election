@@ -1,7 +1,109 @@
 {
   "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
+  "public/manifest.json": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/Pages/HomePage.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
   "resources/js/Pages/TestPage.tsx": [
     "/build/assets/TestPage-D8U01PV7.js"
+  ],
+  "resources/js/features/home/audio-hotspot.css": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/audio-hotspot.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/audio-story-backdrop.css": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/audio-story-backdrop.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/audio-story-cursor.css": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/audio-story-cursor.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/cinematic-header.css": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/cinematic-header.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/copy.ts": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/fonts.ts": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/home-experience.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/home-stage.ts": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/home-transition-video.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/home.css": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/inspect-cursor.css": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/inspect-cursor.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/language-selector.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/media.ts": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/tree-hit-area.tsx": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/tree-scene-utils.ts": [
+    "/build/assets/tree-scene-BSXe3sX8.js"
+  ],
+  "resources/js/features/home/tree-scene.tsx": [
+    "/build/assets/tree-scene-BSXe3sX8.js"
+  ],
+  "resources/js/features/home/use-ambient-audio.ts": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/use-home-language.ts": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
+  ],
+  "resources/js/features/home/use-home-scroll.ts": [
+    "/build/assets/HomePage-CVGQXCoV.js",
+    "/build/assets/HomePage-Bgxk9Rhb.css"
   ],
   "resources/js/ssr.tsx": []
 }

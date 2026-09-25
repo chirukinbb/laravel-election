@@ -1,0 +1,57 @@
+.audio-story-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 80;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  will-change: transform;
+  contain: layout style;
+}
+
+.audio-story-cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+.audio-story-cursor > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.audio-story-cursor__track,
+.audio-story-cursor__progress,
+.audio-story-cursor__cross {
+  stroke: #fff;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.audio-story-cursor__track {
+  opacity: 0.32;
+}
+
+.audio-story-cursor__progress {
+  opacity: 0.9;
+  stroke-linecap: round;
+}
+
+.audio-story-cursor__cross {
+  opacity: 0.88;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-audio-cursor-visible="true"] .audio-exit-surface {
+    cursor: none;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .audio-story-cursor {
+    display: none;
+  }
+}
