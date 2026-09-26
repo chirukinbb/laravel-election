@@ -2,27 +2,15 @@
 
 namespace App\Enums;
 
+use App\Traits\EnumTrait;
+
 enum SettingKeyEnum: string
 {
-    case RateLimitIP = 'rate_limit_ip:number';
-    case RateLimitFP = 'rate_limit_fp:number';
-    case ScoreIP = 'ip_score:number';
-    case ScoreFP = 'fp_score:number';
-    case VoteApproveLimit = 'vote_approve_limit:number';
-    case VoteRejectLimit = 'vote_reject_limit:number';
+    use EnumTrait;
 
-    public function key(): string
-    {
-        return explode(':', $this->value)[0];
-    }
-
-    public function type(): string
-    {
-        return explode(':', $this->value)[1];
-    }
-
-    public function label(): string
-    {
-        return ucwords(str_replace('_', ' ', $this->key()));
-    }
+    case SITE_TITLE = 'site_title:string';
+    case SITE_DESCRIPTION = 'site_description:string';
+    case META_TITLE = 'meta_title:string';
+    case META_DESCRIPTION = 'meta_description:string';
+    case SOCIAL_MEDIA = 'social_media:string';
 }

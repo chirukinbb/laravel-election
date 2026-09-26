@@ -4,8 +4,10 @@ namespace Modules\Election\Providers;
 
 use App\Events\CinematicMenuEvent;
 use App\Events\DashboardWidgetEvent;
+use App\Events\SettingsEvent;
 use Illuminate\Support\Facades\Event;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
+use Modules\Election\Enums\SettingKeyEnum;
 use Modules\Election\View\Components\DashboardHeaderComponent;
 use Modules\Election\View\Components\DashboardWidgetsComponent;
 use Nwidart\Modules\Support\ModuleServiceProvider;
@@ -106,6 +108,10 @@ class ElectionServiceProvider extends ModuleServiceProvider
                 'label' => 'About',
                 'url' => '/about',
             ]);
+        });
+
+        Event::listen(SettingsEvent::class, function (SettingsEvent $event) {
+            $event->setSettings('Election', SettingKeyEnum::cases());
         });
     }
 }
