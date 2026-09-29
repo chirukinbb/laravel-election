@@ -42,7 +42,7 @@ class SettingsController extends Controller
         foreach ($validated['settings'] as $key => $value) {
             $keyEnum = $this->findEnumByKey($key);
 
-            if ($keyEnum) {
+            if ($keyEnum && !empty($value)) {
                 $this->settingsService->set($keyEnum, $value);
             }
         }

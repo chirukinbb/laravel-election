@@ -84,11 +84,7 @@
                                                    name="settings[{{ $key }}]"
                                                    value="{{ $value }}">
                                         @else
-                                            <input type="text"
-                                                   class="form-control @error('settings.' . $key) is-invalid @enderror"
-                                                   id="settings_{{ $key }}"
-                                                   name="settings[{{ $key }}]"
-                                                   value="{{ $value }}">
+                                            <x-multilang-input :key="$key" name="settings[{{ $key }}]" :value="$value"/>
                                         @endif
 
                                         @error('settings.' . $key)

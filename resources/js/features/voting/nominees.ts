@@ -14,16 +14,17 @@ export interface Supporter {
 
 export interface Nominee {
   id: string;
-  firstName: string;
-  lastName: string;
-  country: string;
-  activity: LocalizedNomineeText;
-  reason: LocalizedNomineeText;
-  qualities: LocalizedNomineeText;
-  contribution: LocalizedNomineeText;
-  /** Zero-based cell in the five-column, four-row portrait atlas. */
-  portraitIndex: number;
-  supporters: readonly Supporter[];
+    firstName: string;
+    lastName: string;
+    country: string;
+    activity: LocalizedNomineeText;
+    reason: LocalizedNomineeText;
+    qualities: LocalizedNomineeText;
+    contribution: LocalizedNomineeText;
+    /** Zero-based cell in the five-column, four-row portrait atlas. */
+    portraitIndex: number;
+    supporters: readonly Supporter[];
+    avatarUrl: string;
 }
 
 export const NOMINEE_PORTRAIT_ATLAS = "/media/voting/nominees-atlas.webp";

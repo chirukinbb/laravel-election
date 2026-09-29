@@ -101,7 +101,7 @@ class ElectionServiceProvider extends ModuleServiceProvider
             $event->add([
                 'key' => 'voting',
                 'label' => 'Voting',
-                'url' => '/voting',
+                'url' => route('voting'),
             ]);
             $event->add([
                 'key' => 'about',

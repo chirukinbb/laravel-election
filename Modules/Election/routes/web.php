@@ -39,4 +39,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('clean-logs', [AntiFraudController::class, 'clean'])->name('clean');
 });
 
-Route::get('widget', [WidgetController::class, 'index']);
+Route::prefix('{lang?}')
+    ->whereIn('lang', ['en', 'ru', 'es']) // Поддерживаемые языки
+    ->middleware(['web', 'set_locale']) // Устанавливаем язык
+    ->group(function () {
+        Route::get('voting', [WidgetController::class, 'index'])->name('voting');
+    });

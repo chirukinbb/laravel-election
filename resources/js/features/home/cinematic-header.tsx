@@ -1,4 +1,4 @@
-import {Link, usePage} from "@inertiajs/react";
+import {Link, router, usePage} from "@inertiajs/react";
 import {Fragment, type RefObject, useEffect, useId, useRef, useState, useSyncExternalStore,} from "react";
 import {homeCopy, type HomeLanguage} from "./copy";
 import {montserrat} from "./fonts";
@@ -36,15 +36,29 @@ export interface MenuItem {
 }
 
 export interface InertiaSharedProps {
+  readonly locale?: HomeLanguage;
   readonly navigation?: {
     readonly menu?: readonly MenuItem[];
   };
+
   readonly [key: string]: unknown;
+}
+
+/**
+ * Вспомогательная функция для добавления языкового префикса к URL
+ */
+function withLocale(url: string, locale: string): string {
+  if (!url) return `/${locale}`;
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("#")) {
+    return url;
+  }
+  const cleanUrl = url.startsWith("/") ? url : `/${url}`;
+  return `/${locale}${cleanUrl}`.replace(/\/+/g, "/");
 }
 
 export function CinematicHeader({
                                   inspect,
-                                  language,
+                                  language: propLanguage,
                                   onLanguageChange,
                                   sound,
                                   onToggleSound,
@@ -58,8 +72,8 @@ export function CinematicHeader({
                                   tone = inspect ? "dark" : "light",
                                 }: {
   readonly inspect: boolean;
-  readonly language: HomeLanguage;
-  readonly onLanguageChange: (language: HomeLanguage) => void;
+  readonly language?: HomeLanguage;
+  readonly onLanguageChange?: (language: HomeLanguage) => void;
   readonly sound: boolean;
   readonly onToggleSound: () => void;
   readonly onTree: () => void;
@@ -73,6 +87,13 @@ export function CinematicHeader({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [treeExpanded, setTreeExpanded] = useState(false);
+
+  // Получаем текущие данные из Inertia Page Props и URL
+  const {url: currentPath, props} = usePage<InertiaSharedProps>();
+
+  // Определяем язык из URL (props.locale) или используем проп по умолчанию
+  const currentLanguage: HomeLanguage =
+      (props.locale as HomeLanguage) ?? propLanguage ?? "en";
 
   const compact = useSyncExternalStore(
       subscribeCompactHeader,
@@ -91,12 +112,10 @@ export function CinematicHeader({
 
   const navigationId = useId();
   const treeId = useId();
-  const copy = homeCopy[language];
+  const copy = homeCopy[currentLanguage] ?? homeCopy.en;
 
-  // Получаем динамическое меню из Shared Props Inertia
-  const { navigation } = usePage<InertiaSharedProps>().props;
-  const menuItems = navigation?.menu ?? [];
-
+  // Динамическое меню из Shared Props
+  const menuItems = props.navigation?.menu ?? [];
   const treeItem = menuItems.find((item) => item.key === "tree");
   const regularItems = menuItems.filter((item) => item.key !== "tree");
 
@@ -120,13 +139,34 @@ export function CinematicHeader({
   const openNavigation = () => {
     cancelClose();
     if (document.activeElement === backRef.current)
-      logoLink.current?.focus({ preventScroll: true });
+      logoLink.current?.focus({preventScroll: true});
     setExpanded(true);
   };
 
   const openTree = () => {
     cancelTreeClose();
     setTreeExpanded(true);
+  };
+
+  // Обработчик переключения языка с подстановкой нового префикса в URL
+  const handleLanguageSelect = (newLang: HomeLanguage) => {
+    if (onLanguageChange) {
+      onLanguageChange(newLang);
+    }
+
+    if (newLang === currentLanguage) return;
+
+    // Подменяем языковой префикс в текущем URL (например, /ru/about -> /es/about)
+    const segments = currentPath.split("/").filter(Boolean);
+    if (segments.length > 0 && ["en", "ru", "es"].includes(segments[0])) {
+      segments[0] = newLang;
+    } else {
+      segments.unshift(newLang);
+    }
+
+    const newUrl = "/" + segments.join("/");
+    collapse();
+    router.get(newUrl);
   };
 
   useEffect(
@@ -226,7 +266,7 @@ export function CinematicHeader({
       >
         <Link
             ref={logoLink}
-            href="/"
+            href={`/${currentLanguage}`}
             className="cinematic-logo inspect-logo"
             aria-label="Tree of Unity"
             onPointerEnter={(event) => {
@@ -283,7 +323,7 @@ export function CinematicHeader({
           </button>
 
           <nav className="cinematic-nav" aria-label={copy.navigation.primary}>
-            {/* Динамический сепшн Tree с выпадающим подменю */}
+            {/* Пункт Tree с подменю и языковыми роутами */}
             {treeItem ? (
                 <div
                     className="cinematic-tree"
@@ -316,7 +356,7 @@ export function CinematicHeader({
                   <Link
                       ref={treeLink}
                       className="cinematic-tree__trigger"
-                      href={treeItem.url}
+                      href={withLocale(treeItem.url, currentLanguage)}
                       aria-expanded={compact ? undefined : treeExpanded}
                       aria-controls={compact ? undefined : treeId}
                       onFocus={(event) => {
@@ -341,7 +381,9 @@ export function CinematicHeader({
                         <button
                             className="cinematic-tree__toggle"
                             type="button"
-                            aria-label={treeSectionsLabel[language] ?? treeSectionsLabel.en}
+                            aria-label={
+                                treeSectionsLabel[currentLanguage] ?? treeSectionsLabel.en
+                            }
                             aria-expanded={treeExpanded}
                             aria-controls={treeId}
                             onClick={() => {
@@ -367,7 +409,11 @@ export function CinematicHeader({
                         >
                           <div className="tree-submenu__inner">
                             {treeItem.children.map((sub) => (
-                                <Link key={sub.url} href={sub.url} onClick={collapse}>
+                                <Link
+                                    key={sub.url}
+                                    href={withLocale(sub.url, currentLanguage)}
+                                    onClick={collapse}
+                                >
                                   {sub.label}
                                 </Link>
                             ))}
@@ -378,17 +424,20 @@ export function CinematicHeader({
                 </div>
             ) : null}
 
-            {/* Динамические основные пункты меню с разделителем логотипа посередине */}
+            {/* Пункты меню с языковыми префиксами */}
             {regularItems.map((item, index) => {
-              const halfIndex = Math.ceil(regularItems.length / 2) -1;
+              const halfIndex = Math.ceil(regularItems.length / 2) - 1;
               const isHalfway = index === halfIndex;
 
               return (
                   <Fragment key={item.key}>
                     {isHalfway ? (
-                        <span className="inspect-menu__logo-space" aria-hidden="true" />
+                        <span className="inspect-menu__logo-space" aria-hidden="true"/>
                     ) : null}
-                    <Link href={item.url} onClick={collapse}>
+                    <Link
+                        href={withLocale(item.url, currentLanguage)}
+                        onClick={collapse}
+                    >
                       {(copy.navigation as Record<string, string>)[item.key] || item.label}
                     </Link>
                   </Fragment>
@@ -397,7 +446,10 @@ export function CinematicHeader({
           </nav>
 
           <div className="inspect-menu__language">
-            <LanguageSelector language={language} onChange={onLanguageChange} />
+            <LanguageSelector
+                language={currentLanguage}
+                onChange={handleLanguageSelect}
+            />
           </div>
         </div>
 

@@ -9,30 +9,48 @@ class SettingsService
 {
     private array $settings = [];
 
-    public function __construct()
+    public function __construct(bool $isFull)
     {
-        $this->loadSettings();
+        $this->loadSettings($isFull);
     }
 
-    private function loadSettings(): void
+    private function loadSettings(bool $isFull): void
     {
         foreach (SettingKeyEnum::cases() as $keyEnum) {
-            $setting = Setting::where('key', $keyEnum->key())->first();
-            $this->settings[$keyEnum->key()] = $setting?->value;
+            $setting = Setting::with('translations')->where('key', $keyEnum->key())->first();
+            $value = $setting->value;
+
+            if (isset($setting->translations_array)) {
+                $value = $isFull ? $setting->translations_array : $setting->translations_array[app()->getLocale()];
+            }
+
+            $this->settings[$keyEnum->key()] = $value;
         }
     }
 
-    public function get(\UnitEnum $key): ?string
+    public function get(\UnitEnum $key): string|array|null
     {
         return $this->settings[$key->key()] ?? null;
     }
 
-    public function set(SettingKeyEnum $key, ?string $value): void
+    public function set(SettingKeyEnum $key, string|array $value): void
     {
-        Setting::updateOrCreate(
-            ['key' => $key->key()],
-            ['value' => $value]
+        $setting = Setting::firstOrCreate(
+            ['key' => $key->key()]
         );
+
+        if (is_array($value)) {
+            $setting->update(['value' => null]);
+
+            foreach ($value as $locale => $text) {
+                $setting->translations()->updateOrCreate(
+                    ['language' => $locale],
+                    ['text' => $text]
+                );
+            }
+        } else {
+            $setting->update(['value' => $value]);
+        }
 
         $this->settings[$key->key()] = $value;
     }
@@ -49,6 +67,6 @@ class SettingsService
 
     public function refresh(): void
     {
-        $this->loadSettings();
+        $this->loadSettings(true);
     }
 }

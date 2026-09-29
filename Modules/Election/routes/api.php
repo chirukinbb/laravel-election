@@ -36,3 +36,8 @@ Route::middleware(['auth:sanctum', 'abilities:' . \App\Enums\RoleEnum::ADMIN->na
         Route::get('/votes/suspicious-stats', [AdminController::class, 'getSuspiciousVotesStats'])->name('admin.votes.suspicious-stats');
         Route::get('/votes/suspicious', [AdminController::class, 'getSuspiciousVotes'])->name('admin.votes.suspicious');
     });
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('candidates/{election}', [\Modules\Election\Http\Controllers\Api\CandidateController::class, 'index'])->name('candidates');
+    Route::get('candidate/{candidate}', [\Modules\Election\Http\Controllers\Api\CandidateController::class, 'show'])->name('candidate');
+});
