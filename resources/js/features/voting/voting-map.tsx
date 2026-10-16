@@ -1,14 +1,17 @@
 "use client";
+import type {Locale as Language} from "@/i18n/locales";
+import {localeDirection} from "@/i18n/locales";
 
 import type {KeyboardEvent, PointerEvent} from "react";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 
 import type {Continent} from "./countries";
 import {continentNames, countries, getCountryName} from "./countries";
 
 import "./voting-map.css";
+import {mapCopy as copy} from "./map-copy";
+import {votingCount} from "./format";
 
-type Language = "en" | "ru" | "es";
 type MapFeature = {
   id: string;
   code: string | null;
@@ -31,56 +34,6 @@ export type VotingMapProps = {
   counts: Readonly<Record<string, number>>;
   onContinentChange: (continent: Continent | null) => void;
   onCountrySelect: (code: string) => void;
-};
-
-const copy = {
-  en: {
-    world: "World",
-    explore: "Explore by continent",
-    label:
-      "Interactive world map. Use arrow keys to browse countries, Enter to select.",
-    loading: "Preparing the world map…",
-    error:
-      "The map could not load. All countries are still available in the list.",
-    retry: "Try again",
-    zoomIn: "Zoom in",
-    zoomOut: "Zoom out",
-    reset: "Reset view",
-    hint: "Select a country to discover its nominees",
-    nominees: "nominees",
-    source: "Map: Natural Earth",
-  },
-  ru: {
-    world: "Весь мир",
-    explore: "Выберите материк",
-    label:
-      "Интерактивная карта мира. Стрелки — выбор страны, Enter — подтвердить.",
-    loading: "Загружаем карту мира…",
-    error: "Не удалось загрузить карту. Все страны доступны в списке.",
-    retry: "Повторить",
-    zoomIn: "Приблизить",
-    zoomOut: "Отдалить",
-    reset: "Сбросить вид",
-    hint: "Выберите страну, чтобы увидеть её кандидатов",
-    nominees: "кандидатов",
-    source: "Карта: Natural Earth",
-  },
-  es: {
-    world: "Mundo",
-    explore: "Explorar por continente",
-    label:
-      "Mapa interactivo. Usa las flechas para explorar países y Enter para seleccionar.",
-    loading: "Preparando el mapa…",
-    error:
-      "No se pudo cargar el mapa. Todos los países siguen disponibles en la lista.",
-    retry: "Reintentar",
-    zoomIn: "Acercar",
-    zoomOut: "Alejar",
-    reset: "Restablecer vista",
-    hint: "Selecciona un país para descubrir sus candidatos",
-    nominees: "candidatos",
-    source: "Mapa: Natural Earth",
-  },
 };
 
 let cachedMap: Promise<MapData> | null = null;
@@ -145,8 +98,17 @@ export function VotingMap({
   const scale = baseScale * position.zoom;
   const x = 500 - (bounds[0]! + bounds[2]! / 2) * scale + position.x;
   const y = 280 - (bounds[1]! + bounds[3]! / 2) * scale + position.y;
-  const activeCountries = countries.filter(
-    (country) => !continent || country.continent === continent,
+  const activeCountries = useMemo(
+    () =>
+      countries
+        .filter((country) => !continent || country.continent === continent)
+        .sort((a, b) =>
+          getCountryName(a.code, language).localeCompare(
+            getCountryName(b.code, language),
+            language,
+          ),
+        ),
+    [continent, language],
   );
   const keyboardCountry =
     activeCountries.find((country) => country.code === focusedCountry)?.code ??
@@ -246,7 +208,11 @@ export function VotingMap({
   }
 
   return (
-    <section className="voting-map" aria-label={t.explore}>
+    <section
+      className="voting-map"
+      aria-label={t.explore}
+      dir={localeDirection(language)}
+    >
       <div className="voting-map__continents" aria-label={t.explore}>
         <button
           type="button"
@@ -275,6 +241,7 @@ export function VotingMap({
 
       <div
         className="voting-map__viewport"
+        dir="ltr"
         data-dragging={dragging}
         onPointerDown={startDrag}
         onPointerMove={moveDrag}
@@ -320,7 +287,7 @@ export function VotingMap({
                     data-dimmed={dimmed}
                     aria-pressed={selectedCountry === code}
                     aria-disabled={dimmed}
-                    aria-label={`${name}, ${counts[code] ?? 0} ${t.nominees}`}
+                    aria-label={`${name}, ${votingCount(counts[code] ?? 0, "nominees", language)}`}
                     onPointerEnter={() => setHoveredCountry(code)}
                     onPointerLeave={() => setHoveredCountry(null)}
                     onFocus={() => {
@@ -356,7 +323,11 @@ export function VotingMap({
             </g>
           </svg>
         ) : (
-          <div className="voting-map__message" role="status">
+          <div
+            className="voting-map__message"
+            role="status"
+            dir={localeDirection(language)}
+          >
             <p>{failed ? t.error : t.loading}</p>
             {failed ? (
               <button
@@ -397,7 +368,7 @@ export function VotingMap({
         </div>
         <p className="voting-map__caption">
           {captionCountry
-            ? `${getCountryName(captionCountry, language)} · ${counts[captionCountry] ?? 0} ${t.nominees}`
+            ? `${getCountryName(captionCountry, language)} · ${votingCount(counts[captionCountry] ?? 0, "nominees", language)}`
             : t.hint}
         </p>
       </div>

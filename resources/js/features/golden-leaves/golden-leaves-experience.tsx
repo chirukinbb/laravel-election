@@ -8,18 +8,19 @@ import {didot, montserrat} from "@/features/home/fonts";
 import {cinematicMedia} from "@/features/home/media";
 import {CinematicHeader} from "@/features/home/cinematic-header";
 import {useHomeLanguage} from "@/features/home/use-home-language";
+import {localeDirection, localeNumberingSystem} from "@/i18n/locales";
 import {useAmbientAudio} from "@/features/home/use-ambient-audio";
 import {leafEditorialFilm, leafEditorialMedia, type LeafEditorialMedia,} from "./media";
 import {useEditorialMotion} from "./use-editorial-motion";
 import {useEditorialRail} from "./use-editorial-rail";
 import {EditorialCursor} from "./editorial-cursor";
+import {goldenLeavesCopy} from "./copy";
 import "./golden-leaves.css";
 
 const LeafScene = dynamic(
   () => import("./leaf-scene").then((module) => module.LeafScene),
   { ssr: false },
 );
-const gallery = leafEditorialMedia.slice(0, 5);
 type Overlay = "gallery" | "film" | null;
 
 function RollingLabel({ children }: { readonly children: string }) {
@@ -38,13 +39,17 @@ function MediaSlot({
   readonly media: LeafEditorialMedia;
   readonly className?: string;
 }) {
+  const [language] = useHomeLanguage();
+  const copy = goldenLeavesCopy[language];
   return (
     <div
       className={`leaves-media ${className}`}
       data-media-slot={media.id}
       data-placeholder={!media.src}
       role={media.src ? undefined : "img"}
-      aria-label={media.src ? undefined : `${media.alt} — image coming soon`}
+      aria-label={
+        media.src ? undefined : `${media.alt} — ${copy.imageComingSoon}`
+      }
     >
       {media.src ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -57,6 +62,12 @@ function MediaSlot({
 export function GoldenLeavesExperience() {
   const router = useRouter();
   const [language, setLanguage] = useHomeLanguage();
+  const copy = goldenLeavesCopy[language];
+  const localizedMedia = leafEditorialMedia.map((media, index) => ({
+    ...media,
+    ...copy.media[index]!,
+  }));
+  const gallery = localizedMedia.slice(0, 5);
   const back = useRef<HTMLButtonElement>(null);
   const root = useRef<HTMLElement>(null);
   const ambient = useRef<HTMLAudioElement>(null);
@@ -71,7 +82,7 @@ export function GoldenLeavesExperience() {
   const [showGallery, setShowGallery] = useState(false);
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [slide, setSlide] = useState(0);
-  const [notice, setNotice] = useState("");
+  const [notice, setNotice] = useState(false);
   useEditorialMotion(root, reduced);
   const { moveRail } = useEditorialRail(rail, reduced);
 
@@ -96,7 +107,7 @@ export function GoldenLeavesExperience() {
 
   const soundError = useCallback(() => {
     setSound(false);
-    setNotice("Sound is unavailable. Please try again.");
+    setNotice(true);
   }, []);
   useAmbientAudio({
     audioRef: ambient,
@@ -140,6 +151,8 @@ export function GoldenLeavesExperience() {
       ref={root}
       className={`golden-leaves ${didot.variable} ${montserrat.variable}`}
       data-testid="golden-leaves"
+      lang={language}
+      dir={localeDirection(language)}
       data-reduced-motion={reduced}
     >
       <EditorialCursor rootRef={root} reducedMotion={reduced} />
@@ -149,7 +162,7 @@ export function GoldenLeavesExperience() {
         onLanguageChange={setLanguage}
         sound={sound}
         onToggleSound={() => {
-          setNotice("");
+          setNotice(false);
           setSound((value) => !value);
         }}
         onTree={() => router.push("/#tree")}
@@ -163,17 +176,14 @@ export function GoldenLeavesExperience() {
         <span className="leaves-progress__fill" />
       </div>
 
-      <section
-        className="leaves-hero"
-        aria-label="Golden leaf in three dimensions"
-      >
+      <section className="leaves-hero" aria-label={copy.heroLabel}>
         <div className="leaves-hero__scene">
           <LeafScene reducedMotion={reduced} variant="hero" />
         </div>
         <a
           className="leaves-explore"
           href="#leaves-introduction"
-          aria-label="Explore Golden Leaves"
+          aria-label={copy.explore}
         >
           <span aria-hidden="true">↓</span>
         </a>
@@ -184,37 +194,33 @@ export function GoldenLeavesExperience() {
         aria-labelledby="leaves-title"
       >
         <p className="leaves-eyebrow" data-reveal>
-          Golden Leaves
+          {copy.title}
         </p>
         <h1 id="leaves-title" data-reveal>
           <span className="leaves-title-line">
-            <span>A thousand leaves.</span>
+            <span>{copy.titleFirst}</span>
           </span>
           <span className="leaves-title-line">
-            <span>Individual dedications.</span>
+            <span>{copy.titleLast}</span>
           </span>
         </h1>
         <p className="leaves-intro__copy" data-reveal>
-          A Golden Leaf is both part of the tree’s form and a personal
-          dedication within the composition.
+          {copy.intro}
         </p>
       </section>
 
       <div ref={galleryRegion} className="leaves-gallery-region">
-        <section className="leaves-wide" aria-label="Golden leaf photography">
+        <section className="leaves-wide" aria-label={copy.photography}>
           <button
             className="leaves-wide__frame"
             type="button"
-            aria-label="Open Golden Leaves gallery"
+            aria-label={copy.galleryOpen}
             onClick={() => openOverlay("gallery")}
           >
             <MediaSlot media={gallery[0]!} />
           </button>
         </section>
-        <section
-          className="leaves-mosaic"
-          aria-label="Form, detail and dedication"
-        >
+        <section className="leaves-mosaic" aria-label={copy.mosaic}>
           {gallery.slice(1).map((media, index) => (
             <figure
               className={`leaves-mosaic__item leaves-mosaic__item--${index + 1}`}
@@ -225,7 +231,10 @@ export function GoldenLeavesExperience() {
                 <button
                   className="leaves-image-button"
                   type="button"
-                  aria-label={`View ${media.alt}`}
+                  aria-label={copy.viewImage.replace(
+                    "{description}",
+                    media.alt,
+                  )}
                   onClick={() => openOverlay("gallery", index + 1)}
                 >
                   <MediaSlot media={media} />
@@ -237,33 +246,23 @@ export function GoldenLeavesExperience() {
         </section>
       </div>
 
-      <section
-        className="leaves-narrative"
-        aria-label="The form of a golden leaf"
-      >
+      <section className="leaves-narrative" aria-label={copy.formLabel}>
         <p className="leaves-narrative__first" data-reveal>
-          Conceived as a dedication, each leaf brings a personal story into a
-          shared work. A single form becomes part of a greater whole.
+          {copy.narrativeFirst}
         </p>
         <div className="leaves-narrative__scene" data-parallax="70">
           <LeafScene reducedMotion={reduced} variant="detail" />
         </div>
         <p className="leaves-narrative__last" data-reveal>
-          The proposal centres on a five-metre bronze tree and 1,000 handcrafted
-          gold leaves. Individual jewellery elements come together in one
-          sculptural composition.
+          {copy.narrativeLast}
         </p>
       </section>
 
-      <section
-        className="leaves-film"
-        aria-label="Golden Leaves film"
-        data-reveal
-      >
+      <section className="leaves-film" aria-label={copy.film} data-reveal>
         <button
           className="leaves-film__button"
           type="button"
-          aria-label="Open Golden Leaves film"
+          aria-label={copy.filmOpen}
           onClick={() => openOverlay("film")}
         >
           <span
@@ -273,31 +272,26 @@ export function GoldenLeavesExperience() {
           >
             {leafEditorialFilm.poster ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={leafEditorialFilm.poster} alt="Golden Leaves film" />
+              <img src={leafEditorialFilm.poster} alt={copy.film} />
             ) : null}
           </span>
           <span className="leaves-play" aria-hidden="true">
-            PLAY
+            {copy.play}
           </span>
         </button>
       </section>
 
-      <section
-        className="leaves-story"
-        aria-label="A dedication within the whole"
-      >
+      <section className="leaves-story" aria-label={copy.storyLabel}>
         <p className="leaves-story__copy" data-reveal>
-          A leaf holds its place in the crown, while its dedication holds a
-          meaning of its own. The design brings these individual expressions
-          together in a symbol of humanity.
+          {copy.story}
         </p>
         <figure
           className="leaves-story__image leaves-story__image--first"
           data-parallax="80"
         >
           <div data-reveal>
-            <MediaSlot media={leafEditorialMedia[5]!} />
-            <figcaption>{leafEditorialMedia[5]!.caption}</figcaption>
+            <MediaSlot media={localizedMedia[5]!} />
+            <figcaption>{localizedMedia[5]!.caption}</figcaption>
           </div>
         </figure>
         <figure
@@ -305,8 +299,8 @@ export function GoldenLeavesExperience() {
           data-parallax="-55"
         >
           <div data-reveal>
-            <MediaSlot media={leafEditorialMedia[6]!} />
-            <figcaption>{leafEditorialMedia[6]!.caption}</figcaption>
+            <MediaSlot media={localizedMedia[6]!} />
+            <figcaption>{localizedMedia[6]!.caption}</figcaption>
           </div>
         </figure>
       </section>
@@ -317,19 +311,20 @@ export function GoldenLeavesExperience() {
       >
         <div className="leaves-community__heading" data-reveal>
           <h2 id="leaves-community-title">
-            Follow the story
+            {copy.communityFirst}
             <br />
-            of Tree of Unity
+            {copy.communityLast}
           </h2>
           <Link className="leaves-text-link" href="/story">
-            <RollingLabel>EXPLORE THE PROJECT</RollingLabel>
+            <RollingLabel>{copy.exploreProject}</RollingLabel>
           </Link>
         </div>
         <div
           className="leaves-rail"
           ref={rail}
           data-testid="leaves-rail"
-          aria-label="Golden Leaves images"
+          aria-label={copy.images}
+          dir="ltr"
           tabIndex={0}
           onKeyDown={(event) => {
             if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
@@ -344,7 +339,8 @@ export function GoldenLeavesExperience() {
                 type="button"
                 key={`${repeat}-${media.id}`}
                 className={`leaves-rail__item leaves-rail__item--${index}`}
-                aria-label={`View ${media.alt}`}
+                aria-label={copy.viewImage.replace("{description}", media.alt)}
+                dir={localeDirection(language)}
                 style={
                   {
                     "--rail-offset": `${[28, 64, 0, -24, 28][index]}px`,
@@ -361,17 +357,17 @@ export function GoldenLeavesExperience() {
           <button
             type="button"
             onClick={() => moveRail(-1)}
-            aria-label="Previous images"
+            aria-label={copy.previousImages}
           >
-            PREVIOUS
+            {copy.previous}
           </button>
           <span aria-hidden="true" />
           <button
             type="button"
             onClick={() => moveRail(1)}
-            aria-label="Next images"
+            aria-label={copy.nextImages}
           >
-            NEXT
+            {copy.next}
           </button>
         </div>
       </section>
@@ -381,24 +377,24 @@ export function GoldenLeavesExperience() {
         aria-labelledby="leaves-contact-title"
       >
         <div className="leaves-contact__background" data-parallax="80">
-          <MediaSlot media={leafEditorialMedia[7]!} />
+          <MediaSlot media={localizedMedia[7]!} />
         </div>
         <div className="leaves-contact__card" data-reveal>
           <h2 id="leaves-contact-title">
-            More information
+            {copy.contactFirst}
             <br />
-            about Golden Leaves
+            {copy.contactLast}
           </h2>
           <Link href="/contact" className="leaves-contact__link">
-            <RollingLabel>CONTACT TREE OF UNITY</RollingLabel>
+            <RollingLabel>{copy.contact}</RollingLabel>
           </Link>
         </div>
       </section>
       <section className="leaves-ending" aria-labelledby="leaves-ending-title">
         <div data-reveal>
-          <h2 id="leaves-ending-title">Continue the discovery</h2>
+          <h2 id="leaves-ending-title">{copy.continueDiscovery}</h2>
           <Link className="leaves-text-link" href="/#tree">
-            <RollingLabel>RETURN TO THE TREE</RollingLabel>
+            <RollingLabel>{copy.returnTree}</RollingLabel>
           </Link>
         </div>
       </section>
@@ -412,10 +408,10 @@ export function GoldenLeavesExperience() {
         onClick={() => openOverlay("gallery")}
       >
         <span className="leaves-gallery-mark" aria-hidden="true" />
-        <RollingLabel>ALL PICTURES</RollingLabel>
+        <RollingLabel>{copy.allPictures}</RollingLabel>
       </button>
       <p className="leaves-notice" role="status">
-        {notice}
+        {notice ? copy.soundUnavailable : ""}
       </p>
       <audio
         ref={ambient}
@@ -439,18 +435,19 @@ export function GoldenLeavesExperience() {
             ["ArrowRight", "ArrowLeft"].includes(event.key)
           ) {
             event.preventDefault();
-            advance(event.key === "ArrowRight" ? 1 : -1);
+            advance(
+              (event.key === "ArrowRight" ? 1 : -1) *
+                (localeDirection(language) === "rtl" ? -1 : 1),
+            );
           }
         }}
       >
         <h2 id="leaves-dialog-title" className="leaves-dialog__title">
-          {overlay === "film"
-            ? "Golden Leaves — the film"
-            : "Golden Leaves — gallery"}
+          {overlay === "film" ? copy.filmTitle : copy.galleryTitle}
         </h2>
         <button
           className="leaves-close leaves-dialog__close"
-          aria-label="Close gallery or film"
+          aria-label={copy.closeOverlay}
           type="button"
           onClick={closeOverlay}
         >
@@ -466,19 +463,27 @@ export function GoldenLeavesExperience() {
               <button
                 type="button"
                 onClick={() => advance(-1)}
-                aria-label="Previous picture"
+                aria-label={copy.previousPicture}
               >
-                PREVIOUS
+                {copy.previous}
               </button>
               <span aria-live="polite">
-                {slide + 1} / {gallery.length}
+                <bdi>
+                  {new Intl.NumberFormat(language, {
+                    numberingSystem: localeNumberingSystem(language),
+                  }).format(slide + 1)}{" "}
+                  /{" "}
+                  {new Intl.NumberFormat(language, {
+                    numberingSystem: localeNumberingSystem(language),
+                  }).format(gallery.length)}
+                </bdi>
               </span>
               <button
                 type="button"
                 onClick={() => advance(1)}
-                aria-label="Next picture"
+                aria-label={copy.nextPicture}
               >
-                NEXT
+                {copy.next}
               </button>
             </div>
           </>
@@ -495,7 +500,7 @@ export function GoldenLeavesExperience() {
               />
             ) : (
               <div className="leaves-film-placeholder">
-                <p>The Golden Leaves film is being prepared.</p>
+                <p>{copy.filmUnavailable}</p>
               </div>
             )}
           </div>

@@ -1,6 +1,4 @@
-"use client";
-// ✅ Стандартный React / Vite
-import {type CSSProperties, lazy, useCallback, useEffect, useReducer, useRef, useState} from "react";
+import React, {type CSSProperties, useCallback, useEffect, useReducer, useRef, useState,} from "react";
 import {homeExperienceReducer, INITIAL_HOME_EXPERIENCE_STATE,} from "./home-stage";
 import {cinematicMedia as media, type SceneMedia} from "./media";
 import {AudioStoryCursor} from "./audio-story-cursor";
@@ -16,8 +14,10 @@ import {CinematicHeader} from "./cinematic-header";
 import {homeCopy, type HomeLanguage} from "./copy";
 import {useHomeLanguage} from "./use-home-language";
 import "./home.css";
+import {localeDirection} from "../../i18n/locales";
 
-const TreeScene = lazy(() =>
+// Lazy load TreeScene using React.lazy
+const TreeScene = React.lazy(() =>
     import("./tree-scene").then((module) => ({ default: module.TreeScene }))
 );
 
@@ -26,13 +26,13 @@ function isPlaybackAbort(error: unknown) {
 }
 
 function ScenePlate({
-  scene,
-  name,
-  visible,
-  motion,
-  opacity = 1,
-  onFallback,
-}: {
+                      scene,
+                      name,
+                      visible,
+                      motion,
+                      opacity = 1,
+                      onFallback,
+                    }: {
   readonly scene: SceneMedia;
   readonly name: string;
   readonly visible: boolean;
@@ -42,6 +42,7 @@ function ScenePlate({
 }) {
   const video = useRef<HTMLVideoElement>(null);
   const [failed, setFailed] = useState(false);
+
   useEffect(() => {
     const element = video.current;
     if (!element) return;
@@ -58,53 +59,52 @@ function ScenePlate({
       element.pause();
     };
   }, [visible, motion, onFallback]);
+
   return (
-    <div
-      aria-hidden="true"
-      className={
-        "scene-plate scene-plate--" +
-        name +
-        (name === "home" || name === "day" ? " scene-parallax-plane" : "") +
-        (scene.containsUi && (!scene.video || failed)
-          ? " scene-plate--reference"
-          : "")
-      }
-      style={{ opacity, visibility: visible ? "visible" : "hidden" }}
-    >
-      {/* Text and controls stay separate from the owner-supplied poster assets. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="scene-plate__poster"
-        src={scene.poster}
-        srcSet={scene.posterSrcSet}
-        sizes={scene.posterSrcSet ? "100vw" : undefined}
-        alt=""
-        fetchPriority={name === "home" ? "high" : "auto"}
-      />
-      {scene.video && !failed ? (
-        <video
-          ref={video}
-          className="scene-plate__video"
-          src={scene.video}
-          poster={scene.poster}
-          muted
-          loop
-          playsInline
-          preload={name === "home" ? "metadata" : "none"}
-          onError={() => {
-            setFailed(true);
-            onFallback?.();
-          }}
+      <div
+          aria-hidden="true"
+          className={
+              "scene-plate scene-plate--" +
+              name +
+              (name === "home" || name === "day" ? " scene-parallax-plane" : "") +
+              (scene.containsUi && (!scene.video || failed)
+                  ? " scene-plate--reference"
+                  : "")
+          }
+          style={{ opacity, visibility: visible ? "visible" : "hidden" }}
+      >
+        <img
+            className="scene-plate__poster"
+            src={scene.poster}
+            srcSet={scene.posterSrcSet}
+            sizes={scene.posterSrcSet ? "100vw" : undefined}
+            alt=""
+            {...({ fetchPriority: name === "home" ? "high" : "auto" } as any)}
         />
-      ) : null}
-    </div>
+        {scene.video && !failed ? (
+            <video
+                ref={video}
+                className="scene-plate__video"
+                src={scene.video}
+                poster={scene.poster}
+                muted
+                loop
+                playsInline
+                preload={name === "home" ? "metadata" : "none"}
+                onError={() => {
+                  setFailed(true);
+                  onFallback?.();
+                }}
+            />
+        ) : null}
+      </div>
   );
 }
 
 export function HomeExperience() {
   const [state, dispatch] = useReducer(
-    homeExperienceReducer,
-    INITIAL_HOME_EXPERIENCE_STATE,
+      homeExperienceReducer,
+      INITIAL_HOME_EXPERIENCE_STATE
   );
   const stateRef = useRef(state);
   const root = useRef<HTMLElement>(null);
@@ -114,6 +114,7 @@ export function HomeExperience() {
   const explore = useRef<HTMLButtonElement>(null);
   const interact = useRef<HTMLButtonElement>(null);
   const back = useRef<HTMLButtonElement>(null);
+
   const [sound, setSound] = useState(false);
   const [language, setLanguage] = useHomeLanguage();
   const copy = homeCopy[language];
@@ -130,13 +131,17 @@ export function HomeExperience() {
   const [turnDecoded, setTurnDecoded] = useState(false);
   const [homeFailed, setHomeFailed] = useState(false);
   const [revealFailed, setRevealFailed] = useState(false);
+
   const homeFallback = useCallback(() => setHomeFailed(true), []);
   const revealFallback = useCallback(() => setRevealFailed(true), []);
+
   const [goldFailed, setGoldFailed] = useState(false);
   const [goldCovered, setGoldCovered] = useState(false);
   const [captionText, setCaptionText] = useState("");
+
   const previousPhase = useRef(state.phase);
   const scrollTransition = useRef(false);
+
   const night = state.phase === "audio";
   const moving = !reduced && !hidden;
   const hasTurn = Boolean(media.turn.video) && !turnFailed;
@@ -144,9 +149,10 @@ export function HomeExperience() {
   const phase = state.phase;
   const returning = phase === "turning" && state.turnDriver === "return";
   const referenceHome =
-    media.home.containsUi && (!media.home.video || homeFailed);
+      media.home.containsUi && (!media.home.video || homeFailed);
   const referenceReveal =
-    media.reveal.containsUi && (!media.reveal.video || revealFailed);
+      media.reveal.containsUi && (!media.reveal.video || revealFailed);
+
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
@@ -170,36 +176,34 @@ export function HomeExperience() {
     setNotice("");
   };
 
-  // Focus follows meaningful user navigation, never individual scroll frames.
   useEffect(() => {
     const previous = previousPhase.current;
     previousPhase.current = phase;
     if (phase === "reveal" && previous !== "home" && !scrollTransition.current)
       interact.current?.focus({ preventScroll: true });
     if (
-      phase === "audio" ||
-      phase === "gold" ||
-      phase === "fallback" ||
-      phase === "interactive"
+        phase === "audio" ||
+        phase === "gold" ||
+        phase === "fallback" ||
+        phase === "interactive"
     )
       back.current?.focus({ preventScroll: true });
     if (phase === "home" && previous !== "home" && !scrollTransition.current)
       explore.current?.focus({ preventScroll: true });
     if (phase === "home" || phase === "reveal") {
-      // Scrolling changes the scene without creating a keyboard focus ring.
       if (phase === "reveal" && document.activeElement === explore.current)
         explore.current?.blur();
       scrollTransition.current = false;
     }
     if (
-      phase === "home" &&
-      previous !== "home" &&
-      window.location.hash === "#tree"
+        phase === "home" &&
+        previous !== "home" &&
+        window.location.hash === "#tree"
     )
       window.history.replaceState(
-        window.history.state,
-        "",
-        window.location.pathname + window.location.search,
+          window.history.state,
+          "",
+          window.location.pathname + window.location.search
       );
   }, [phase]);
 
@@ -209,36 +213,42 @@ export function HomeExperience() {
     if (reduced) dispatch({ type: "SHOW_REVEAL" });
     else dispatch({ type: "START_TURN", driver: "auto" });
   };
+
   const returnToTree = useCallback(() => {
     story.current?.pause();
     dispatch({ type: "EXIT_AUDIO" });
     dispatch({ type: "BACK_TO_TREE" });
     setNotice("");
   }, []);
+
   const returnHome = () => {
     story.current?.pause();
     scrollTransition.current = false;
     const current = stateRef.current;
     if (
-      !reduced &&
-      (current.phase === "reveal" || current.phase === "turning")
+        !reduced &&
+        (current.phase === "reveal" || current.phase === "turning")
     ) {
       dispatch({ type: "START_RETURN" });
     } else dispatch({ type: "SHOW_HOME" });
     setNotice("");
   };
+
   const startScroll = useCallback(() => {
     scrollTransition.current = true;
     setNotice("");
   }, []);
+
   const turnProgress = useCallback(
-    (progress: number, driver: "auto" | "scroll" | "return") => {
-      dispatch({ type: "TURN_PROGRESS", progress, driver });
-    },
-    [],
+      (progress: number, driver: "auto" | "scroll" | "return") => {
+        dispatch({ type: "TURN_PROGRESS", progress, driver });
+      },
+      []
   );
+
   const turnReady = useCallback(() => setTurnDecoded(true), []);
   const turnError = useCallback(() => setTurnFailed(true), []);
+
   useHomeScroll({
     stateRef,
     dispatch,
@@ -247,23 +257,24 @@ export function HomeExperience() {
     onTurnStart: startScroll,
   });
 
-  // The real clip owns its playback. This timeline is only the media-error fallback.
   useEffect(() => {
     if (
-      hasTurn ||
-      phase !== "turning" ||
-      state.turnDriver === "scroll" ||
-      hidden
+        hasTurn ||
+        phase !== "turning" ||
+        state.turnDriver === "scroll" ||
+        hidden
     )
       return;
+
     const reverse = state.turnDriver === "return";
     if (reduced) {
       dispatch({ type: reverse ? "SHOW_HOME" : "SHOW_REVEAL" });
       return;
     }
+
     if (reverse) {
       const from = stateRef.current.turnProgress;
-      const duration = Math.max(300, 1000 * from);
+      const duration = Math.max(300, 1000 * (1 - from));
       const started = performance.now();
       let frame = 0;
       const tick = (now: number) => {
@@ -279,6 +290,7 @@ export function HomeExperience() {
       frame = requestAnimationFrame(tick);
       return () => cancelAnimationFrame(frame);
     }
+
     let raf = 0;
     const from = stateRef.current.turnProgress;
     const started = performance.now();
@@ -295,6 +307,7 @@ export function HomeExperience() {
     setSound(false);
     setNotice(copy.notice.soundCannotStart);
   }, [copy.notice.soundCannotStart]);
+
   useAmbientAudio({
     audioRef: ambient,
     enabled: sound,
@@ -328,28 +341,26 @@ export function HomeExperience() {
     const audio = story.current;
     const track = audio?.textTracks[0];
     if (!track) return;
-    // TextTrack is imperative browser state, not React-owned data.
-    // eslint-disable-next-line react-hooks/immutability
     track.mode = "hidden";
     const sync = () =>
-      setCaptionText(
-        Array.from(track.activeCues ?? [])
-          .map((cue) => (cue as VTTCue).text)
-          .join("\n"),
-      );
+        setCaptionText(
+            Array.from(track.activeCues ?? [])
+                .map((cue) => (cue as VTTCue).text)
+                .join("\n")
+        );
     track.addEventListener("cuechange", sync);
     return () => track.removeEventListener("cuechange", sync);
   }, []);
 
   const openAudio = (event: React.MouseEvent<HTMLButtonElement>) => {
     const pointerType =
-      "pointerType" in event.nativeEvent
-        ? event.nativeEvent.pointerType
-        : "mouse";
+        "pointerType" in event.nativeEvent
+            ? (event.nativeEvent as any).pointerType
+            : "mouse";
     setAudioPointer(
-      event.detail > 0 && pointerType === "mouse"
-        ? { x: event.clientX, y: event.clientY }
-        : null,
+        event.detail > 0 && pointerType === "mouse"
+            ? { x: event.clientX, y: event.clientY }
+            : null
     );
     setStoryPaused(false);
     setNotice("");
@@ -370,24 +381,25 @@ export function HomeExperience() {
     setNotice("");
     dispatch({ type: "OPEN_INTERACTIVE" });
   };
+
   const sceneReady = useCallback(() => dispatch({ type: "SCENE_READY" }), []);
   const sceneError = useCallback(
-    (message: string) => dispatch({ type: "FAIL_SCENE", message }),
-    [],
+      (message: string) => dispatch({ type: "FAIL_SCENE", message }),
+      []
   );
 
   useEffect(() => {
     if (phase !== "gold") return;
     const coverage = window.setTimeout(
-      () => {
-        if (hasGold) setGoldFailed(true);
-        setGoldCovered(true);
-      },
-      reduced ? 0 : hasGold ? 10000 : 900,
+        () => {
+          if (hasGold) setGoldFailed(true);
+          setGoldCovered(true);
+        },
+        reduced ? 0 : hasGold ? 10000 : 900
     );
     const loading = window.setTimeout(
-      () => sceneError(copy.notice.treeSlow),
-      20000,
+        () => sceneError("TREE_LOAD_TIMEOUT"),
+        20000
     );
     let cancelled = false;
     if (hasGold && goldVideo.current)
@@ -399,13 +411,13 @@ export function HomeExperience() {
       window.clearTimeout(coverage);
       window.clearTimeout(loading);
     };
-  }, [phase, reduced, hasGold, sceneError, copy.notice.treeSlow]);
+  }, [phase, reduced, hasGold, sceneError]);
 
   useEffect(() => {
     if (phase !== "gold" || !goldCovered || !state.sceneReady) return;
     const timer = window.setTimeout(
-      () => dispatch({ type: "REVEAL_INTERACTIVE" }),
-      reduced ? 0 : 120,
+        () => dispatch({ type: "REVEAL_INTERACTIVE" }),
+        reduced ? 0 : 120
     );
     return () => window.clearTimeout(timer);
   }, [phase, goldCovered, state.sceneReady, reduced]);
@@ -413,337 +425,357 @@ export function HomeExperience() {
   const onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key === "Escape") {
       if (
-        phase === "audio" ||
-        phase === "gold" ||
-        phase === "interactive" ||
-        phase === "fallback"
+          phase === "audio" ||
+          phase === "gold" ||
+          phase === "interactive" ||
+          phase === "fallback"
       )
         returnToTree();
       else if (returning) dispatch({ type: "SHOW_HOME" });
       else if (phase === "turning" || phase === "reveal") returnHome();
     }
   };
+
   const titleVisible = phase === "home";
   const treeVisible = phase !== "home";
   const technical = phase === "gold" || phase === "interactive";
   const rootStyle = { "--turn-progress": state.turnProgress } as CSSProperties;
 
   return (
-    <section
-      ref={root}
-      className={`${didot.variable} ${montserrat.variable} home-experience${night ? " home-experience--night" : ""}`}
-      lang={language}
-      data-testid="home-experience"
-      data-phase={phase}
-      data-turn-driver={state.turnDriver ?? undefined}
-      data-transition-ready={turnDecoded}
-      data-motion={moving ? "playing" : "paused"}
-      aria-label={copy.experienceLabel}
-      onKeyDown={onKeyDown}
-      style={rootStyle}
-    >
-      <div className="cinematic-backdrop" aria-hidden="true">
-        <ScenePlate
-          scene={media.home}
-          onFallback={homeFallback}
-          name="home"
-          visible={phase === "home" || phase === "turning"}
-          motion={moving}
-        />
-        <ScenePlate
-          scene={media.reveal}
-          onFallback={revealFallback}
-          name="day"
-          visible={treeVisible}
-          motion={moving && !night && !technical}
-          opacity={phase === "turning" ? state.turnProgress : 1}
-        />
-        {hasTurn && !reduced ? (
-          <HomeTransitionVideo
-            src={media.turn.video!}
-            smallSrc={media.turn.videoSmall ?? null}
-            reverseSrc={media.turn.reverseVideo ?? null}
-            reverseSmallSrc={media.turn.reverseVideoSmall ?? null}
-            durationHint={media.turn.duration ?? 4}
-            frameRateHint={media.turn.frameRate ?? 24}
-            phase={phase}
-            driver={state.turnDriver}
-            progress={state.turnProgress}
-            hidden={hidden}
-            onProgress={turnProgress}
-            onReady={turnReady}
-            onError={turnError}
+      <section
+          ref={root}
+          className={`${didot.variable} ${montserrat.variable} home-experience${
+              night ? " home-experience--night" : ""
+          }`}
+          lang={language}
+          dir={localeDirection(language)}
+          data-testid="home-experience"
+          data-phase={phase}
+          data-turn-driver={state.turnDriver ?? undefined}
+          data-transition-ready={turnDecoded}
+          data-motion={moving ? "playing" : "paused"}
+          aria-label={copy.experienceLabel}
+          onKeyDown={onKeyDown}
+          style={rootStyle}
+      >
+        <div className="cinematic-backdrop" aria-hidden="true">
+          <ScenePlate
+              scene={media.home}
+              onFallback={homeFallback}
+              name="home"
+              visible={phase === "home" || phase === "turning"}
+              motion={moving}
           />
-        ) : null}
-        <AudioStoryBackdrop
-          active={night}
-          hidden={hidden}
-          reducedMotion={reduced}
-          preload={phase === "reveal"}
-          dayPoster={media.reveal.poster}
-          dayPosterSrcSet={media.reveal.posterSrcSet}
-          nightPoster={media.night.poster}
-          nightPosterSrcSet={media.night.posterSrcSet}
-          sources={media.audioTransition}
-        />
-        <div className="scene-vignette" />
-      </div>
-
-      {technical ? (
-        <div
-          className={
-            "tree-stage" +
-            (phase === "interactive" ? " tree-stage--visible" : "")
-          }
-        >
-          <TreeScene
-            modelUrl={media.tree.model}
-            active={phase === "interactive" && !hidden}
-            onReady={sceneReady}
-            onError={sceneError}
+          <ScenePlate
+              scene={media.reveal}
+              onFallback={revealFallback}
+              name="day"
+              visible={treeVisible}
+              motion={moving && !night && !technical}
+              opacity={phase === "turning" ? state.turnProgress : 1}
           />
+          {hasTurn && !reduced ? (
+              <HomeTransitionVideo
+                  src={media.turn.video!}
+                  smallSrc={media.turn.videoSmall ?? null}
+                  reverseSrc={media.turn.reverseVideo ?? null}
+                  reverseSmallSrc={media.turn.reverseVideoSmall ?? null}
+                  durationHint={media.turn.duration ?? 4}
+                  frameRateHint={media.turn.frameRate ?? 24}
+                  phase={phase}
+                  driver={state.turnDriver}
+                  progress={state.turnProgress}
+                  hidden={hidden}
+                  onProgress={turnProgress}
+                  onReady={turnReady}
+                  onError={turnError}
+              />
+          ) : null}
+          <AudioStoryBackdrop
+              active={night}
+              hidden={hidden}
+              reducedMotion={reduced}
+              preload={phase === "reveal"}
+              dayPoster={media.reveal.poster}
+              dayPosterSrcSet={media.reveal.posterSrcSet}
+              nightPoster={media.night.poster}
+              nightPosterSrcSet={media.night.posterSrcSet}
+              sources={media.audioTransition}
+          />
+          <div className="scene-vignette" />
         </div>
-      ) : null}
-      {phase === "interactive" ? (
-        <div className="gold-reveal" aria-hidden="true" />
-      ) : null}
-      {phase === "interactive" ? (
-        <InspectCursor regionRef={root} reducedMotion={reduced} />
-      ) : null}
 
-      <CinematicHeader
-        key={phase === "interactive" ? "inspect" : "cinematic"}
-        inspect={phase === "interactive"}
-        language={language}
-        onLanguageChange={changeLanguage}
-        sound={sound}
-        onToggleSound={() => {
-          setSound((value) => !value);
-          setNotice("");
-        }}
-        onTree={() => {
-          if (phase === "home" || phase === "turning")
-            dispatch({ type: "SHOW_REVEAL" });
-          else returnToTree();
-        }}
-        onHome={returnHome}
-        onClose={returnToTree}
-        backRef={back}
-        logo={media.logo}
-        logoBlack={media.logoBlack}
-      />
+        {technical ? (
+            <div
+                className={
+                    "tree-stage" +
+                    (phase === "interactive" ? " tree-stage--visible" : "")
+                }
+            >
+              <React.Suspense fallback={null}>
+                <TreeScene
+                    modelUrl={media.tree.model}
+                    label={copy.treeSceneLabel}
+                    active={phase === "interactive" && !hidden}
+                    onReady={sceneReady}
+                    onError={sceneError}
+                />
+              </React.Suspense>
+            </div>
+        ) : null}
+        {phase === "interactive" ? (
+            <div className="gold-reveal" aria-hidden="true" />
+        ) : null}
+        {phase === "interactive" ? (
+            <InspectCursor regionRef={root} reducedMotion={reduced} />
+        ) : null}
 
-      <div
-        className={
-          "home-title" + (referenceHome ? " home-title--reference" : "")
-        }
-        data-visible={titleVisible}
-      >
-        <p>{copy.symbolOfHumanity}</p>
-        <h1 lang="en">
-          Tree <span>of</span> Unity
-        </h1>
-        <p>{copy.lastingLegacy}</p>
-      </div>
+        <CinematicHeader
+            key={phase === "interactive" ? "inspect" : "cinematic"}
+            inspect={phase === "interactive"}
+            language={language}
+            onLanguageChange={changeLanguage}
+            sound={sound}
+            onToggleSound={() => {
+              setSound((value) => !value);
+              setNotice("");
+            }}
+            onTree={() => {
+              if (phase === "home" || phase === "turning")
+                dispatch({ type: "SHOW_REVEAL" });
+              else returnToTree();
+            }}
+            onHome={returnHome}
+            onClose={returnToTree}
+            backRef={back}
+            logo={media.logo}
+            logoBlack={media.logoBlack}
+        />
 
-      <div
-        className="explore-position"
-        data-visible={titleVisible}
-        aria-hidden={!titleVisible}
-      >
-        <button
-          ref={explore}
-          type="button"
-          className={
-            "explore-button" +
-            (referenceHome && phase === "home"
-              ? " explore-button--reference"
-              : "")
-          }
-          aria-label={copy.exploreLabel}
-          data-scene-surface="true"
-          tabIndex={titleVisible ? 0 : -1}
-          onClick={startExplore}
+        <div
+            className={
+                "home-title" + (referenceHome ? " home-title--reference" : "")
+            }
+            data-visible={titleVisible}
         >
-          <span className="explore-button__label">{copy.explore}</span>
-          <span className="explore-button__indicator" aria-hidden="true">
+          <p>{copy.symbolOfHumanity}</p>
+          <h1 lang="en" dir="ltr" style={didot.style}>
+            Tree <span>of</span> Unity
+          </h1>
+          <p>{copy.lastingLegacy}</p>
+        </div>
+
+        <div
+            className="explore-position"
+            data-visible={titleVisible}
+            aria-hidden={!titleVisible}
+        >
+          <button
+              ref={explore}
+              type="button"
+              className={
+                  "explore-button" +
+                  (referenceHome && phase === "home"
+                      ? " explore-button--reference"
+                      : "")
+              }
+              aria-label={copy.exploreLabel}
+              data-scene-surface="true"
+              tabIndex={titleVisible ? 0 : -1}
+              onClick={startExplore}
+          >
+            <span className="explore-button__label">{copy.explore}</span>
+            <span className="explore-button__indicator" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
               <path d="M12 5v14m-4-4 4 4 4-4" />
             </svg>
           </span>
-        </button>
-      </div>
-
-      <TreeHitArea
-        active={phase === "reveal"}
-        label={copy.treeSurfaceLabel}
-        onActivate={openInteractive}
-      />
-      {phase === "reveal" ? (
-        <>
-          <AudioHotspot
-            label={copy.listen}
-            onActivate={openAudio}
-            reducedMotion={reduced}
-            reference={referenceReveal}
-          />
-          <button
-            ref={interact}
-            type="button"
-            className="interact-button"
-            data-scene-surface="true"
-            aria-label={copy.interactLabel}
-            onClick={openInteractive}
-          >
-            <span className="interact-button__label">{copy.interact}</span>
-            <span className="interact-button__line" aria-hidden="true" />
           </button>
-        </>
-      ) : null}
+        </div>
 
-      {night ? (
-        <>
-          <button
-            ref={back}
-            type="button"
-            className="audio-exit-surface"
-            aria-label={copy.closeAudio}
-            tabIndex={-1}
-            onClick={returnToTree}
-          />
-          <AudioStoryCursor
-            audioRef={story}
-            regionRef={root}
-            reducedMotion={reduced}
-            initialPoint={audioPointer}
-          />
-        </>
-      ) : null}
-
-      {night ? (
-        <div className="audio-story-panel">
-          <p className="audio-story-invitation">
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.3"
-            >
-              <path d="M4 14v-3a8 8 0 0 1 16 0v3M4 13H2v7h5v-7H4Zm16 0h2v7h-5v-7h3Z" />
-            </svg>
-            {sound ? copy.listen : copy.listenPrompt}
-          </p>
-          {media.audioStory.audio ? (
-            <div className="audio-story-controls">
+        <TreeHitArea
+            active={phase === "reveal"}
+            label={copy.treeSurfaceLabel}
+            onActivate={openInteractive}
+        />
+        {phase === "reveal" ? (
+            <>
+              <AudioHotspot
+                  label={copy.listen}
+                  onActivate={openAudio}
+                  reducedMotion={reduced}
+                  reference={referenceReveal}
+              />
               <button
-                type="button"
-                className="quiet-button"
-                onClick={() => setStoryPaused((value) => !value)}
-              >
-                {storyPaused ? copy.playStory : copy.pauseStory}
-              </button>
-              {media.audioStory.captions ? (
-                <button
+                  ref={interact}
                   type="button"
-                  className="quiet-button"
-                  aria-pressed={captions}
-                  onClick={() => setCaptions((value) => !value)}
+                  className="interact-button"
+                  data-scene-surface="true"
+                  aria-label={copy.interactLabel}
+                  onClick={openInteractive}
+              >
+                <span className="interact-button__label">{copy.interact}</span>
+                <span className="interact-button__line" aria-hidden="true" />
+              </button>
+            </>
+        ) : null}
+
+        {night ? (
+            <>
+              <button
+                  ref={back}
+                  type="button"
+                  className="audio-exit-surface"
+                  aria-label={copy.closeAudio}
+                  tabIndex={-1}
+                  onClick={returnToTree}
+              />
+              <AudioStoryCursor
+                  audioRef={story}
+                  regionRef={root}
+                  reducedMotion={reduced}
+                  initialPoint={audioPointer}
+              />
+            </>
+        ) : null}
+
+        {night ? (
+            <div className="audio-story-panel">
+              <p className="audio-story-invitation">
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
                 >
-                  {copy.subtitles}
-                </button>
+                  <path d="M4 14v-3a8 8 0 0 1 16 0v3M4 13H2v7h5v-7H4Zm16 0h2v7h-5v-7h3Z" />
+                </svg>
+                {sound ? copy.listen : copy.listenPrompt}
+              </p>
+              {media.audioStory.audio &&
+              media.audioStory.language === "en" &&
+              language !== "en" ? (
+                  <p className="story-unavailable">{copy.narrationEnglish}</p>
+              ) : null}
+              {media.audioStory.audio ? (
+                  <div className="audio-story-controls">
+                    <button
+                        type="button"
+                        className="quiet-button"
+                        onClick={() => setStoryPaused((value) => !value)}
+                    >
+                      {storyPaused ? copy.playStory : copy.pauseStory}
+                    </button>
+                    {media.audioStory.captions ? (
+                        <button
+                            type="button"
+                            className="quiet-button"
+                            aria-pressed={captions}
+                            onClick={() => setCaptions((value) => !value)}
+                        >
+                          {copy.subtitles}
+                        </button>
+                    ) : null}
+                  </div>
+              ) : (
+                  <p className="story-unavailable">{copy.storyUnavailable}</p>
+              )}
+              {captions && captionText ? (
+                  <p
+                      className="story-caption"
+                      lang={media.audioStory.language}
+                      dir="auto"
+                  >
+                    {captionText}
+                  </p>
               ) : null}
             </div>
-          ) : (
-            <p className="story-unavailable">{copy.storyUnavailable}</p>
-          )}
-          {captions && captionText ? (
-            <p className="story-caption">{captionText}</p>
-          ) : null}
-        </div>
-      ) : null}
+        ) : null}
 
-      {phase === "gold" || phase === "fallback" ? (
-        <div
-          className={
-            "gold-cover" +
-            (goldCovered || phase === "fallback" ? " gold-cover--complete" : "")
-          }
-          data-testid="gold-cover"
-          role="status"
-          aria-live="polite"
-        >
-          {hasGold && phase === "gold" ? (
-            <video
-              ref={goldVideo}
-              className="gold-cover__video"
-              src={media.goldTransition.video ?? undefined}
-              muted
-              playsInline
-              preload="auto"
-              onEnded={() => setGoldCovered(true)}
-              onError={() => setGoldFailed(true)}
-            />
-          ) : null}
-          <div className="gold-cover__message">
+        {phase === "gold" || phase === "fallback" ? (
+            <div
+                className={
+                    "gold-cover" +
+                    (goldCovered || phase === "fallback" ? " gold-cover--complete" : "")
+                }
+                data-testid="gold-cover"
+                role="status"
+                aria-live="polite"
+            >
+              {hasGold && phase === "gold" ? (
+                  <video
+                      ref={goldVideo}
+                      className="gold-cover__video"
+                      src={media.goldTransition.video ?? undefined}
+                      muted
+                      playsInline
+                      preload="auto"
+                      onEnded={() => setGoldCovered(true)}
+                      onError={() => setGoldFailed(true)}
+                  />
+              ) : null}
+              <div className="gold-cover__message">
             <span className="gold-cover__mark" aria-hidden="true">
               T
             </span>
-            <p>
-              {phase === "fallback" ? copy.treeUnavailable : copy.enteringTree}
-            </p>
-            {phase === "fallback" ? (
-              <p className="gold-cover__detail">{state.error}</p>
-            ) : (
-              <span className="loading-thread" />
-            )}
-            <button
-              ref={back}
-              type="button"
-              className="quiet-button"
-              aria-label={copy.backToTree}
-              onClick={returnToTree}
-            >
-              {copy.backToTree}
-            </button>
-          </div>
-        </div>
-      ) : null}
-
-      <p className="cinematic-notice" role="status" aria-live="polite">
-        {notice}
-      </p>
-      <audio
-        ref={ambient}
-        src={media.ambient.audio}
-        loop
-        preload="none"
-        onError={() => {
-          setSound(false);
-          setNotice(copy.notice.soundUnavailable);
-        }}
-      />
-      <audio
-        ref={story}
-        data-audio-story
-        src={media.audioStory.audio ?? undefined}
-        muted={!sound}
-        preload="none"
-        onEnded={returnToTree}
-        onError={() => {
-          returnToTree();
-          setNotice(copy.notice.storyCannotPlay);
-        }}
-      >
-        {media.audioStory.captions ? (
-          <track
-            kind="captions"
-            src={media.audioStory.captions}
-            srcLang={media.audioStory.language}
-            label={copy.subtitles}
-          />
+                <p>
+                  {phase === "fallback" ? copy.treeUnavailable : copy.enteringTree}
+                </p>
+                {phase === "fallback" ? (
+                    state.error === "TREE_LOAD_TIMEOUT" ? (
+                        <p className="gold-cover__detail">{copy.notice.treeSlow}</p>
+                    ) : null
+                ) : (
+                    <span className="loading-thread" />
+                )}
+                <button
+                    ref={back}
+                    type="button"
+                    className="quiet-button"
+                    aria-label={copy.backToTree}
+                    onClick={returnToTree}
+                >
+                  {copy.backToTree}
+                </button>
+              </div>
+            </div>
         ) : null}
-      </audio>
-    </section>
+
+        <p className="cinematic-notice" role="status" aria-live="polite">
+          {notice}
+        </p>
+        <audio
+            ref={ambient}
+            src={media.ambient.audio}
+            loop
+            preload="none"
+            onError={() => {
+              setSound(false);
+              setNotice(copy.notice.soundUnavailable);
+            }}
+        />
+        <audio
+            ref={story}
+            data-audio-story
+            src={media.audioStory.audio ?? undefined}
+            muted={!sound}
+            preload="none"
+            onEnded={returnToTree}
+            onError={() => {
+              returnToTree();
+              setNotice(copy.notice.storyCannotPlay);
+            }}
+        >
+          {media.audioStory.captions ? (
+              <track
+                  kind="captions"
+                  src={media.audioStory.captions}
+                  srcLang={media.audioStory.language}
+                  label={copy.subtitles}
+              />
+          ) : null}
+        </audio>
+      </section>
   );
 }

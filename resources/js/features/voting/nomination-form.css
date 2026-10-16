@@ -1,0 +1,207 @@
+.nomination-form {
+  inline-size: 100%;
+  max-inline-size: 880px;
+  color: var(--v-ink, #20211f);
+}
+.nomination-form__intro {
+  font-size: 14px;
+  line-height: 1.8;
+}
+.nomination-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 36px;
+  margin-block: 28px;
+}
+.nomination-form__wide {
+  grid-column: 1 / -1;
+}
+.nomination-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-inline-size: 0;
+  text-align: start;
+}
+.nomination-form__field label {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--v-muted, #62656b);
+}
+.nomination-form__field :is(input, select, textarea) {
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 48px;
+  border: 0;
+  border-block-end: 1px solid #969892;
+  border-radius: 0;
+  background: white;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  padding-block: 12px;
+  padding-inline: 2px;
+}
+.nomination-form__field textarea {
+  resize: vertical;
+  border: 1px solid var(--v-line, #d8d8d3);
+  padding: 14px;
+  line-height: 1.7;
+}
+.nomination-form__field [aria-invalid="true"] {
+  border-color: #9a3e31;
+}
+.nomination-form__field :is(input, select, textarea):focus-visible,
+.nomination-form button:focus-visible,
+.nomination-form__check input:focus-visible {
+  outline: 2px solid var(--v-gold, #967642);
+  outline-offset: 4px;
+}
+.nomination-form__hint-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--v-muted, #62656b);
+}
+.nomination-form__counter {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.nomination-form__error,
+.nomination-form__counter[data-over-limit="true"] {
+  color: #9a3e31;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.nomination-form__section {
+  border-block-start: 1px solid var(--v-line, #d8d8d3);
+  padding-block: 32px;
+}
+.nomination-form__section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+}
+.nomination-form__section-heading h4 {
+  font-family: var(--v-serif, Georgia, serif);
+  font-weight: 400;
+  font-size: clamp(25px, 3vw, 34px);
+  margin: 0;
+}
+.nomination-form__section-heading > span {
+  color: var(--v-muted, #62656b);
+  font-size: 10px;
+}
+.nomination-form__section > p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--v-muted, #62656b);
+  margin-block: 12px 24px;
+}
+.nomination-form__entries {
+  display: grid;
+  gap: 24px;
+}
+.nomination-form__entry {
+  position: relative;
+  min-inline-size: 0;
+  margin: 0;
+  padding-block: 12px 8px;
+  padding-inline: 24px;
+  border: 1px solid var(--v-line, #d8d8d3);
+}
+.nomination-form__entry legend {
+  max-inline-size: calc(100% - 44px);
+  padding-inline: 8px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--v-muted, #62656b);
+}
+.nomination-form__remove {
+  position: absolute;
+  inset-block-start: -22px;
+  inset-inline-end: 12px;
+  inline-size: 44px;
+  block-size: 44px;
+  border: 0;
+  background: white;
+  color: inherit;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+.nomination-form__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-inline-size: 100%;
+  min-block-size: 48px;
+  padding-block: 8px;
+  padding-inline: 0;
+  margin-block-start: 12px;
+  border: 0;
+  border-block-end: 1px solid var(--v-gold, #967642);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  text-align: start;
+  cursor: pointer;
+}
+.nomination-form__add > span:first-child {
+  font-size: 22px;
+}
+.nomination-form__add:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.nomination-form__limit {
+  font-size: 10px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.nomination-form__consent {
+  display: grid;
+  gap: 24px;
+  border-block-start: 1px solid var(--v-line, #d8d8d3);
+  padding-block: 30px;
+}
+.nomination-form__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-block-size: 44px;
+  font-size: 12px;
+  line-height: 1.8;
+  cursor: pointer;
+}
+.nomination-form__check input {
+  flex: 0 0 20px;
+  inline-size: 20px;
+  block-size: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--v-gold, #967642);
+}
+.nomination-form__review {
+  gap: 30px;
+}
+@media (max-width: 600px) {
+  .nomination-form__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .nomination-form__entry {
+    padding-inline: 16px;
+  }
+  .nomination-form__hint-row {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+  .nomination-form__review {
+    inline-size: 100%;
+  }
+}

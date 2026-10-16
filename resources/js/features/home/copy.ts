@@ -1,57 +1,56 @@
-export type HomeLanguage = "en" | "ru" | "es";
+import {type Locale, locales} from "@/i18n/locales";
 
+export type HomeLanguage = Locale;
+export const homeLanguages = locales;
 export interface HomeCopy {
-  readonly navigation: {
-    readonly tree: string;
-    readonly story: string;
-    readonly voting: string;
-    readonly about: string;
-    readonly primary: string;
-    readonly open: string;
-    readonly close: string;
+  treeSceneLabel: string;
+  navigation: {
+    tree: string;
+    story: string;
+    voting: string;
+    about: string;
+    primary: string;
+    open: string;
+    close: string;
+    treeSections: string;
+    engravings: string;
+    goldenLeaves: string;
+    humanHandprint: string;
+    account: string;
   };
-  readonly languageLabel: string;
-  readonly soundOn: string;
-  readonly soundOff: string;
-  readonly soundWord: "SOUND";
-  readonly symbolOfHumanity: string;
-  readonly lastingLegacy: string;
-  readonly explore: string;
-  readonly exploreLabel: string;
-  readonly listen: string;
-  readonly interact: string;
-  readonly interactLabel: string;
-  readonly treeSurfaceLabel: string;
-  readonly closeAudio: string;
-  readonly listenPrompt: string;
-  readonly storyUnavailable: string;
-  readonly playStory: string;
-  readonly pauseStory: string;
-  readonly subtitles: string;
-  readonly enteringTree: string;
-  readonly treeUnavailable: string;
-  readonly backToTree: string;
-  readonly experienceLabel: string;
-  readonly notice: {
-    readonly soundUnavailable: string;
-    readonly soundCannotStart: string;
-    readonly playbackPaused: string;
-    readonly animationUnavailable: string;
-    readonly storyCannotPlay: string;
-    readonly treeSlow: string;
+  languageLabel: string;
+  soundOn: string;
+  soundOff: string;
+  soundWord: string;
+  symbolOfHumanity: string;
+  lastingLegacy: string;
+  explore: string;
+  exploreLabel: string;
+  listen: string;
+  interact: string;
+  interactLabel: string;
+  treeSurfaceLabel: string;
+  closeAudio: string;
+  listenPrompt: string;
+  storyUnavailable: string;
+  playStory: string;
+  pauseStory: string;
+  subtitles: string;
+  enteringTree: string;
+  treeUnavailable: string;
+  backToTree: string;
+  experienceLabel: string;
+  narrationEnglish: string;
+  notice: {
+    soundUnavailable: string;
+    soundCannotStart: string;
+    playbackPaused: string;
+    animationUnavailable: string;
+    storyCannotPlay: string;
+    treeSlow: string;
   };
 }
-
-export const homeLanguages: ReadonlyArray<{
-  readonly code: HomeLanguage;
-  readonly nativeName: string;
-}> = [
-  { code: "en", nativeName: "English" },
-  { code: "ru", nativeName: "Русский" },
-  { code: "es", nativeName: "Español" },
-];
-
-// Cinematic interface copy only. Brand, editorial pages, and narration are separate.
+// Brand names and media source languages are intentionally independent of interface locale.
 export const homeCopy: Readonly<Record<HomeLanguage, HomeCopy>> = {
   en: {
     navigation: {
@@ -62,6 +61,11 @@ export const homeCopy: Readonly<Record<HomeLanguage, HomeCopy>> = {
       primary: "Primary",
       open: "Open navigation",
       close: "Close navigation",
+      treeSections: "Tree sections",
+      engravings: "Engravings",
+      goldenLeaves: "Golden Leaves",
+      humanHandprint: "Human Handprint",
+      account: "Account",
     },
     languageLabel: "Language: English",
     soundOn: "Turn sound on",
@@ -94,51 +98,8 @@ export const homeCopy: Readonly<Record<HomeLanguage, HomeCopy>> = {
       treeSlow:
         "The tree is taking longer to load. You can return and try again.",
     },
-  },
-  ru: {
-    navigation: {
-      tree: "Дерево",
-      story: "История",
-      voting: "Голосование",
-      about: "О проекте",
-      primary: "Основная навигация",
-      open: "Открыть навигацию",
-      close: "Закрыть навигацию",
-    },
-    languageLabel: "Язык: русский",
-    soundOn: "Включить звук",
-    soundOff: "Выключить звук",
-    soundWord: "SOUND",
-    symbolOfHumanity: "Символ человечества",
-    lastingLegacy: "Наследие для будущих поколений",
-    explore: "Исследовать",
-    exploreLabel: "Исследовать дерево",
-    listen: "Послушать историю",
-    interact: "Взаимодействовать",
-    interactLabel: "Взаимодействовать с деревом",
-    treeSurfaceLabel: "Открыть интерактивное дерево",
-    closeAudio: "Закрыть аудиорассказ",
-    listenPrompt: "Включите звук, чтобы слушать",
-    storyUnavailable: "Аудиорассказ пока недоступен.",
-    playStory: "Воспроизвести рассказ",
-    pauseStory: "Приостановить рассказ",
-    subtitles: "Субтитры",
-    enteringTree: "Переход к дереву",
-    treeUnavailable: "Не удалось открыть дерево",
-    backToTree: "Вернуться к дереву",
-    experienceLabel: "Знакомство с Tree of Unity",
-    notice: {
-      soundUnavailable: "Фоновый звук недоступен.",
-      soundCannotStart:
-        "Не удалось включить звук. Нажмите кнопку звука ещё раз.",
-      playbackPaused:
-        "Воспроизведение приостановлено. Нажмите кнопку воспроизведения, чтобы продолжить.",
-      animationUnavailable:
-        "Анимация недоступна. Показано статичное изображение.",
-      storyCannotPlay: "Не удалось воспроизвести аудиорассказ.",
-      treeSlow:
-        "Дерево загружается дольше обычного. Можно вернуться и попробовать снова.",
-    },
+    narrationEnglish: "Narration and available captions are in English.",
+    treeSceneLabel: "Tree of Unity sculpture in three dimensions",
   },
   es: {
     navigation: {
@@ -149,11 +110,16 @@ export const homeCopy: Readonly<Record<HomeLanguage, HomeCopy>> = {
       primary: "Navegación principal",
       open: "Abrir navegación",
       close: "Cerrar navegación",
+      treeSections: "Secciones del árbol",
+      engravings: "Grabados",
+      goldenLeaves: "Hojas de oro",
+      humanHandprint: "Huella humana",
+      account: "Cuenta",
     },
     languageLabel: "Idioma: español",
     soundOn: "Activar sonido",
     soundOff: "Desactivar sonido",
-    soundWord: "SOUND",
+    soundWord: "SONIDO",
     symbolOfHumanity: "Un símbolo de la humanidad",
     lastingLegacy: "Un legado duradero para las generaciones futuras",
     explore: "Explorar",
@@ -183,5 +149,464 @@ export const homeCopy: Readonly<Record<HomeLanguage, HomeCopy>> = {
       treeSlow:
         "El árbol está tardando más en cargar. Puedes volver e intentarlo de nuevo.",
     },
+    narrationEnglish:
+      "La narración y los subtítulos disponibles están en inglés.",
+    treeSceneLabel: "Escultura Tree of Unity en tres dimensiones",
+  },
+  "zh-Hans": {
+    navigation: {
+      tree: "树",
+      story: "故事",
+      voting: "投票",
+      about: "关于",
+      primary: "主导航",
+      open: "打开导航",
+      close: "关闭导航",
+      treeSections: "树的组成",
+      engravings: "镌刻",
+      goldenLeaves: "金叶",
+      humanHandprint: "人类手印",
+      account: "账户",
+    },
+    languageLabel: "语言：简体中文",
+    soundOn: "开启声音",
+    soundOff: "关闭声音",
+    soundWord: "声音",
+    symbolOfHumanity: "人类的象征",
+    lastingLegacy: "传承世代的永恒遗产",
+    explore: "探索",
+    exploreLabel: "探索这棵树",
+    listen: "聆听故事",
+    interact: "互动",
+    interactLabel: "与树互动",
+    treeSurfaceLabel: "打开互动树",
+    closeAudio: "关闭语音故事",
+    listenPrompt: "开启声音以聆听",
+    storyUnavailable: "语音故事暂未上线。",
+    playStory: "播放故事",
+    pauseStory: "暂停故事",
+    subtitles: "字幕",
+    enteringTree: "正在进入树的世界",
+    treeUnavailable: "无法打开树",
+    backToTree: "返回树",
+    experienceLabel: "Tree of Unity 体验",
+    narrationEnglish: "旁白及现有字幕为英语。",
+    notice: {
+      soundUnavailable: "背景声音不可用。",
+      soundCannotStart: "无法开启声音。请再次点击声音按钮。",
+      playbackPaused: "播放已暂停。点击播放以继续。",
+      animationUnavailable: "动画不可用。现显示静态画面。",
+      storyCannotPlay: "无法播放语音故事。",
+      treeSlow: "树的加载时间比预期更长。您可以返回后重试。",
+    },
+    treeSceneLabel: "Tree of Unity 三维雕塑",
+  },
+  "zh-Hant": {
+    navigation: {
+      tree: "樹",
+      story: "故事",
+      voting: "投票",
+      about: "關於",
+      primary: "主要導覽",
+      open: "開啟導覽",
+      close: "關閉導覽",
+      treeSections: "樹的組成",
+      engravings: "鐫刻",
+      goldenLeaves: "金葉",
+      humanHandprint: "人類手印",
+      account: "帳戶",
+    },
+    languageLabel: "語言：繁體中文",
+    soundOn: "開啟聲音",
+    soundOff: "關閉聲音",
+    soundWord: "聲音",
+    symbolOfHumanity: "人類的象徵",
+    lastingLegacy: "傳承世代的永恆遺產",
+    explore: "探索",
+    exploreLabel: "探索這棵樹",
+    listen: "聆聽故事",
+    interact: "互動",
+    interactLabel: "與樹互動",
+    treeSurfaceLabel: "開啟互動樹",
+    closeAudio: "關閉語音故事",
+    listenPrompt: "開啟聲音以聆聽",
+    storyUnavailable: "語音故事尚未上線。",
+    playStory: "播放故事",
+    pauseStory: "暫停故事",
+    subtitles: "字幕",
+    enteringTree: "正在進入樹的世界",
+    treeUnavailable: "無法開啟樹",
+    backToTree: "返回樹",
+    experienceLabel: "Tree of Unity 體驗",
+    narrationEnglish: "旁白及現有字幕為英語。",
+    notice: {
+      soundUnavailable: "背景聲音無法使用。",
+      soundCannotStart: "無法開啟聲音。請再次點擊聲音按鈕。",
+      playbackPaused: "播放已暫停。點擊播放以繼續。",
+      animationUnavailable: "動畫無法使用。目前顯示靜態畫面。",
+      storyCannotPlay: "無法播放語音故事。",
+      treeSlow: "樹的載入時間比預期更長。您可以返回後重試。",
+    },
+    treeSceneLabel: "Tree of Unity 三維雕塑",
+  },
+  fr: {
+    navigation: {
+      tree: "Arbre",
+      story: "Histoire",
+      voting: "Vote",
+      about: "À propos",
+      primary: "Navigation principale",
+      open: "Ouvrir la navigation",
+      close: "Fermer la navigation",
+      treeSections: "Éléments de l’arbre",
+      engravings: "Gravures",
+      goldenLeaves: "Feuilles d’or",
+      humanHandprint: "Empreinte humaine",
+      account: "Compte",
+    },
+    languageLabel: "Langue : français",
+    soundOn: "Activer le son",
+    soundOff: "Couper le son",
+    soundWord: "SON",
+    symbolOfHumanity: "Un symbole de l’humanité",
+    lastingLegacy: "Un héritage durable pour les générations futures",
+    explore: "Explorer",
+    exploreLabel: "Explorer l’arbre",
+    listen: "Écouter l’histoire",
+    interact: "Interagir",
+    interactLabel: "Interagir avec l’arbre",
+    treeSurfaceLabel: "Ouvrir l’arbre interactif",
+    closeAudio: "Fermer le récit audio",
+    listenPrompt: "Activez le son pour écouter",
+    storyUnavailable: "Le récit audio n’est pas encore disponible.",
+    playStory: "Lire le récit",
+    pauseStory: "Mettre le récit en pause",
+    subtitles: "Sous-titres",
+    enteringTree: "Entrée dans l’arbre",
+    treeUnavailable: "Impossible d’ouvrir l’arbre",
+    backToTree: "Retour à l’arbre",
+    experienceLabel: "Expérience Tree of Unity",
+    narrationEnglish:
+      "La narration et les sous-titres disponibles sont en anglais.",
+    notice: {
+      soundUnavailable: "Le son d’ambiance est indisponible.",
+      soundCannotStart:
+        "Le son n’a pas pu démarrer. Appuyez à nouveau sur le bouton du son.",
+      playbackPaused: "Lecture en pause. Appuyez sur Lecture pour continuer.",
+      animationUnavailable:
+        "Animation indisponible. Une image fixe est affichée.",
+      storyCannotPlay: "Le récit audio n’a pas pu être lu.",
+      treeSlow:
+        "Le chargement de l’arbre prend plus de temps. Vous pouvez revenir et réessayer.",
+    },
+    treeSceneLabel: "Sculpture Tree of Unity en trois dimensions",
+  },
+  de: {
+    navigation: {
+      tree: "Baum",
+      story: "Geschichte",
+      voting: "Abstimmung",
+      about: "Über uns",
+      primary: "Hauptnavigation",
+      open: "Navigation öffnen",
+      close: "Navigation schließen",
+      treeSections: "Bereiche des Baums",
+      engravings: "Gravuren",
+      goldenLeaves: "Goldene Blätter",
+      humanHandprint: "Menschlicher Handabdruck",
+      account: "Konto",
+    },
+    languageLabel: "Sprache: Deutsch",
+    soundOn: "Ton einschalten",
+    soundOff: "Ton ausschalten",
+    soundWord: "TON",
+    symbolOfHumanity: "Ein Symbol der Menschheit",
+    lastingLegacy: "Ein bleibendes Erbe für kommende Generationen",
+    explore: "Entdecken",
+    exploreLabel: "Den Baum entdecken",
+    listen: "Die Geschichte anhören",
+    interact: "Interagieren",
+    interactLabel: "Mit dem Baum interagieren",
+    treeSurfaceLabel: "Den interaktiven Baum öffnen",
+    closeAudio: "Hörgeschichte schließen",
+    listenPrompt: "Schalten Sie den Ton zum Zuhören ein",
+    storyUnavailable: "Die Hörgeschichte ist noch nicht verfügbar.",
+    playStory: "Geschichte abspielen",
+    pauseStory: "Geschichte pausieren",
+    subtitles: "Untertitel",
+    enteringTree: "Der Baum wird geöffnet",
+    treeUnavailable: "Der Baum konnte nicht geöffnet werden",
+    backToTree: "Zurück zum Baum",
+    experienceLabel: "Tree of Unity erleben",
+    narrationEnglish:
+      "Die Erzählung und verfügbare Untertitel sind auf Englisch.",
+    notice: {
+      soundUnavailable: "Der Hintergrundton ist nicht verfügbar.",
+      soundCannotStart:
+        "Der Ton konnte nicht gestartet werden. Drücken Sie die Tontaste erneut.",
+      playbackPaused:
+        "Wiedergabe pausiert. Drücken Sie auf Wiedergabe, um fortzufahren.",
+      animationUnavailable:
+        "Animation nicht verfügbar. Ein Standbild wird angezeigt.",
+      storyCannotPlay: "Die Hörgeschichte konnte nicht abgespielt werden.",
+      treeSlow:
+        "Der Baum braucht länger zum Laden. Sie können zurückkehren und es erneut versuchen.",
+    },
+    treeSceneLabel: "Tree of Unity als dreidimensionale Skulptur",
+  },
+  ar: {
+    navigation: {
+      tree: "الشجرة",
+      story: "القصة",
+      voting: "التصويت",
+      about: "عن المشروع",
+      primary: "التنقل الرئيسي",
+      open: "فتح قائمة التنقل",
+      close: "إغلاق قائمة التنقل",
+      treeSections: "أقسام الشجرة",
+      engravings: "النقوش",
+      goldenLeaves: "الأوراق الذهبية",
+      humanHandprint: "بصمة اليد البشرية",
+      account: "الحساب",
+    },
+    languageLabel: "اللغة: العربية",
+    soundOn: "تشغيل الصوت",
+    soundOff: "إيقاف الصوت",
+    soundWord: "الصوت",
+    symbolOfHumanity: "رمز للإنسانية",
+    lastingLegacy: "إرث باقٍ للأجيال القادمة",
+    explore: "استكشف",
+    exploreLabel: "استكشف الشجرة",
+    listen: "استمع إلى القصة",
+    interact: "تفاعل",
+    interactLabel: "تفاعل مع الشجرة",
+    treeSurfaceLabel: "فتح الشجرة التفاعلية",
+    closeAudio: "إغلاق القصة الصوتية",
+    listenPrompt: "شغّل الصوت للاستماع",
+    storyUnavailable: "القصة الصوتية غير متاحة بعد.",
+    playStory: "تشغيل القصة",
+    pauseStory: "إيقاف القصة مؤقتًا",
+    subtitles: "الترجمة النصية",
+    enteringTree: "جارٍ الدخول إلى الشجرة",
+    treeUnavailable: "تعذّر فتح الشجرة",
+    backToTree: "العودة إلى الشجرة",
+    experienceLabel: "تجربة Tree of Unity",
+    narrationEnglish: "السرد والترجمة النصية المتاحة باللغة الإنجليزية.",
+    notice: {
+      soundUnavailable: "صوت الخلفية غير متاح.",
+      soundCannotStart: "تعذّر تشغيل الصوت. اضغط زر الصوت مرة أخرى.",
+      playbackPaused: "توقف التشغيل مؤقتًا. اضغط تشغيل للمتابعة.",
+      animationUnavailable: "الرسوم المتحركة غير متاحة. تُعرض صورة ثابتة.",
+      storyCannotPlay: "تعذّر تشغيل القصة الصوتية.",
+      treeSlow:
+        "يستغرق تحميل الشجرة وقتًا أطول. يمكنك العودة والمحاولة مجددًا.",
+    },
+    treeSceneLabel: "منحوتة Tree of Unity بثلاثة أبعاد",
+  },
+  ja: {
+    navigation: {
+      tree: "木",
+      story: "ストーリー",
+      voting: "投票",
+      about: "プロジェクトについて",
+      primary: "メインナビゲーション",
+      open: "ナビゲーションを開く",
+      close: "ナビゲーションを閉じる",
+      treeSections: "木の構成要素",
+      engravings: "刻印",
+      goldenLeaves: "黄金の葉",
+      humanHandprint: "人類の手形",
+      account: "アカウント",
+    },
+    languageLabel: "言語：日本語",
+    soundOn: "音声をオンにする",
+    soundOff: "音声をオフにする",
+    soundWord: "音声",
+    symbolOfHumanity: "人類の象徴",
+    lastingLegacy: "世代を超えて受け継がれる遺産",
+    explore: "探索する",
+    exploreLabel: "木を探索する",
+    listen: "ストーリーを聴く",
+    interact: "触れてみる",
+    interactLabel: "木に触れてみる",
+    treeSurfaceLabel: "インタラクティブな木を開く",
+    closeAudio: "音声ストーリーを閉じる",
+    listenPrompt: "音声をオンにしてお聴きください",
+    storyUnavailable: "音声ストーリーはまだ公開されていません。",
+    playStory: "ストーリーを再生",
+    pauseStory: "ストーリーを一時停止",
+    subtitles: "字幕",
+    enteringTree: "木の世界に入っています",
+    treeUnavailable: "木を開けませんでした",
+    backToTree: "木に戻る",
+    experienceLabel: "Tree of Unity の体験",
+    narrationEnglish: "ナレーションと利用可能な字幕は英語です。",
+    notice: {
+      soundUnavailable: "環境音を利用できません。",
+      soundCannotStart:
+        "音声を再生できませんでした。音声ボタンをもう一度押してください。",
+      playbackPaused: "再生を一時停止しました。再生ボタンで続行できます。",
+      animationUnavailable:
+        "アニメーションを利用できないため、静止画を表示しています。",
+      storyCannotPlay: "音声ストーリーを再生できませんでした。",
+      treeSlow:
+        "木の読み込みに時間がかかっています。戻ってから、もう一度お試しください。",
+    },
+    treeSceneLabel: "立体で見る Tree of Unity の彫刻",
+  },
+  "pt-BR": {
+    navigation: {
+      tree: "Árvore",
+      story: "História",
+      voting: "Votação",
+      about: "Sobre",
+      primary: "Navegação principal",
+      open: "Abrir navegação",
+      close: "Fechar navegação",
+      treeSections: "Partes da árvore",
+      engravings: "Gravações",
+      goldenLeaves: "Folhas de ouro",
+      humanHandprint: "Marca da mão humana",
+      account: "Conta",
+    },
+    languageLabel: "Idioma: português do Brasil",
+    soundOn: "Ativar som",
+    soundOff: "Desativar som",
+    soundWord: "SOM",
+    symbolOfHumanity: "Um símbolo da humanidade",
+    lastingLegacy: "Um legado duradouro para as próximas gerações",
+    explore: "Explorar",
+    exploreLabel: "Explorar a árvore",
+    listen: "Ouvir a história",
+    interact: "Interagir",
+    interactLabel: "Interagir com a árvore",
+    treeSurfaceLabel: "Abrir a árvore interativa",
+    closeAudio: "Fechar história em áudio",
+    listenPrompt: "Ative o som para ouvir",
+    storyUnavailable: "A história em áudio ainda não está disponível.",
+    playStory: "Reproduzir história",
+    pauseStory: "Pausar história",
+    subtitles: "Legendas",
+    enteringTree: "Entrando na árvore",
+    treeUnavailable: "Não foi possível abrir a árvore",
+    backToTree: "Voltar à árvore",
+    experienceLabel: "Experiência Tree of Unity",
+    narrationEnglish: "A narração e as legendas disponíveis estão em inglês.",
+    notice: {
+      soundUnavailable: "O som ambiente está indisponível.",
+      soundCannotStart:
+        "Não foi possível iniciar o som. Toque novamente no botão de som.",
+      playbackPaused: "Reprodução pausada. Toque em reproduzir para continuar.",
+      animationUnavailable:
+        "Animação indisponível. Exibindo uma imagem estática.",
+      storyCannotPlay: "Não foi possível reproduzir a história em áudio.",
+      treeSlow:
+        "A árvore está demorando mais para carregar. Você pode voltar e tentar novamente.",
+    },
+    treeSceneLabel: "Escultura Tree of Unity em três dimensões",
+  },
+  ko: {
+    navigation: {
+      tree: "나무",
+      story: "이야기",
+      voting: "투표",
+      about: "프로젝트 소개",
+      primary: "주 탐색",
+      open: "탐색 메뉴 열기",
+      close: "탐색 메뉴 닫기",
+      treeSections: "나무의 구성",
+      engravings: "새김",
+      goldenLeaves: "황금 잎",
+      humanHandprint: "인류의 손자국",
+      account: "계정",
+    },
+    languageLabel: "언어: 한국어",
+    soundOn: "소리 켜기",
+    soundOff: "소리 끄기",
+    soundWord: "소리",
+    symbolOfHumanity: "인류의 상징",
+    lastingLegacy: "세대를 이어 남을 유산",
+    explore: "탐험하기",
+    exploreLabel: "나무 탐험하기",
+    listen: "이야기 듣기",
+    interact: "교감하기",
+    interactLabel: "나무와 교감하기",
+    treeSurfaceLabel: "인터랙티브 나무 열기",
+    closeAudio: "음성 이야기 닫기",
+    listenPrompt: "소리를 켜고 들어 보세요",
+    storyUnavailable: "음성 이야기는 아직 제공되지 않습니다.",
+    playStory: "이야기 재생",
+    pauseStory: "이야기 일시 정지",
+    subtitles: "자막",
+    enteringTree: "나무로 들어가는 중",
+    treeUnavailable: "나무를 열 수 없습니다",
+    backToTree: "나무로 돌아가기",
+    experienceLabel: "Tree of Unity 체험",
+    narrationEnglish: "해설과 제공되는 자막은 영어입니다.",
+    notice: {
+      soundUnavailable: "배경 소리를 사용할 수 없습니다.",
+      soundCannotStart:
+        "소리를 재생할 수 없습니다. 소리 버튼을 다시 눌러 주세요.",
+      playbackPaused:
+        "재생이 일시 정지되었습니다. 재생 버튼을 눌러 계속하세요.",
+      animationUnavailable:
+        "애니메이션을 사용할 수 없어 정지 이미지를 표시합니다.",
+      storyCannotPlay: "음성 이야기를 재생할 수 없습니다.",
+      treeSlow:
+        "나무를 불러오는 데 시간이 더 걸리고 있습니다. 돌아간 후 다시 시도할 수 있습니다.",
+    },
+    treeSceneLabel: "입체로 보는 Tree of Unity 조각",
+  },
+  it: {
+    navigation: {
+      tree: "Albero",
+      story: "Storia",
+      voting: "Votazione",
+      about: "Il progetto",
+      primary: "Navigazione principale",
+      open: "Apri navigazione",
+      close: "Chiudi navigazione",
+      treeSections: "Sezioni dell’albero",
+      engravings: "Incisioni",
+      goldenLeaves: "Foglie d’oro",
+      humanHandprint: "Impronta umana",
+      account: "Account",
+    },
+    languageLabel: "Lingua: italiano",
+    soundOn: "Attiva audio",
+    soundOff: "Disattiva audio",
+    soundWord: "AUDIO",
+    symbolOfHumanity: "Un simbolo dell’umanità",
+    lastingLegacy: "Un’eredità duratura per le generazioni future",
+    explore: "Esplora",
+    exploreLabel: "Esplora l’albero",
+    listen: "Ascolta la storia",
+    interact: "Interagisci",
+    interactLabel: "Interagisci con l’albero",
+    treeSurfaceLabel: "Apri l’albero interattivo",
+    closeAudio: "Chiudi la storia audio",
+    listenPrompt: "Attiva l’audio per ascoltare",
+    storyUnavailable: "La storia audio non è ancora disponibile.",
+    playStory: "Riproduci la storia",
+    pauseStory: "Metti in pausa la storia",
+    subtitles: "Sottotitoli",
+    enteringTree: "Ingresso nell’albero",
+    treeUnavailable: "Impossibile aprire l’albero",
+    backToTree: "Torna all’albero",
+    experienceLabel: "Esperienza Tree of Unity",
+    narrationEnglish:
+      "La narrazione e i sottotitoli disponibili sono in inglese.",
+    notice: {
+      soundUnavailable: "L’audio di sottofondo non è disponibile.",
+      soundCannotStart:
+        "Impossibile avviare l’audio. Premi di nuovo il pulsante audio.",
+      playbackPaused: "Riproduzione in pausa. Premi Riproduci per continuare.",
+      animationUnavailable:
+        "Animazione non disponibile. Viene mostrata un’immagine fissa.",
+      storyCannotPlay: "Impossibile riprodurre la storia audio.",
+      treeSlow:
+        "Il caricamento dell’albero sta richiedendo più tempo. Puoi tornare indietro e riprovare.",
+    },
+    treeSceneLabel: "Scultura Tree of Unity in tre dimensioni",
   },
 };

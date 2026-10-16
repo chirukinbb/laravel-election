@@ -1,8 +1,10 @@
 "use client";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
+import {localeNumberingSystem} from "@/i18n/locales";
 import type {HomeLanguage} from "@/features/home/copy";
 import {votingCopy} from "./copy";
 import {DEMO_ROUND, remainingTime} from "./voting-model";
+import {votingNumber} from "./format";
 
 export function Countdown({
   language,
@@ -29,13 +31,27 @@ export function Countdown({
   const copy = votingCopy[language];
   const labels = [copy.days, copy.hours, copy.minutes, copy.seconds];
   const values = now === null ? [90, 0, 0, 0] : remainingTime(now);
+  const deadlineLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(language, {
+        dateStyle: "long",
+        timeStyle: "short",
+        timeZone: "UTC",
+        numberingSystem: localeNumberingSystem(language),
+      }).format(new Date(DEMO_ROUND.endsAt)) + " UTC",
+    [language],
+  );
   return (
-    <div className="voting-countdown" aria-label={copy.closes}>
+    <div
+      className="voting-countdown"
+      aria-label={copy.closes}
+      title={deadlineLabel}
+    >
       <p className="voting-kicker">{copy.closes}</p>
       <div className="voting-countdown__digits" role="timer" aria-live="off">
         {values.map((value, index) => (
           <div key={labels[index]}>
-            <span>{String(value).padStart(2, "0")}</span>
+            <span>{votingNumber(value, language, 2)}</span>
             <small>{labels[index]}</small>
           </div>
         ))}

@@ -1,3 +1,4 @@
+import {locales} from "@/i18n/locales";
 import {describe, expect, it} from "vitest";
 import {countries, getCountryName} from "./countries";
 import {nominees} from "./nominees";
@@ -35,7 +36,7 @@ describe("Voting demonstration directory", () => {
         "qualities",
         "contribution",
       ] as const) {
-        for (const language of ["en", "ru", "es"] as const) {
+        for (const language of locales.map(({ code }) => code)) {
           expect(
             nominee[field][language].trim(),
             `${nominee.id}: ${field}/${language}`,
@@ -91,7 +92,7 @@ describe("Voting search, filters and ranking", () => {
 
   it.each([
     ["en", "japan"],
-    ["ru", "япония"],
+    ["ar", "اليابان"],
     ["es", "japon"],
   ] as const)("searches the translated country in %s", (language, query) => {
     expect(
@@ -135,7 +136,7 @@ describe("Voting search, filters and ranking", () => {
     );
   });
 
-  it.each(["en", "ru", "es"] as const)(
+  it.each(locales.map(({ code }) => code))(
     "sorts names alphabetically for %s without changing the input",
     (language) => {
       const selected = filterNominees(

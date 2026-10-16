@@ -8,6 +8,7 @@ import {disposeTreeObject, getTreeCameraFit,} from "@/features/home/tree-scene-u
 export interface TreeSceneProps {
   modelUrl: string;
   active: boolean;
+  label: string;
   onReady: () => void;
   onError: (message: string) => void;
 }
@@ -18,6 +19,7 @@ const BACKGROUND = "#F5F5F5";
 export function TreeScene({
   modelUrl,
   active,
+  label,
   onReady,
   onError,
 }: TreeSceneProps) {
@@ -356,7 +358,7 @@ export function TreeScene({
       data-tree-scene=""
       data-active={active}
       role="img"
-      aria-label="Tree of Unity sculpture in three dimensions"
+      aria-label={label}
       aria-hidden={!active}
       style={{
         position: "absolute",

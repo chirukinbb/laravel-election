@@ -11,21 +11,25 @@ export type CandidateSort = "votes" | "name";
 export function fullName(person: Pick<Nominee, "firstName" | "lastName">) {
   return person.firstName + " " + person.lastName;
 }
-export function normalizeSearch(value: string) {
+export function normalizeSearch(value: string, language: HomeLanguage = "en") {
   return value
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
-    .toLocaleLowerCase()
+    .toLocaleLowerCase(language)
     .trim();
 }
 export function voteCount(person: Nominee, votedId: string | null) {
   return person.supporters.length + Number(votedId === person.id);
 }
-export function getRanking(people: readonly Nominee[], votedId: string | null) {
+export function getRanking(
+  people: readonly Nominee[],
+  votedId: string | null,
+  language: HomeLanguage = "en",
+) {
   return [...people].sort(
     (a, b) =>
       voteCount(b, votedId) - voteCount(a, votedId) ||
-      fullName(a).localeCompare(fullName(b), "en"),
+      fullName(a).localeCompare(fullName(b), language),
   );
 }
 export function filterNominees(
@@ -36,16 +40,17 @@ export function filterNominees(
   language: HomeLanguage,
   votedId: string | null,
 ) {
-  const normalized = normalizeSearch(query);
+  const normalized = normalizeSearch(query, language);
   const filtered = people.filter(
     (person) =>
       (!country || person.country === country) &&
       normalizeSearch(
         fullName(person) + " " + getCountryName(person.country, language),
+        language,
       ).includes(normalized),
   );
   return sort === "votes"
-    ? getRanking(filtered, votedId)
+    ? getRanking(filtered, votedId, language)
     : [...filtered].sort((a, b) =>
         fullName(a).localeCompare(fullName(b), language, {
           sensitivity: "base",

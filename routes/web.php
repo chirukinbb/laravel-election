@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::prefix('{lang?}')
-    ->whereIn('lang', ['en', 'ru', 'es']) // Поддерживаемые языки
+    ->whereIn('lang', array_keys(config('tou.locales'))) // Поддерживаемые языки
     ->middleware(['web', 'set_locale']) // Устанавливаем язык
     ->group(function () {
         Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');

@@ -163,8 +163,7 @@
   position: absolute;
   z-index: 10;
   top: 21px;
-  left: 0;
-  right: 0;
+  inset-inline: 0;
 }
 .cinematic-nav {
   display: grid;
@@ -211,7 +210,7 @@
 }
 .cinematic-language {
   position: absolute;
-  right: 32px;
+  inset-inline-end: 32px;
   top: 4px;
   color: #fff;
   font-size: 11px;
@@ -220,7 +219,7 @@
 }
 .sound-toggle {
   position: absolute;
-  left: 24px;
+  inset-inline-start: 24px;
   top: 2px;
   min-width: 72px;
   min-height: 44px;
@@ -243,8 +242,7 @@
 .sound-toggle__label::after {
   content: "";
   position: absolute;
-  left: -1px;
-  right: -1px;
+  inset-inline: -1px;
   top: 50%;
   height: 1px;
   background: currentColor;
@@ -267,8 +265,7 @@
 .home-title {
   position: absolute;
   top: 31%;
-  left: 7%;
-  right: 7%;
+  inset-inline: 7%;
   text-align: center;
   pointer-events: none;
   opacity: 0;
@@ -330,8 +327,10 @@
   position: absolute;
   z-index: 3;
   bottom: var(--explore-bottom);
-  left: 50%;
-  transform: translateX(-50%);
+  inset-inline: 0;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
   text-align: center;
   opacity: 0;
   pointer-events: none;
@@ -405,9 +404,10 @@
 }
 .interact-button {
   position: absolute;
-  left: 50%;
+  inset-inline: 0;
+  width: fit-content;
+  margin-inline: auto;
   bottom: 6%;
-  transform: translateX(-50%);
   min-width: 164px;
   min-height: 44px;
   padding: 8px 20px;
@@ -452,8 +452,7 @@
   z-index: 3;
   pointer-events: none;
   bottom: 8.5%;
-  left: 20%;
-  right: 20%;
+  inset-inline: 20%;
   text-align: center;
 }
 .audio-story-panel button {
@@ -510,8 +509,7 @@
   position: absolute;
   z-index: 16;
   bottom: 0;
-  left: 24%;
-  right: 24%;
+  inset-inline: 24%;
   margin: 0;
   text-align: center;
   font-size: 11px;
@@ -734,12 +732,12 @@
   }
   .cinematic-language {
     top: 48px;
-    right: 18px;
+    inset-inline-end: 18px;
     font-size: 9px;
   }
   .sound-toggle {
     top: 48px;
-    left: 14px;
+    inset-inline-start: 14px;
     font-size: 10px;
   }
   .scene-plate--home.scene-plate--reference .scene-plate__poster {
@@ -774,8 +772,7 @@
   }
   .home-title {
     top: 34%;
-    left: 5%;
-    right: 5%;
+    inset-inline: 5%;
     text-shadow: 0 1px 15px #fff5e2;
   }
   .home-title--reference::before {
@@ -844,8 +841,7 @@
   }
   .audio-story-panel {
     bottom: 14%;
-    left: 6%;
-    right: 6%;
+    inset-inline: 6%;
   }
   .audio-story-invitation {
     font-size: 9px;
@@ -853,8 +849,7 @@
   }
   .cinematic-notice {
     bottom: 74px;
-    left: 12%;
-    right: 12%;
+    inset-inline: 12%;
     padding: 4px;
   }
 }

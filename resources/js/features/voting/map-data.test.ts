@@ -1,3 +1,4 @@
+import {locales} from "@/i18n/locales";
 import {createElement} from "react";
 
 import {fireEvent, render, screen, waitFor} from "@testing-library/react";
@@ -86,15 +87,16 @@ describe("voting geography", () => {
   });
 
   it("provides valid localized names and bounded continent windows", () => {
-    for (const language of ["en", "ru", "es"] as const) {
+    for (const language of locales.map(({ code }) => code)) {
       for (const country of countries) {
         expect(getCountryName(country.code, language).length).toBeGreaterThan(
-          2,
+          0,
         );
+        expect(getCountryName(country.code, language)).not.toBe(country.code);
       }
     }
     expect(getCountryName("PS", "en")).toBe("State of Palestine");
-    expect(getCountryName("DE", "ru")).toBe("Германия");
+    expect(getCountryName("DE", "ar")).toBe("ألمانيا");
     expect(getCountryName("DE", "es")).toBe("Alemania");
     for (const bounds of Object.values(map.views)) {
       expect(bounds.every(Number.isFinite)).toBe(true);
@@ -150,5 +152,48 @@ describe("VotingMap navigation", () => {
     expect(
       container.querySelectorAll('[role="button"][tabindex="0"]'),
     ).toHaveLength(1);
+  });
+  it("localizes Arabic controls and counts while preserving the map orientation and selection", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => map }),
+    );
+    const props = {
+      continent: null,
+      selectedCountry: "JP",
+      counts: { JP: 3 },
+      onCountrySelect: vi.fn(),
+      onContinentChange: vi.fn(),
+    };
+    const { container, rerender } = render(
+      createElement(VotingMap, { ...props, language: "en" }),
+    );
+    const japan = await screen.findByRole("button", {
+      name: "Japan, 3 nominees",
+    });
+    const path = japan.querySelector("path")?.getAttribute("d");
+    const geometry = container
+      .querySelector(".voting-map__land")
+      ?.getAttribute("style");
+    rerender(createElement(VotingMap, { ...props, language: "ar" }));
+    expect(container.querySelector(".voting-map")).toHaveAttribute(
+      "dir",
+      "rtl",
+    );
+    expect(container.querySelector(".voting-map__viewport")).toHaveAttribute(
+      "dir",
+      "ltr",
+    );
+    expect(screen.getByRole("button", { name: "تكبير" })).toBeInTheDocument();
+    const localizedJapan = screen.getByRole("button", {
+      name: "اليابان, ٣ مرشحين",
+    });
+    expect(localizedJapan).toHaveAttribute("aria-pressed", "true");
+    expect(localizedJapan.querySelector("path")?.getAttribute("d")).toBe(path);
+    expect(
+      container.querySelector(".voting-map__land")?.getAttribute("style"),
+    ).toBe(geometry);
+    fireEvent.click(localizedJapan);
+    expect(props.onCountrySelect).toHaveBeenCalledWith("JP");
   });
 });

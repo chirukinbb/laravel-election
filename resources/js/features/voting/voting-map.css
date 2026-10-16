@@ -172,9 +172,9 @@
 }
 
 .voting-map__controls .voting-map__reset {
-  margin-left: 8px;
+  margin-inline-start: 8px;
   padding-inline: 18px;
-  border-left: 1px solid #d7d9dc;
+  border-inline-start: 1px solid #d7d9dc;
   font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -185,7 +185,7 @@
   color: #677284;
   font-size: 9px;
   letter-spacing: 0.09em;
-  text-align: right;
+  text-align: end;
   text-transform: uppercase;
 }
 
@@ -238,7 +238,7 @@
   .voting-map__caption {
     width: 100%;
     min-height: 24px;
-    text-align: left;
+    text-align: start;
   }
 }
 
@@ -247,5 +247,42 @@
   .voting-map__country path,
   .voting-map__continents button {
     transition: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .voting-map__viewport {
+    animation: world-map-unveil 1.15s cubic-bezier(0.19, 1, 0.22, 1) both;
+    transform-origin: center;
+  }
+  .voting-map__continents {
+    animation: map-controls-enter 0.65s 0.08s ease both;
+  }
+  .voting-map-panel .voting-map-sidebar {
+    animation: map-controls-enter 0.85s 0.18s both
+      cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+}
+@keyframes world-map-unveil {
+  from {
+    opacity: 0;
+    transform: scale(0.965);
+    clip-path: inset(9% 3% 9% 3%);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    clip-path: inset(0);
+    filter: blur(0);
+  }
+}
+@keyframes map-controls-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import {type RefObject, useEffect, useRef} from "react";
+import {useHomeLanguage} from "@/features/home/use-home-language";
+import {goldenLeavesCopy} from "./copy";
 import "./editorial-cursor.css";
 
 interface EditorialCursorProps {
@@ -15,6 +17,7 @@ export function EditorialCursor({
   rootRef,
   reducedMotion,
 }: EditorialCursorProps) {
+  const [language] = useHomeLanguage();
   const cursorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -164,7 +167,9 @@ export function EditorialCursor({
       <span className="leaves-editorial-cursor__orbit">360°</span>
       <span className="leaves-editorial-cursor__left">‹</span>
       <span className="leaves-editorial-cursor__right">›</span>
-      <span className="leaves-editorial-cursor__play">PLAY</span>
+      <span className="leaves-editorial-cursor__play">
+        {goldenLeavesCopy[language].play}
+      </span>
     </div>
   );
 }

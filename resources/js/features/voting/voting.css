@@ -139,15 +139,10 @@
   translate: 0 4px;
 }
 .voting-countdown {
-  width: min(100%, 500px);
+  width: min(100%, 700px);
 }
 .voting-countdown > .voting-kicker {
-  font-family: var(--v-serif);
-  font-size: 15px;
-  letter-spacing: 0.18em;
-  text-transform: none;
-  color: var(--v-ink);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .voting-countdown__digits {
   display: grid;
@@ -163,10 +158,10 @@
 .voting-countdown__digits > div + div::before {
   content: "";
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 29%;
   height: 33%;
-  border-left: 1px solid #bdbfc2;
+  border-inline-start: 1px solid #bdbfc2;
 }
 .voting-countdown__digits span {
   font-family: var(--v-serif);
@@ -183,7 +178,7 @@
   letter-spacing: 0.15em;
   display: block;
   width: 100%;
-  padding-left: 0.15em;
+  padding-inline-start: 0.15em;
 }
 .voting-workspace {
   position: relative;
@@ -240,9 +235,10 @@
   color: #94703a;
 }
 .voting-tabs > .voting-text-link {
-  margin-right: 3px;
+  margin-inline-end: 3px;
 }
 .voting-stage {
+  position: relative;
   min-height: 740px;
 }
 .voting-filters {
@@ -289,7 +285,8 @@
 .voting-country-toolbar select {
   min-width: 0;
   width: 100%;
-  padding: 12px 22px 10px 0;
+  padding-block: 12px 10px;
+  padding-inline: 0 22px;
   border: 0;
   background: transparent;
   border-radius: 0;
@@ -307,7 +304,7 @@
   table-layout: auto;
 }
 .voting-table th {
-  text-align: left;
+  text-align: start;
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -317,7 +314,7 @@
   border-bottom: 1px solid var(--v-line);
 }
 .voting-table th:first-child {
-  padding-left: 3px;
+  padding-inline-start: 3px;
   width: 60px;
 }
 .voting-table th:last-child {
@@ -329,7 +326,7 @@
   transition: background 0.2s;
 }
 .voting-table td:first-child {
-  padding-left: 3px;
+  padding-inline-start: 3px;
 }
 .voting-table tr:hover td,
 .voting-table tr:focus-within td {
@@ -348,7 +345,7 @@
 .voting-person {
   display: flex;
   align-items: center;
-  text-align: left;
+  text-align: start;
   gap: 18px;
   background: none;
   border: 0;
@@ -470,7 +467,8 @@
   display: flex;
   align-items: center;
   gap: 25px;
-  padding: 14px 16px 14px 28px;
+  padding-block: 14px;
+  padding-inline: 28px 16px;
   background: #20211f;
   color: #fff;
   box-shadow: 0 8px 24px #00000018;
@@ -479,8 +477,8 @@
   display: flex;
   align-items: center;
   gap: 26px;
-  padding-right: 25px;
-  border-right: 1px solid #72736d;
+  padding-inline-end: 25px;
+  border-inline-end: 1px solid #72736d;
 }
 .voting-dock__links button {
   border: 0;
@@ -541,7 +539,7 @@
 }
 .voting-demo-label {
   margin: 22px 0 0;
-  text-align: right;
+  text-align: end;
   text-transform: uppercase;
   color: var(--v-muted);
   font-size: 8px;
@@ -568,8 +566,8 @@
 .voting-map-sidebar {
   min-width: 0;
   height: var(--v-map-height);
-  border-left: 1px solid var(--v-line);
-  padding-left: 30px;
+  border-inline-start: 1px solid var(--v-line);
+  padding-inline-start: 30px;
   overflow: hidden;
 }
 .voting-country-browser {
@@ -646,10 +644,11 @@
   font-size: 8px;
 }
 .voting-country-toolbar select {
-  width: 125px;
-  padding: 4px 10px 4px 0;
+  width: min(100%, 180px);
+  padding-block: 4px;
+  padding-inline: 0 10px;
   font-size: 10px;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 .voting-country-list {
   list-style: none;
@@ -675,7 +674,7 @@
   padding: 9px 3px;
   border: 0;
   background: none;
-  text-align: left;
+  text-align: start;
   font-family: var(--v-serif);
   font-size: 17px;
   transition:
@@ -692,11 +691,11 @@
   text-overflow: ellipsis;
 }
 .voting-country-list button span:nth-child(2) {
-  text-align: right;
+  text-align: end;
   font-variant-numeric: tabular-nums;
 }
 .voting-country-list button span:last-child {
-  text-align: right;
+  text-align: end;
 }
 .voting-map-sort {
   margin: 18px 0 5px;
@@ -771,7 +770,8 @@
   animation: voting-panel-in 0.4s ease both;
 }
 .voting-panel__intro {
-  padding: 0 60px 0 0;
+  padding-block: 0;
+  padding-inline: 0 60px;
   margin-bottom: 38px;
 }
 .voting-panel__intro h3 {
@@ -784,9 +784,9 @@
 }
 .voting-close {
   position: sticky;
-  float: right;
+  float: inline-end;
   margin-bottom: -44px;
-  right: 0;
+  inset-inline-end: 0;
   top: 104px;
   display: grid;
   place-items: center;
@@ -814,86 +814,7 @@
 .voting-close:hover span {
   transform: rotate(90deg);
 }
-.voting-profile {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.5fr);
-  gap: 8vw;
-  align-items: start;
-}
-.voting-profile__identity {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  position: sticky;
-  top: 120px;
-}
-.voting-profile__activity {
-  margin: 0;
-  font-family: var(--v-serif);
-  font-size: 23px;
-  line-height: 1.3;
-}
-.voting-profile__identity .voting-solid {
-  width: 100%;
-  margin-top: 8px;
-  font-size: 15px;
-}
-.voting-profile__story {
-  max-width: 770px;
-}
-.voting-profile__story > section {
-  margin-bottom: 32px;
-}
-.voting-profile h4 {
-  font-size: 24px;
-  line-height: 1.25;
-  margin: 0 0 12px;
-}
-.voting-profile__story p {
-  font-size: 14px;
-  line-height: 1.9;
-  color: #575c63;
-  margin: 0;
-}
-.voting-supporters {
-  border-top: 1px solid var(--v-line);
-  padding-top: 30px;
-}
-.voting-supporters__title {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 20px;
-}
-.voting-supporters__title > span {
-  font-family: var(--v-serif);
-  font-size: 28px;
-  color: var(--v-gold);
-}
-.voting-supporters table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  margin-top: 10px;
-}
-.voting-supporters th {
-  text-align: left;
-  padding: 12px 0;
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 400;
-  color: var(--v-muted);
-}
-.voting-supporters td {
-  padding: 10px 0;
-  border-top: 1px solid var(--v-line);
-}
-.voting-supporters td:last-child {
-  color: var(--v-muted);
-}
+
 .voting-panel__demo {
   color: var(--v-muted);
   font-size: 10px;
@@ -1129,7 +1050,7 @@
     gap: 22px;
   }
   .voting-map-sidebar {
-    padding-left: 20px;
+    padding-inline-start: 20px;
   }
   .voting-results--compact .voting-person strong {
     font-size: 15px;
@@ -1139,11 +1060,11 @@
   }
   .voting-dock {
     gap: 18px;
-    padding-left: 20px;
+    padding-inline-start: 20px;
   }
   .voting-dock__links {
     gap: 16px;
-    padding-right: 18px;
+    padding-inline-end: 18px;
   }
   .voting-dock__links button {
     font-size: 13px;
@@ -1171,7 +1092,7 @@
     max-width: 530px;
     margin: auto;
   }
-  .voting-experience[lang="ru"] .voting-hero h1 {
+  .voting-experience:lang(de) .voting-hero h1 {
     font-size: clamp(30px, 8.7vw, 58px);
   }
   .voting-hero__intro {
@@ -1181,7 +1102,6 @@
   }
   .voting-countdown {
     margin: auto;
-    max-width: 360px;
   }
   .voting-countdown__digits span {
     font-size: 55px;
@@ -1190,7 +1110,7 @@
     font-size: 11px;
   }
   .voting-countdown > .voting-kicker {
-    font-size: 13px;
+    font-size: 8px;
   }
   .voting-explore {
     font-size: 13px;
@@ -1215,7 +1135,7 @@
     letter-spacing: 0.06em;
     max-width: 125px;
     gap: 5px;
-    text-align: right;
+    text-align: end;
   }
   .voting-stage {
     min-height: 620px;
@@ -1339,7 +1259,7 @@
   }
   .voting-dock__prompt {
     font-size: 15px;
-    padding-left: 4px;
+    padding-inline-start: 4px;
   }
   .voting-demo-label {
     font-size: 7px;
@@ -1353,7 +1273,7 @@
     height: auto;
   }
   .voting-map-sidebar {
-    border-left: 0;
+    border-inline-start: 0;
     border-top: 1px solid var(--v-line);
     padding: 23px 0 0;
   }
@@ -1372,7 +1292,7 @@
   }
   .voting-panel__intro {
     margin-bottom: 25px;
-    padding-right: 48px;
+    padding-inline-end: 48px;
   }
   .voting-panel__intro h3 {
     font-size: 34px;
@@ -1385,31 +1305,7 @@
     height: 36px;
     font-size: 22px;
   }
-  .voting-profile {
-    grid-template-columns: 1fr;
-    gap: 35px;
-  }
-  .voting-profile__identity {
-    position: static;
-    gap: 14px;
-  }
-  .voting-profile .voting-portrait--large {
-    width: 200px;
-    height: 200px;
-  }
-  .voting-profile__identity .voting-solid {
-    width: auto;
-    min-width: 230px;
-  }
-  .voting-profile h4 {
-    font-size: 23px;
-  }
-  .voting-profile__story p {
-    font-size: 14px;
-  }
-  .voting-supporters__title h4 {
-    font-size: 21px;
-  }
+
   .voting-panel__demo {
     font-size: 9px;
   }
@@ -1469,5 +1365,227 @@
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Direction follows the document; photographs and map geometry keep their orientation. */
+.voting-arrow {
+  flex-shrink: 0;
+}
+.voting-arrow:dir(rtl):not(.voting-arrow--down) {
+  transform: scaleX(-1);
+}
+.voting-experience :is(h1, h2, h3, h4, p, button, label) {
+  overflow-wrap: anywhere;
+}
+.voting-experience :is(input, textarea) {
+  text-align: start;
+}
+.voting-experience :is(.voting-person strong, .voting-dock__selection strong) {
+  unicode-bidi: plaintext;
+}
+.voting-tabs > *,
+.voting-dock > *,
+.voting-person > span {
+  min-width: 0;
+}
+.voting-explore {
+  max-width: calc(100% - 32px);
+  white-space: normal;
+}
+.voting-dock__links button {
+  white-space: normal;
+}
+.voting-map__footer {
+  flex-wrap: wrap;
+}
+.voting-filter-toggle {
+  margin-inline-start: auto;
+  margin-inline-end: 0;
+}
+.voting-experience:lang(ar)
+  :is(
+    .voting-kicker,
+    .voting-countdown__digits small,
+    .voting-tabs button,
+    .voting-table th,
+    .voting-person__activity,
+    .voting-dock small,
+    .voting-demo-label,
+    .voting-map__continents button,
+    .voting-map__caption,
+    .voting-map__reset,
+    .v-story__eyebrow,
+    .v-story__caption
+  ) {
+  letter-spacing: normal;
+}
+.voting-directory-ui {
+  transition:
+    opacity 0.45s ease,
+    visibility 0.45s;
+}
+.voting-directory-ui[data-dissolved="true"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.voting-stage > .nominee-profile,
+.voting-stage > .voting-panel {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  inline-size: 100%;
+}
+.voting-stage > .voting-panel {
+  z-index: 2;
+  margin-block-start: -51px;
+  block-size: calc(100svh - 128px);
+  min-block-size: 520px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  background: #fff;
+  padding: 32px 4% 40px;
+  border: 0;
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+.voting-panel[data-closing="true"] {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: none;
+  pointer-events: none;
+}
+.voting-stage > .voting-panel .voting-close {
+  inset-block-start: 0;
+}
+.voting-workspace {
+  overflow-anchor: none;
+}
+.voting-experience .voting-search input:focus-visible {
+  outline: none;
+}
+.voting-search:focus-within {
+  outline: 1px solid #84662f;
+  outline-offset: 4px;
+  border-color: #84662f;
+}
+.voting-select > span {
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.voting-select select {
+  flex: 1;
+  inline-size: 0;
+}
+.voting-country-back {
+  gap: 12px;
+  min-block-size: 44px;
+}
+.voting-country-back .voting-arrow {
+  inline-size: 23px;
+  block-size: 23px;
+  flex-shrink: 0;
+  transform: scaleX(-1);
+}
+[dir="rtl"] .voting-country-back .voting-arrow {
+  transform: none;
+}
+.voting-dock {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+  max-inline-size: 920px;
+  padding: 16px 24px;
+  gap: 20px;
+  animation: voting-selection-enter 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.voting-dock__selection {
+  border-inline-end: 1px solid #ffffff40;
+  padding-inline-end: 20px;
+  min-block-size: 48px;
+}
+.voting-dock__vote,
+.voting-dock__explore {
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--v-serif);
+  font-size: 17px;
+  line-height: 1.3;
+  padding: 12px 16px;
+}
+.voting-dock__explore {
+  background: transparent;
+  border: 1px solid #ffffff60;
+  color: #fff;
+}
+.voting-dock__explore:hover {
+  border-color: #d4b67b;
+}
+.voting-dock .voting-arrow {
+  flex-shrink: 0;
+}
+@keyframes voting-selection-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 760px) {
+  .voting-dock {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    margin-inline: 0;
+  }
+  .voting-dock__selection {
+    grid-column: 1/-1;
+    border-inline-end: 0;
+    border-block-end: 1px solid #ffffff40;
+    padding: 0 0 12px;
+    justify-content: center;
+  }
+  .voting-dock__vote,
+  .voting-dock__explore {
+    font-size: 15px;
+    padding: 10px;
+    gap: 8px;
+  }
+  .voting-stage > .voting-panel {
+    block-size: calc(100svh - 113px);
+    min-block-size: 470px;
+    padding-inline: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .voting-panel,
+  .voting-dock {
+    animation: none;
+    transition: none;
+  }
+}
+.nomination-review-extra {
+  margin-block: 32px;
+}
+.nomination-review-extra li {
+  padding-block: 12px;
+  border-block-end: 1px solid var(--v-line);
+}
+.nomination-review-extra a {
+  overflow-wrap: anywhere;
+}
+@media (prefers-reduced-motion: reduce) {
+  .voting-directory-ui {
+    transition: none;
   }
 }

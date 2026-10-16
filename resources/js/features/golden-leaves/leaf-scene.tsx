@@ -4,6 +4,8 @@ import {useEffect, useRef} from "react";
 import type {Group, Mesh, MeshStandardMaterial, WebGLRenderer} from "three";
 
 import {disposeTreeObject} from "@/features/home/tree-scene-utils";
+import {useHomeLanguage} from "@/features/home/use-home-language";
+import {goldenLeavesCopy} from "./copy";
 
 export interface LeafSceneProps {
   modelUrl?: string;
@@ -23,6 +25,8 @@ export function LeafScene({
   onReady,
   onError,
 }: LeafSceneProps) {
+  const [language] = useHomeLanguage();
+  const copy = goldenLeavesCopy[language];
   const hostRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLSpanElement>(null);
   const callbacks = useRef({ onReady, onError });
@@ -56,8 +60,7 @@ export function LeafScene({
 
     host.dataset.state = "loading";
     host.dataset.intro = "waiting";
-    status.textContent = "";
-    status.style.display = "block";
+    status.style.display = "none";
 
     const cancelFrame = () => {
       if (frame !== null) cancelAnimationFrame(frame);
@@ -85,7 +88,6 @@ export function LeafScene({
       host.dataset.state = "error";
       host.dataset.intro = "complete";
       status.style.display = "block";
-      status.textContent = "3D leaf is unavailable.";
       callbacks.current.onError?.();
     };
 
@@ -371,7 +373,7 @@ export function LeafScene({
       data-state="loading"
       data-intro="waiting"
       role="img"
-      aria-label="Golden Leaf in three dimensions"
+      aria-label={copy.heroLabel}
       style={{
         position: "relative",
         width: "100%",
@@ -383,6 +385,7 @@ export function LeafScene({
         ref={statusRef}
         aria-live="polite"
         style={{
+          display: "none",
           position: "absolute",
           top: "50%",
           width: "100%",
@@ -390,7 +393,9 @@ export function LeafScene({
           fontSize: "12px",
           color: "#706c63",
         }}
-      />
+      >
+        {copy.leafUnavailable}
+      </span>
     </div>
   );
 }

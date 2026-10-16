@@ -3,6 +3,7 @@
 import {useEffect, useRef} from "react";
 import type {HomeLanguage} from "@/features/home/copy";
 import {votingStoryCopy} from "./voting-story-copy";
+import {votingNumber} from "./format";
 import "./voting-story.css";
 
 interface VotingStoryProps {
@@ -111,7 +112,7 @@ function useStoryMotion() {
     return () => {
       stopMotion();
       preference.removeEventListener("change", configureMotion);
-      for (const element of reveals) delete element.dataset.vStoryReveal;
+      for (const element of reveals) element.dataset.vStoryReveal = "";
     };
   }, []);
 
@@ -199,7 +200,7 @@ export function VotingStory({ language, onViewNominees }: VotingStoryProps) {
           {copy.steps.map((step, index) => (
             <li className="v-story__step" key={index} data-v-story-reveal>
               <span className="v-story__step-number" aria-hidden="true">
-                {String(index + 1).padStart(2, "0")}
+                {votingNumber(index + 1, language, 2)}
               </span>
               <h4>{step.title}</h4>
               <p className="v-story__body">{step.body}</p>

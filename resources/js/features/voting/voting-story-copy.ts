@@ -1,11 +1,12 @@
-import type {HomeLanguage} from "@/features/home/copy";
+import type {Locale} from "@/i18n/locales";
+import {storyTranslations} from "./story-translations";
 
 interface VotingStoryStep {
   title: string;
   body: string;
 }
 
-interface VotingStoryCopy {
+export interface VotingStoryCopy {
   eyebrow: string;
   title: readonly [string, string];
   introduction: string;
@@ -26,7 +27,7 @@ interface VotingStoryCopy {
   previewNote: string;
 }
 
-export const votingStoryCopy: Record<HomeLanguage, VotingStoryCopy> = {
+export const votingStoryCopy: Record<Locale, VotingStoryCopy> = {
   en: {
     eyebrow: "The meaning of a vote",
     title: ["A human story.", "A shared recognition."],
@@ -65,44 +66,7 @@ export const votingStoryCopy: Record<HomeLanguage, VotingStoryCopy> = {
     previewNote:
       "Tree of Unity is a planned project. The nominees and votes shown in this preview are fictional.",
   },
-  ru: {
-    eyebrow: "Смысл голосования",
-    title: ["История человека.", "Общее признание."],
-    introduction:
-      "За каждым именем — жизнь, которую определяют поступки. Humanity Chooses предлагает заметить людей, чья забота, смелость и повседневные решения меняют жизнь других.",
-    landscapeCaption: "Tree of Unity · Место в нашей общей истории",
-    awardEyebrow: "Золотой Лист",
-    awardTitle: ["Один лист.", "Одно имя."],
-    awardBody:
-      "Золотой Лист задуман как долговечный знак признания: имя одного человека становится частью общей истории Tree of Unity.",
-    awardSecond:
-      "Планируемая программа включает 50 ежемесячных раундов. В каждом раунде Золотой Лист будет посвящён одному человеку, постепенно создавая историю человеческого вклада.",
-    portraitCaption: "Золотой Лист · Символ признания",
-    detailCaption: "Личное имя в общей истории",
-    statement: ["Что заслуживает", "памяти?"],
-    statementBody:
-      "Забота без зрителей. Знания, которыми делятся свободно. Терпение помогать снова и снова. Номинация начинается с истории, которая стоит за такими поступками.",
-    processEyebrow: "Как участвовать",
-    processTitle: "От истории к выбору.",
-    steps: [
-      {
-        title: "Узнайте номинантов",
-        body: "Откройте список или карту мира. В профиле можно прочитать о деятельности человека и о том, почему его предложили.",
-      },
-      {
-        title: "Сделайте выбор",
-        body: "Познакомьтесь с историями и выберите человека, чей вклад вам близок. До подтверждения выбор можно изменить.",
-      },
-      {
-        title: "Подтвердите голос",
-        body: "Проверьте выбранное имя и подтвердите решение. В этой версии действие показывает процесс голосования; реальный голос не отправляется.",
-      },
-    ],
-    returnTitle: "Познакомьтесь с людьми за этими именами.",
-    returnAction: "Смотреть номинантов",
-    previewNote:
-      "Tree of Unity — планируемый проект. Номинанты и голоса в этой демонстрационной версии вымышлены.",
-  },
+  ...storyTranslations,
   es: {
     eyebrow: "El significado de un voto",
     title: ["Una historia humana.", "Un reconocimiento compartido."],

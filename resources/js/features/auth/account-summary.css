@@ -1,0 +1,57 @@
+.account-summary {
+  min-height: calc(100svh - 4rem);
+  padding: 76px 24px 80px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  color: #181818;
+  background: #fff;
+  text-align: center;
+  font-family: var(--font-tou-interface), Arial, sans-serif;
+}
+.account-summary__eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.account-summary h1 {
+  font-family: var(--font-tou-display), Georgia, serif;
+  font-size: clamp(38px, 5.6vw, 88px);
+  font-weight: 400;
+  line-height: 1.1;
+  max-width: 850px;
+  margin: 24px 0;
+}
+.account-summary__email {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+  margin: 24px 0 40px;
+}
+.account-summary > div > a {
+  display: block;
+  text-underline-offset: 6px;
+  margin: 24px;
+}
+.account-summary > div > button {
+  display: inline-flex;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 180px;
+  background: #191919;
+  color: #fff;
+  padding: 12px 24px;
+  border: 1px solid #191919;
+  cursor: pointer;
+}
+
+.account-summary .directional-icon {
+  display: inline-block;
+}
+.account-summary :focus-visible {
+  outline: 2px solid #7b6138;
+  outline-offset: 5px;
+}
+.account-summary button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}

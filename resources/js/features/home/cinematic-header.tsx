@@ -1,9 +1,72 @@
-import {Link, router, usePage} from "@inertiajs/react";
-import {Fragment, type RefObject, useEffect, useId, useRef, useState, useSyncExternalStore,} from "react";
+import {Link, usePage} from "@inertiajs/react";
+import {type ReactNode, type RefObject, useEffect, useId, useRef, useState, useSyncExternalStore,} from "react";
 import {homeCopy, type HomeLanguage} from "./copy";
-import {montserrat} from "./fonts";
 import {LanguageSelector} from "./language-selector";
 import "./cinematic-header.css";
+
+/* ---------- Типы данных меню (приходят из Laravel: props.navigation.menu) ---------- */
+
+export type MenuChild = { label: string; url: string };
+export type MenuItem = {
+  key: string;
+  label: string;
+  url: string;
+  children?: MenuChild[];
+};
+
+type SharedProps = {
+  locale?: string;
+  navigation?: { menu?: MenuItem[] };
+};
+
+/* ---------- Хелперы ---------- */
+
+const RTL = new Set(["ar", "he", "fa", "ur"]);
+const localeDirection = (lang: string) => (RTL.has(lang) ? "rtl" : "ltr");
+
+/**
+ * Приводит url из бэкенда к виду, пригодному для SPA-перехода.
+ * "http://localhost:8080/en/voting" -> "/en/voting" (тот же origin)
+ * Внешние ссылки возвращаются как есть и помечаются external.
+ */
+function resolveUrl(url: string): { href: string; external: boolean } {
+  if (!/^https?:\/\//i.test(url)) return { href: url, external: false };
+  if (typeof window === "undefined") return { href: url, external: false };
+  try {
+    const parsed = new URL(url);
+    if (parsed.origin === window.location.origin)
+      return {
+        href: parsed.pathname + parsed.search + parsed.hash,
+        external: false,
+      };
+  } catch {
+    /* fallthrough */
+  }
+  return { href: url, external: true };
+}
+
+function NavLink({
+                   url,
+                   onClick,
+                   children,
+                 }: {
+  url: string;
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
+  children: ReactNode;
+}) {
+  const { href, external } = resolveUrl(url);
+  if (external)
+    return (
+        <a href={href} onClick={onClick}>
+          {children}
+        </a>
+    );
+  return (
+      <Link href={href} onClick={onClick}>
+        {children}
+      </Link>
+  );
+}
 
 const compactHeaderQuery =
     "(max-width: 1200px), (hover: none), (pointer: coarse)";
@@ -17,156 +80,100 @@ function subscribeCompactHeader(onChange: () => void) {
 const getCompactHeader = () => window.matchMedia(compactHeaderQuery).matches;
 const getServerCompactHeader = () => false;
 
-const treeSectionsLabel: Record<string, string> = {
-  en: "Tree sections",
-  ru: "Разделы дерева",
-  es: "Secciones del árbol",
-};
-
-export interface SubMenuItem {
-  readonly label: string;
-  readonly url: string;
-}
-
-export interface MenuItem {
-  readonly key: string;
-  readonly label: string;
-  readonly url: string;
-  readonly children?: readonly SubMenuItem[];
-}
-
-export interface InertiaSharedProps {
-  readonly locale?: HomeLanguage;
-  readonly navigation?: {
-    readonly menu?: readonly MenuItem[];
-  };
-
-  readonly [key: string]: unknown;
-}
-
-/**
- * Вспомогательная функция для добавления языкового префикса к URL
- */
-function withLocale(url: string, locale: string): string {
-  if (!url) return `/${locale}`;
-  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("#")) {
-    return url;
-  }
-  const cleanUrl = url.startsWith("/") ? url : `/${url}`;
-  return `/${locale}${cleanUrl}`.replace(/\/+/g, "/");
-}
+/* ---------- Компонент ---------- */
 
 export function CinematicHeader({
-                                  inspect,
-                                  language: propLanguage,
+                                  inspect = false,
+                                  language: languageProp,
                                   onLanguageChange,
-                                  sound,
+                                  sound = false,
                                   onToggleSound,
                                   onTree,
                                   onHome,
                                   onClose,
-                                  backRef,
+                                  backRef: backRefProp,
                                   logo,
                                   logoBlack,
                                   showClose = inspect,
                                   tone = inspect ? "dark" : "light",
+                                  onNavigate,
+                                  menu: menuProp,
+                                  homeUrl = "/",
+                                  accountUrl = "/account",
                                 }: {
-  readonly inspect: boolean;
+  readonly inspect?: boolean;
+  /** По умолчанию берётся из shared prop `locale` */
   readonly language?: HomeLanguage;
-  readonly onLanguageChange?: (language: HomeLanguage) => void;
-  readonly sound: boolean;
-  readonly onToggleSound: () => void;
-  readonly onTree: () => void;
-  readonly onHome: () => void;
-  readonly onClose: () => void;
-  readonly backRef: RefObject<HTMLButtonElement | null>;
+  readonly onLanguageChange: (language: HomeLanguage) => void;
+  readonly sound?: boolean;
+  readonly onToggleSound?: () => void;
+  /** Если передан — клик по "Explore" в пункте tree не делает SPA-переход, а вызывает этот колбэк */
+  readonly onTree?: () => void;
+  /** Если передан — клик по логотипу вызывает колбэк вместо перехода */
+  readonly onHome?: () => void;
+  readonly onClose?: () => void;
+  readonly backRef?: RefObject<HTMLButtonElement | null>;
   readonly logo: string;
   readonly logoBlack: string;
   readonly showClose?: boolean;
   readonly tone?: "light" | "dark";
+  readonly onNavigate?: () => void;
+  /** По умолчанию берётся из shared props: navigation.menu */
+  readonly menu?: MenuItem[];
+  readonly homeUrl?: string;
+  readonly accountUrl?: string;
 }) {
+  const { props } = usePage<SharedProps>();
+  const language = (languageProp ?? props.locale ?? "en") as HomeLanguage;
+  const menu = menuProp ?? props.navigation?.menu ?? [];
+  // Пустое место под логотип — посередине меню
+  const logoSlot = Math.floor(menu.length / 2);
+
   const [expanded, setExpanded] = useState(false);
-  const [treeExpanded, setTreeExpanded] = useState(false);
-
-  // Получаем текущие данные из Inertia Page Props и URL
-  const {url: currentPath, props} = usePage<InertiaSharedProps>();
-
-  // Определяем язык из URL (props.locale) или используем проп по умолчанию
-  const currentLanguage: HomeLanguage =
-      (props.locale as HomeLanguage) ?? propLanguage ?? "en";
-
+  // key раскрытого подменю (или null)
+  const [treeOpen, setTreeOpen] = useState<string | null>(null);
   const compact = useSyncExternalStore(
       subscribeCompactHeader,
       getCompactHeader,
       getServerCompactHeader,
   );
-
   const headerRef = useRef<HTMLElement>(null);
   const logoLink = useRef<HTMLAnchorElement>(null);
   const menuToggle = useRef<HTMLButtonElement>(null);
-  const treeLink = useRef<HTMLAnchorElement>(null);
+  const ownBackRef = useRef<HTMLButtonElement>(null);
+  const backRef = backRefProp ?? ownBackRef;
+  const treeTriggers = useRef<Record<string, HTMLButtonElement | null>>({});
   const suppressLogoFocus = useRef(false);
   const suppressTreeFocus = useRef(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const treeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const navigationId = useId();
-  const treeId = useId();
-  const copy = homeCopy[currentLanguage] ?? homeCopy.en;
-
-  // Динамическое меню из Shared Props
-  const menuItems = props.navigation?.menu ?? [];
-  const treeItem = menuItems.find((item) => item.key === "tree");
-  const regularItems = menuItems.filter((item) => item.key !== "tree");
+  const treeIdBase = useId();
+  const copy = homeCopy[language];
 
   const cancelClose = () => {
     if (closeTimer.current !== null) clearTimeout(closeTimer.current);
     closeTimer.current = null;
   };
-
   const cancelTreeClose = () => {
     if (treeTimer.current !== null) clearTimeout(treeTimer.current);
     treeTimer.current = null;
   };
-
   const collapse = () => {
     cancelClose();
     cancelTreeClose();
     setExpanded(false);
-    setTreeExpanded(false);
+    setTreeOpen(null);
   };
-
   const openNavigation = () => {
     cancelClose();
     if (document.activeElement === backRef.current)
-      logoLink.current?.focus({preventScroll: true});
+      logoLink.current?.focus({ preventScroll: true });
     setExpanded(true);
   };
-
-  const openTree = () => {
+  const openTree = (key: string) => {
     cancelTreeClose();
-    setTreeExpanded(true);
-  };
-
-  // Обработчик переключения языка с подстановкой нового префикса в URL
-  const handleLanguageSelect = (newLang: HomeLanguage) => {
-    if (onLanguageChange) {
-      onLanguageChange(newLang);
-    }
-
-    if (newLang === currentLanguage) return;
-
-    // Подменяем языковой префикс в текущем URL (например, /ru/about -> /es/about)
-    const segments = currentPath.split("/").filter(Boolean);
-    if (segments.length > 0 && ["en", "ru", "es"].includes(segments[0])) {
-      segments[0] = newLang;
-    } else {
-      segments.unshift(newLang);
-    }
-
-    const newUrl = "/" + segments.join("/");
-    collapse();
-    router.get(newUrl);
+    setTreeOpen(key);
   };
 
   useEffect(
@@ -185,7 +192,7 @@ export function CinematicHeader({
       closeTimer.current = null;
       treeTimer.current = null;
       setExpanded(false);
-      setTreeExpanded(false);
+      setTreeOpen(null);
       if (headerRef.current?.contains(document.activeElement)) {
         suppressLogoFocus.current = true;
         (query.matches ? menuToggle.current : logoLink.current)?.focus({
@@ -206,23 +213,185 @@ export function CinematicHeader({
           !headerRef.current?.contains(event.target)
       ) {
         setExpanded(false);
-        setTreeExpanded(false);
+        setTreeOpen(null);
       }
     };
     document.addEventListener("pointerdown", closeOutside, { passive: true });
     return () => document.removeEventListener("pointerdown", closeOutside);
   }, [expanded]);
 
+  // SPA: закрываем меню после любой Inertia-навигации
+  useEffect(() => {
+    const onFinish = () => {
+      cancelClose();
+      cancelTreeClose();
+      setExpanded(false);
+      setTreeOpen(null);
+    };
+    document.addEventListener("inertia:navigate", onFinish);
+    return () => document.removeEventListener("inertia:navigate", onFinish);
+  }, []);
+
+  useEffect(() => {
+    if (!compact || !expanded || !headerRef.current) return;
+    const header = headerRef.current;
+    const root = document.documentElement;
+    const body = document.body;
+    const rootOverflow = root.style.overflow;
+    const bodyOverflow = body.style.overflow;
+    root.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    // Изолируем только соседей по цепочке предков хедера
+    const background: Array<[HTMLElement, boolean]> = [];
+    let current: HTMLElement = header;
+    while (current.parentElement) {
+      for (const sibling of current.parentElement.children) {
+        if (sibling !== current && sibling instanceof HTMLElement) {
+          background.push([sibling, sibling.inert]);
+          sibling.setAttribute("inert", "");
+        }
+      }
+      if (current.parentElement === body) break;
+      current = current.parentElement;
+    }
+    const keepFocusInside = (event: FocusEvent) => {
+      if (event.target instanceof Node && !header.contains(event.target))
+        menuToggle.current?.focus({ preventScroll: true });
+    };
+    document.addEventListener("focusin", keepFocusInside);
+    return () => {
+      root.style.overflow = rootOverflow;
+      body.style.overflow = bodyOverflow;
+      for (const [element, inert] of background)
+        element.toggleAttribute("inert", inert);
+      document.removeEventListener("focusin", keepFocusInside);
+    };
+  }, [compact, expanded]);
+
+  const renderItem = (item: MenuItem) => {
+    const children = item.children ?? [];
+    if (children.length === 0)
+      return (
+          <NavLink key={item.key} url={item.url} onClick={collapse}>
+            {item.label}
+          </NavLink>
+      );
+
+    const isOpen = treeOpen === item.key;
+    const submenuId = `${treeIdBase}-${item.key}`;
+    const isTree = item.key === "tree";
+
+    return (
+        <div
+            key={item.key}
+            className="cinematic-tree"
+            onPointerEnter={(event) => {
+              if (!compact && event.pointerType === "mouse") openTree(item.key);
+            }}
+            onPointerLeave={(event) => {
+              if (compact || event.pointerType !== "mouse") return;
+              cancelTreeClose();
+              const region = event.currentTarget;
+              treeTimer.current = setTimeout(() => {
+                const active = document.activeElement;
+                if (
+                    active instanceof Element &&
+                    region.contains(active) &&
+                    active.matches(":focus-visible")
+                )
+                  return;
+                setTreeOpen(null);
+              }, 170);
+            }}
+            onBlur={(event) => {
+              if (!compact && !event.currentTarget.contains(event.relatedTarget))
+                setTreeOpen(null);
+            }}
+        >
+          <button
+              ref={(node) => {
+                treeTriggers.current[item.key] = node;
+              }}
+              className="cinematic-tree__trigger"
+              type="button"
+              aria-expanded={isOpen}
+              aria-controls={submenuId}
+              onFocus={(event) => {
+                if (
+                    !compact &&
+                    !suppressTreeFocus.current &&
+                    event.currentTarget.matches(":focus-visible")
+                )
+                  openTree(item.key);
+              }}
+              onClick={() => {
+                cancelTreeClose();
+                // Hover уже открывает подменю на десктопе — клик не должен его закрывать
+                if (compact) setTreeOpen((value) => (value === item.key ? null : item.key));
+                else openTree(item.key);
+              }}
+          >
+            <span>{item.label}</span>
+            <svg
+                className="cinematic-tree__chevron"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+            >
+              <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1" />
+            </svg>
+          </button>
+          <div
+              id={submenuId}
+              className="tree-submenu"
+              data-open={isOpen}
+              aria-hidden={!isOpen}
+              inert={!isOpen}
+          >
+            <div className="tree-submenu__inner">
+              <NavLink
+                  url={item.url}
+                  onClick={(event) => {
+                    if (isTree && onTree) {
+                      event.preventDefault();
+                      collapse();
+                      onTree();
+                    } else collapse();
+                  }}
+              >
+                {isTree ? copy.exploreLabel : item.label}
+              </NavLink>
+              {children.map((child) => (
+                  <NavLink key={child.url} url={child.url} onClick={collapse}>
+                    {child.label}
+                  </NavLink>
+              ))}
+            </div>
+          </div>
+        </div>
+    );
+  };
+
   return (
       <header
           ref={headerRef}
-          className={`cinematic-header inspect-header ${montserrat.variable}`}
+          className="cinematic-header inspect-header"
+          lang={language}
+          dir={localeDirection(language)}
           data-mode={inspect ? "inspect" : "cinematic"}
           data-tone={tone}
           data-expanded={expanded}
-          data-tree-expanded={treeExpanded}
+          data-tree-expanded={treeOpen !== null}
           data-compact={compact}
           data-navigation-surface="true"
+          role={compact && expanded ? "dialog" : undefined}
+          aria-modal={compact && expanded ? true : undefined}
+          aria-label={compact && expanded ? copy.navigation.primary : undefined}
+          onClickCapture={(event) => {
+            if (event.target instanceof Element && event.target.closest("a[href]"))
+              onNavigate?.();
+          }}
           onPointerEnter={cancelClose}
           onPointerLeave={(event) => {
             if (compact || event.pointerType !== "mouse") return;
@@ -237,24 +406,46 @@ export function CinematicHeader({
               )
                 return;
               setExpanded(false);
-              setTreeExpanded(false);
+              setTreeOpen(null);
             }, 180);
           }}
           onBlur={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) collapse();
           }}
           onKeyDown={(event) => {
+            if (compact && expanded && event.key === "Tab") {
+              const controls = Array.from(
+                  event.currentTarget.querySelectorAll<HTMLElement>(
+                      'a[href], button:not([disabled]), [tabindex="0"]',
+                  ),
+              ).filter(
+                  (control) =>
+                      !control.closest("[inert]") &&
+                      control.getClientRects().length > 0 &&
+                      getComputedStyle(control).visibility !== "hidden",
+              );
+              const first = controls[0];
+              const last = controls.at(-1);
+              if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last?.focus();
+              } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first?.focus();
+              }
+            }
             if (!expanded || event.key !== "Escape") return;
             event.preventDefault();
             event.stopPropagation();
             if (compact) {
               collapse();
               menuToggle.current?.focus({ preventScroll: true });
-            } else if (treeExpanded) {
+            } else if (treeOpen !== null) {
+              const key = treeOpen;
               cancelTreeClose();
-              setTreeExpanded(false);
+              setTreeOpen(null);
               suppressTreeFocus.current = true;
-              treeLink.current?.focus({ preventScroll: true });
+              treeTriggers.current[key]?.focus({ preventScroll: true });
               suppressTreeFocus.current = false;
             } else {
               collapse();
@@ -266,7 +457,7 @@ export function CinematicHeader({
       >
         <Link
             ref={logoLink}
-            href={`/${currentLanguage}`}
+            href={homeUrl}
             className="cinematic-logo inspect-logo"
             aria-label="Tree of Unity"
             onPointerEnter={(event) => {
@@ -276,9 +467,11 @@ export function CinematicHeader({
               if (!compact && !suppressLogoFocus.current) openNavigation();
             }}
             onClick={(event) => {
-              event.preventDefault();
               collapse();
-              onHome();
+              if (onHome) {
+                event.preventDefault();
+                onHome();
+              }
             }}
         >
           <img src={expanded || tone === "dark" ? logoBlack : logo} alt="" />
@@ -311,145 +504,68 @@ export function CinematicHeader({
             aria-hidden={!expanded}
             inert={!expanded}
         >
-          <button
-              type="button"
-              className="sound-toggle"
-              data-state={sound ? "on" : "off"}
-              aria-label={sound ? copy.soundOff : copy.soundOn}
-              aria-pressed={sound}
-              onClick={onToggleSound}
-          >
-            <span className="sound-toggle__label">SOUND</span>
-          </button>
+          <div className="inspect-menu__main">
+            <nav className="cinematic-nav" aria-label={copy.navigation.primary}>
+              {menu.flatMap((item, index) => {
+                const nodes: ReactNode[] = [];
+                if (index === logoSlot)
+                  nodes.push(
+                      <span
+                          key="logo-space"
+                          className="inspect-menu__logo-space"
+                          aria-hidden="true"
+                      />,
+                  );
+                nodes.push(renderItem(item));
+                return nodes;
+              })}
+            </nav>
+          </div>
 
-          <nav className="cinematic-nav" aria-label={copy.navigation.primary}>
-            {/* Пункт Tree с подменю и языковыми роутами */}
-            {treeItem ? (
-                <div
-                    className="cinematic-tree"
-                    onPointerEnter={(event) => {
-                      if (!compact && event.pointerType === "mouse") openTree();
-                    }}
-                    onPointerLeave={(event) => {
-                      if (compact || event.pointerType !== "mouse") return;
-                      cancelTreeClose();
-                      const region = event.currentTarget;
-                      treeTimer.current = setTimeout(() => {
-                        const active = document.activeElement;
-                        if (
-                            active instanceof Element &&
-                            region.contains(active) &&
-                            active.matches(":focus-visible")
-                        )
-                          return;
-                        setTreeExpanded(false);
-                      }, 170);
-                    }}
-                    onBlur={(event) => {
-                      if (
-                          !compact &&
-                          !event.currentTarget.contains(event.relatedTarget)
-                      )
-                        setTreeExpanded(false);
-                    }}
+          <div className="inspect-menu__utilities">
+            {onToggleSound ? (
+                <button
+                    type="button"
+                    className="sound-toggle"
+                    data-state={sound ? "on" : "off"}
+                    aria-label={sound ? copy.soundOff : copy.soundOn}
+                    aria-pressed={sound}
+                    onClick={onToggleSound}
                 >
-                  <Link
-                      ref={treeLink}
-                      className="cinematic-tree__trigger"
-                      href={withLocale(treeItem.url, currentLanguage)}
-                      aria-expanded={compact ? undefined : treeExpanded}
-                      aria-controls={compact ? undefined : treeId}
-                      onFocus={(event) => {
-                        if (
-                            !compact &&
-                            !suppressTreeFocus.current &&
-                            event.currentTarget.matches(":focus-visible")
-                        )
-                          openTree();
-                      }}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        collapse();
-                        onTree();
-                      }}
-                  >
-                    {copy.navigation.tree || treeItem.label}
-                  </Link>
-
-                  {treeItem.children && treeItem.children.length > 0 ? (
-                      <>
-                        <button
-                            className="cinematic-tree__toggle"
-                            type="button"
-                            aria-label={
-                                treeSectionsLabel[currentLanguage] ?? treeSectionsLabel.en
-                            }
-                            aria-expanded={treeExpanded}
-                            aria-controls={treeId}
-                            onClick={() => {
-                              cancelTreeClose();
-                              setTreeExpanded((value) => !value);
-                            }}
-                        >
-                          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                            <path
-                                d="m5 7.5 5 5 5-5"
-                                stroke="currentColor"
-                                strokeWidth="1"
-                            />
-                          </svg>
-                        </button>
-
-                        <div
-                            id={treeId}
-                            className="tree-submenu"
-                            data-open={treeExpanded}
-                            aria-hidden={!treeExpanded}
-                            inert={!treeExpanded}
-                        >
-                          <div className="tree-submenu__inner">
-                            {treeItem.children.map((sub) => (
-                                <Link
-                                    key={sub.url}
-                                    href={withLocale(sub.url, currentLanguage)}
-                                    onClick={collapse}
-                                >
-                                  {sub.label}
-                                </Link>
-                            ))}
-                          </div>
-                        </div>
-                      </>
-                  ) : null}
-                </div>
+                  <span className="sound-toggle__label">{copy.soundWord}</span>
+                </button>
             ) : null}
-
-            {/* Пункты меню с языковыми префиксами */}
-            {regularItems.map((item, index) => {
-              const halfIndex = Math.ceil(regularItems.length / 2) - 1;
-              const isHalfway = index === halfIndex;
-
-              return (
-                  <Fragment key={item.key}>
-                    {isHalfway ? (
-                        <span className="inspect-menu__logo-space" aria-hidden="true"/>
-                    ) : null}
-                    <Link
-                        href={withLocale(item.url, currentLanguage)}
-                        onClick={collapse}
-                    >
-                      {(copy.navigation as Record<string, string>)[item.key] || item.label}
-                    </Link>
-                  </Fragment>
-              );
-            })}
-          </nav>
-
-          <div className="inspect-menu__language">
-            <LanguageSelector
-                language={currentLanguage}
-                onChange={handleLanguageSelect}
-            />
+            <div className="inspect-menu__language">
+              <Link
+                  href={accountUrl}
+                  className="inspect-account-link"
+                  aria-label={copy.navigation.account}
+                  onClick={collapse}
+              >
+                <svg
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                  <circle
+                      cx="12"
+                      cy="8"
+                      r="3.3"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                  />
+                  <path
+                      d="M5.5 20v-1.5a6.5 6.5 0 0 1 13 0V20"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                  />
+                </svg>
+                <span>{copy.navigation.account}</span>
+              </Link>
+              <LanguageSelector language={language} onChange={onLanguageChange} />
+            </div>
           </div>
         </div>
 
@@ -463,7 +579,7 @@ export function CinematicHeader({
                 inert={expanded}
                 onClick={() => {
                   collapse();
-                  onClose();
+                  onClose?.();
                 }}
             >
               <svg viewBox="0 0 20 20" aria-hidden="true" fill="none">
