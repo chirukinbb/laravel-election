@@ -51,13 +51,38 @@ type Panel =
     | "review"
     | "nomination-success"
     | null;
+type PaginatorMeta = {
+  data?: unknown[];
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+};
 const PAGE_SIZE = 10;
+const TAB_QUERY = "tab";
+const NOMINEE_QUERY = "nominee";
 const counts = nominees.reduce<Record<string, number>>((result, person) => {
   result[person.country] = (result[person.country] ?? 0) + 1;
   return result;
 }, {});
 
-function Arrow({ down = false }: { readonly down?: boolean }) {
+function updateVotingUrl({
+                           tab,
+                           nominee,
+                         }: {
+  readonly tab?: View | null;
+  readonly nominee?: string | null;
+}) {
+  const url = new URL(window.location.href);
+  if (tab) url.searchParams.set(TAB_QUERY, tab);
+  else url.searchParams.delete(TAB_QUERY);
+  if (nominee) url.searchParams.set(NOMINEE_QUERY, nominee);
+  else url.searchParams.delete(NOMINEE_QUERY);
+  const next = `${url.pathname}${url.search ? `?${url.searchParams.toString()}` : ""}${url.hash}`;
+  window.history.replaceState(window.history.state, "", next);
+}
+
+function Arrow({down = false}: { readonly down?: boolean }) {
   return (
       <svg
           className={down ? "voting-arrow voting-arrow--down" : "voting-arrow"}
@@ -166,7 +191,11 @@ function Pagination({
   );
 }
 
-export function VotingExperience() {
+export function VotingExperience({
+                                   candidates,
+                                 }: {
+  readonly candidates?: PaginatorMeta;
+}) {
   const [language] = useHomeLanguage();
   const copy = votingCopy[language];
   const profileCopy = getProfileCopy(language);
@@ -213,10 +242,29 @@ export function VotingExperience() {
       () => filterNominees(nominees, query, country, sort, language, voted),
       [query, country, sort, language, voted],
   );
+  const serverPagination = useMemo(() => {
+    if (!candidates || !Array.isArray(candidates.data)) {
+      return null;
+    }
+    const total = typeof candidates.total === "number" ? candidates.total : filtered.length;
+    const size = typeof candidates.per_page === "number" ? candidates.per_page : PAGE_SIZE;
+    const pages = Math.max(1, typeof candidates.last_page === "number" ? candidates.last_page : Math.ceil(total / size));
+    const current = Math.min(
+        Math.max(1, typeof candidates.current_page === "number" ? candidates.current_page : page),
+        pages,
+    );
+    return {current, total, size, pages};
+  }, [candidates, filtered.length, page]);
   const currentPage = Math.min(
       page,
       Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
   );
+  const pagination = serverPagination ?? {
+    current: currentPage,
+    total: filtered.length,
+    size: PAGE_SIZE,
+    pages: Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
+  };
   const orderedCountries = useMemo(
       () =>
           [...countries].sort((a, b) =>
@@ -307,20 +355,16 @@ export function VotingExperience() {
       closeTimer.current = null;
       setPanel(null);
       setPanelClosing(false);
-      const url = new URL(window.location.href);
-      if (url.searchParams.has("nominee")) {
-        url.searchParams.delete("nominee");
-        window.history.replaceState(window.history.state, "", url);
-      }
+      updateVotingUrl({tab: view, nominee: null});
       requestAnimationFrame(() => {
-        origin.current?.focus({ preventScroll: true });
+        origin.current?.focus({preventScroll: true});
       });
     };
     if (panel !== null && !reduced) {
       setPanelClosing(true);
       closeTimer.current = setTimeout(finish, 450);
     } else finish();
-  }, [panel, reduced]);
+  }, [panel, reduced, view]);
   useEffect(
       () => () => {
         if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -328,21 +372,27 @@ export function VotingExperience() {
       [],
   );
   useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get("nominee");
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get(TAB_QUERY) as View | null;
+    const validTab = tab === "list" || tab === "map" ? tab : null;
+    if (validTab) setView(validTab);
+
+    const id = params.get(NOMINEE_QUERY);
     const person = nominees.find((item) => item.id === id);
     if (!person) return;
     const frame = requestAnimationFrame(() => {
       origin.current = workspace.current;
       setProfile(person);
       setPanel("profile");
+      updateVotingUrl({tab: validTab ?? view, nominee: person.id});
     });
     return () => cancelAnimationFrame(frame);
-  }, []);
+  }, [view]);
   useEffect(() => {
     const opening = panel !== null && previousPanel.current === null;
     previousPanel.current = panel;
     if (!panel) return;
-    panelHeading.current?.focus({ preventScroll: true });
+    panelHeading.current?.focus({preventScroll: true});
     const frame = opening
         ? requestAnimationFrame(() => {
           const block = workspace.current;
@@ -374,6 +424,7 @@ export function VotingExperience() {
   const openProfile = (person: Nominee) => {
     setProfile(person);
     setVoteOrigin(null);
+    updateVotingUrl({tab: view, nominee: person.id});
     openPanel("profile");
   };
   const selectCountry = (code: string | null) => {
@@ -540,9 +591,9 @@ export function VotingExperience() {
             </div>
         )}
         <Pagination
-            page={currentPage}
-            total={filtered.length}
-            size={PAGE_SIZE}
+            page={pagination.current}
+            total={pagination.total}
+            size={pagination.size}
             onChange={setPage}
             language={language}
         />
@@ -609,7 +660,10 @@ export function VotingExperience() {
                   aria-selected={view === "list"}
                   aria-controls="voting-list-panel"
                   tabIndex={view === "list" ? 0 : -1}
-                  onClick={() => setView("list")}
+                  onClick={() => {
+                    setView("list");
+                    updateVotingUrl({tab: "list", nominee: null});
+                  }}
                   onKeyDown={(event) => {
                     if (
                         event.key ===
@@ -618,6 +672,7 @@ export function VotingExperience() {
                             : "ArrowRight")
                     ) {
                       setView("map");
+                      updateVotingUrl({tab: "map", nominee: null});
                       document.getElementById("voting-map-tab")?.focus();
                     }
                   }}
@@ -631,7 +686,10 @@ export function VotingExperience() {
                   aria-selected={view === "map"}
                   aria-controls="voting-map-panel"
                   tabIndex={view === "map" ? 0 : -1}
-                  onClick={() => setView("map")}
+                  onClick={() => {
+                    setView("map");
+                    updateVotingUrl({tab: "map", nominee: null});
+                  }}
                   onKeyDown={(event) => {
                     if (
                         event.key ===
@@ -640,6 +698,7 @@ export function VotingExperience() {
                             : "ArrowLeft")
                     ) {
                       setView("list");
+                      updateVotingUrl({tab: "list", nominee: null});
                       document.getElementById("voting-list-tab")?.focus();
                     }
                   }}

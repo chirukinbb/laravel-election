@@ -1,7 +1,7 @@
 import {Head} from "@inertiajs/react";
 import {VotingExperience} from "../features/voting/voting-experience";
 
-export default function VotingPage({title, meta, user}) {
+export default function VotingPage({title, meta, user, candidates}) {
     const currentUrl = `${window.location.href}`
     const mediaUrl = meta?.media
 
@@ -41,7 +41,7 @@ export default function VotingPage({title, meta, user}) {
                 <link rel="icon" href="/icon.svg" type="image/svg+xml"/>
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
             </Head>
-            <VotingExperience/>
+            <VotingExperience candidates={candidates}/>
         </>
     )
 }

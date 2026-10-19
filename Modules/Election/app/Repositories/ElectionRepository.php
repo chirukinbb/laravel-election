@@ -15,10 +15,9 @@ class ElectionRepository
         $this->election = Election::query();
     }
 
-    function getOngoingElection(string $shop)
+    function getOngoingElection()
     {
         return $this->election->where('date_start', '<=', now())
-            ->whereRelation('user', 'name', $shop)
             ->where('date_end', '>=', now())
             ->first();
     }

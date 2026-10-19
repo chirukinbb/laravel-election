@@ -18,6 +18,11 @@ class SettingsService
     {
         foreach (SettingKeyEnum::cases() as $keyEnum) {
             $setting = Setting::with('translations')->where('key', $keyEnum->key())->first();
+
+            if (!$setting) {
+                continue;
+            }
+
             $value = $setting->value;
 
             if (isset($setting->translations_array)) {

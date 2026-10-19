@@ -7,11 +7,6 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Modules\Election\Enums\CandidateStatusEnum;
-use Modules\Election\Enums\VoteStatusEnum;
-use Modules\Election\Models\Candidate;
-use Modules\Election\Models\Election;
-use Modules\Election\Models\Vote;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
@@ -37,62 +32,6 @@ class DatabaseSeeder extends Seeder
             'shopify_user_id' => Hash::make('111')
         ])->assignRole(Role::create(['name' => RoleEnum::USER->name]));
 
-        $election = Election::create([
-            'user_id' => $admin->id,
-            'name' => 'President of USA',
-            'date_start' => '2025-03-22',
-            'date_end' => '2025-03-24'
-        ]);
-
-        Candidate::create([
-            'first_name' => 'Donny',
-            'last_name' => 'Trump',
-            'reason_for_nomination' => 'because',
-            'country_code' => 'AF',
-            'status' => CandidateStatusEnum::PendingReview->name,
-            'election_id' => $election->id
-        ]);
-
-        $candidate = Candidate::create([
-            'first_name' => 'Donny',
-            'last_name' => 'Trump jr',
-            'reason_for_nomination' => 'because',
-            'country_code' => 'AF',
-            'status' => CandidateStatusEnum::Approved->name,
-            'election_id' => $election->id
-        ]);
-
-        $candidate = Candidate::create([
-            'first_name' => 'Elon',
-            'last_name' => 'Musk jr',
-            'reason_for_nomination' => 'because',
-            'country_code' => 'AF',
-            'status' => CandidateStatusEnum::Approved->name,
-            'election_id' => $election->id
-        ]);
-
-        Vote::create([
-            'user_id' => $voters->id,
-            'candidate_id' => $candidate->id,
-            'status' => VoteStatusEnum::Pending->name,
-            'ip_hash' => '33333333333333333333333',
-            'fingerprint_hash' => '3333333333333',
-        ]);
-
-        Vote::create([
-            'user_id' => $voters->id,
-            'candidate_id' => $candidate->id,
-            'status' => VoteStatusEnum::Verified->name,
-            'ip_hash' => '33333333333333333333333',
-            'fingerprint_hash' => '3333333333333',
-        ]);
-
-        Vote::create([
-            'user_id' => $voters->id,
-            'candidate_id' => $candidate->id,
-            'status' => VoteStatusEnum::Rejected->name,
-            'ip_hash' => '33333333333333333333333',
-            'fingerprint_hash' => '3333333333333',
-        ]);
+        $this->call(\Modules\Election\Database\Seeders\ElectionDatabaseSeeder::class);
     }
 }

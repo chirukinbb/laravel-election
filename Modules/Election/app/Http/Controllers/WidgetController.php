@@ -5,8 +5,10 @@ namespace Modules\Election\Http\Controllers;
 use App\Enums\SettingKeyEnum;
 use App\Http\Controllers\Controller;
 use App\Services\SettingsService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Modules\Election\Http\Resources\CandidateResource;
 use Modules\Election\Repositories\CandidateRepository;
 use Modules\Election\Repositories\ElectionRepository;
 
@@ -28,8 +30,8 @@ class WidgetController extends Controller
     {
 //        $shop = $request->input('shop');
 //        $electionId = $request->input('election');
-//
-//        $election = $this->electionRepository->getById((int)$electionId, $shop);
+
+        $election = $this->electionRepository->getOngoingElection();
 //
 //        if (is_null($election))
 //            return view('empty');
@@ -49,7 +51,9 @@ class WidgetController extends Controller
 
                 'description' => $this->settingsService->get(SettingKeyEnum::META_DESCRIPTION),
                 'media' => $this->settingsService->get(SettingKeyEnum::SOCIAL_MEDIA)
-            ]
+            ],
+            'election_finish' => Carbon::parse($election->date_end)->timestamp,
+            'candidates' => CandidateResource::collection($this->candidateRepository->paginate())
         ]);
     }
 }

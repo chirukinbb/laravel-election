@@ -14,17 +14,18 @@ return new class extends Migration {
             $table->unsignedBigInteger('election_id');
             $table->string('first_name');
             $table->string('last_name');
-            $table->enum('country_code', array_keys(config('election.countries')));
-            $table->string('city')->nullable();
-            $table->string('profession')->nullable();
-            $table->string('role')->nullable();
-            $table->string('website')->nullable();
-            $table->string('socials')->nullable();
-            $table->string('photo_url')->nullable();
-            $table->string('reason_for_nomination');
+            $table->string('country');
+            $table->string('city');
+
+            $table->json('activity')->nullable();
+            $table->text('reason')->nullable();
+
+            $table->string('nominator_name')->nullable();
+            $table->string('portrait_url')->nullable();
+            $table->boolean('show_nominator')->default(false);
+
             $table->enum('status', collect(CandidateStatusEnum::cases())->map(fn($case) => $case->name)->toArray())
                 ->default(CandidateStatusEnum::PendingReview->name);
-            $table->string('category')->nullable();
             $table->unsignedBigInteger('proposed_by')->default(0);
 
             $table->timestamps();

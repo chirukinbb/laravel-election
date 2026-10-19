@@ -21,9 +21,7 @@ export interface Nominee extends NomineeProfileDetails {
   reason: LocalizedNomineeText;
   qualities: LocalizedNomineeText;
   contribution: LocalizedNomineeText;
-  /** Zero-based cell in the five-column, four-row portrait atlas. */
-  portraitIndex: number;
-  supporters: readonly Supporter[];
+  portraitUrl: string;
 }
 
 export const NOMINEE_PORTRAIT_ATLAS = "/media/voting/nominees-atlas.webp";
@@ -720,18 +718,20 @@ export const nominees: readonly Nominee[] = profiles.map((profile, index) => {
     throw new Error(`Missing demonstration supporter count for ${profile.id}`);
   }
   return addDemoProfileDetails(
-    {
-      ...profile,
-      activity: translateNomineeText(profile.id, "activity", profile.activity),
-      reason: translateNomineeText(profile.id, "reason", profile.reason),
-      qualities: translateNomineeText(
-        profile.id,
-        "qualities",
-        profile.qualities,
-      ),
-      contribution: translateNomineeText(
-        profile.id,
-        "contribution",
+      {
+        ...profile,
+        portraitIndex: index,
+        portraitUrl: NOMINEE_PORTRAIT_ATLAS,
+        activity: translateNomineeText(profile.id, "activity", profile.activity),
+        reason: translateNomineeText(profile.id, "reason", profile.reason),
+        qualities: translateNomineeText(
+            profile.id,
+            "qualities",
+            profile.qualities,
+        ),
+        contribution: translateNomineeText(
+            profile.id,
+            "contribution",
         profile.contribution,
       ),
       supporters: makeSupporters(

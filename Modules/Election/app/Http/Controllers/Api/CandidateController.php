@@ -5,7 +5,7 @@ namespace Modules\Election\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Election\Enums\VoteStatusEnum;
-use Modules\Election\Http\Resources\FullCandidateResource;
+use Modules\Election\Http\Resources\CandidateResource;
 use Modules\Election\Http\Resources\ShortCandidateResource;
 use Modules\Election\Models\Candidate;
 use Modules\Election\Models\Election;
@@ -72,6 +72,6 @@ class CandidateController extends Controller
 
     public function show(Candidate $candidate)
     {
-        return FullCandidateResource::make($candidate);
+        return CandidateResource::make($candidate);
     }
 }

@@ -30,4 +30,9 @@ class CandidateRepository
             ->groupBy('category')
             ->get()->map(fn(Candidate $candidate) => $candidate->category)->toArray();
     }
+
+    public function paginate(): \LaravelIdea\Helper\Modules\Election\Models\_IH_Candidate_C|\Illuminate\Pagination\LengthAwarePaginator|array
+    {
+        return $this->builder->where('status', CandidateStatusEnum::Approved->name)->paginate();
+    }
 }

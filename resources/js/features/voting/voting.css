@@ -378,16 +378,16 @@
   font-size: 16px;
 }
 .voting-portrait {
-  width: 43px;
-  height: 43px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  display: block;
-  overflow: hidden;
-  background-color: #e7e3db;
-  background-image: url("/media/voting/nominees-atlas.webp");
-  background-size: 500% 400%;
-  background-position: var(--portrait-x) var(--portrait-y);
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: block;
+    overflow: hidden;
+    background-color: #e7e3db;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 .voting-portrait--large {
   width: clamp(170px, 22vw, 300px);

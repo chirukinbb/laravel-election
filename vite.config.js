@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
     plugins: [
         laravel({
-            input: 'resources/js/app.tsx',
+            input: ['resources/js/app.tsx', 'resources/css/app.css'],
             ssr: 'resources/js/ssr.tsx', // Точка входа для SSR
             refresh: true,
         }),
@@ -20,9 +20,7 @@ export default defineConfig({
             clientPort: 5173,
         },
     },
-    // Добавьте этот блок, чтобы Vite не ругался на серверные модули Inertia
     ssr: {
         noExternal: ['@inertiajs/react', '@inertiajs/core'],
     },
-    input: ['resources/js/app.tsx', 'resources/css/app.css'],
 });

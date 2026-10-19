@@ -16,24 +16,22 @@ use Modules\Election\Events\UpdateCandidates;
 class Candidate extends Model
 {
     protected $fillable = [
-        'election_id',
         'first_name',
         'last_name',
-        'country_code',
+        'country',
         'city',
-        'profession',
-        'role',
-        'website',
-        'socials',
-        'photo_url',
-        'reason_for_nomination',
+        'activity',
+        'reason',
+        'nominator_name',
+        'show_nominator',
         'status',
-        'category',
-        'proposed_by'
+        'proposed_by',
+        'portrait_url'
     ];
 
     protected $casts = [
-        'socials' => 'array'
+        'show_nominator' => 'boolean',
+        'activity' => 'array',
     ];
 
     public static function boot()
@@ -94,5 +92,31 @@ class Candidate extends Model
     public function proposedBy(): HasOne
     {
         return $this->hasOne(User::class, 'id', 'proposed_by');
+    }
+
+    public function contributions(): HasMany
+    {
+        return $this->hasMany(CandidateContribution::class);
+    }
+
+    public function links(): HasMany
+    {
+        return $this->hasMany(CandidateLink::class);
+    }
+
+    /**
+     * @return array<int, array{what: string, when: string, forWhom: string}>
+     */
+    public function contributionItems(): array
+    {
+        return $this->contributions()->get()->map(fn(CandidateContribution $item) => $item->toFrontendArray())->all();
+    }
+
+    /**
+     * @return array<int, array{label: string, url: string}>
+     */
+    public function linkItems(): array
+    {
+        return $this->links()->get()->map(fn(CandidateLink $item) => $item->toFrontendArray())->all();
     }
 }
