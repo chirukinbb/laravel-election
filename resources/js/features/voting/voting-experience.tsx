@@ -1,7 +1,7 @@
-"use client";
-import React, {type CSSProperties, Suspense, useCallback, useEffect, useMemo, useRef, useState,} from "react";
 import {localeDirection} from "@/i18n/locales";
+import {interpolate} from "@/i18n/catalog";
 
+import {type CSSProperties, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState,} from "react";
 import {GlobalHeader} from "@/components/navigation/global-header";
 import {didot, montserrat} from "@/features/home/fonts";
 import {useHomeLanguage} from "@/features/home/use-home-language";
@@ -12,6 +12,7 @@ import {votingCopy} from "./copy";
 import {votingCount, votingNumber} from "./format";
 import {Countdown} from "./countdown";
 import {Portrait} from "./portrait";
+import {VotingStory} from "./voting-story";
 import {useVotingMotion} from "./use-voting-motion";
 import {
   type CandidateSort,
@@ -22,20 +23,21 @@ import {
   normalizeSearch,
   voteCount,
 } from "./voting-model";
+import {NomineeProfile} from "./nominee-profile";
+import {NominationForm} from "./nomination-form";
 import {emptyNominationDraft} from "./nomination-validation";
 import {getProfileCopy} from "./profile-copy";
 import {getEnhancementCopy} from "./enhancement-copy";
 import "./voting.css";
 
-// Замена next/dynamic на React.lazy
-const VotingMapComponent = React.lazy(() =>
-    import("./voting-map").then((module) => ({ default: module.VotingMap }))
+const VotingMap = lazy(() =>
+    import("./voting-map").then((module) => ({default: module.VotingMap})),
 );
 
-function VotingMapFallback() {
+function MapFallback() {
   return (
       <div className="voting-map-loading" aria-busy="true">
-        <span />
+        <span/>
       </div>
   );
 }
@@ -49,7 +51,6 @@ type Panel =
     | "review"
     | "nomination-success"
     | null;
-
 const PAGE_SIZE = 10;
 const counts = nominees.reduce<Record<string, number>>((result, person) => {
   result[person.country] = (result[person.country] ?? 0) + 1;
@@ -71,7 +72,6 @@ function Arrow({ down = false }: { readonly down?: boolean }) {
       </svg>
   );
 }
-
 function Search({
                   label,
                   value,
@@ -104,7 +104,6 @@ function Search({
       </label>
   );
 }
-
 function Pagination({
                       page,
                       total,
@@ -208,25 +207,25 @@ export function VotingExperience() {
   const chosen = nominees.find((person) => person.id === selected) ?? null;
   const ranked = useMemo(
       () => getRanking(nominees, voted, language),
-      [voted, language]
+      [voted, language],
   );
   const filtered = useMemo(
       () => filterNominees(nominees, query, country, sort, language, voted),
-      [query, country, sort, language, voted]
+      [query, country, sort, language, voted],
   );
   const currentPage = Math.min(
       page,
-      Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+      Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
   );
   const orderedCountries = useMemo(
       () =>
           [...countries].sort((a, b) =>
               getCountryName(a.code, language).localeCompare(
                   getCountryName(b.code, language),
-                  language
-              )
+                  language,
+              ),
           ),
-      [language]
+      [language],
   );
   const filteredCountries = useMemo(
       () =>
@@ -236,30 +235,29 @@ export function VotingExperience() {
                       (!continent || item.continent === continent) &&
                       normalizeSearch(
                           getCountryName(item.code, language),
-                          language
-                      ).includes(normalizeSearch(countryQuery, language))
+                          language,
+                      ).includes(normalizeSearch(countryQuery, language)),
               )
               .sort((a, b) =>
                   countrySort === "count"
                       ? (counts[b.code] ?? 0) - (counts[a.code] ?? 0) ||
                       getCountryName(a.code, language).localeCompare(
                           getCountryName(b.code, language),
-                          language
+                          language,
                       )
-                      : 0
+                      : 0,
               ),
-      [orderedCountries, continent, countryQuery, countrySort, language]
+      [orderedCountries, continent, countryQuery, countrySort, language],
   );
   const currentCountryPage = Math.min(
       countryPage,
-      Math.max(1, Math.ceil(filteredCountries.length / countryPageSize))
+      Math.max(1, Math.ceil(filteredCountries.length / countryPageSize)),
   );
   const countryTotal = filteredCountries.reduce(
       (sum, item) => sum + (counts[item.code] ?? 0),
-      0
+      0,
   );
   const hasCountries = filteredCountries.length > 0;
-
   useEffect(() => {
     const list = countryList.current;
     if (!list || view !== "map" || country || panel || !hasCountries) return;
@@ -272,7 +270,7 @@ export function VotingExperience() {
       countryCapacity.current = nextSize;
       setCountryPage(
           (previousPage) =>
-              Math.floor(((previousPage - 1) * previousSize) / nextSize) + 1
+              Math.floor(((previousPage - 1) * previousSize) / nextSize) + 1,
       );
       setCountryPageSize(nextSize);
     };
@@ -289,7 +287,6 @@ export function VotingExperience() {
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
   }, []);
-
   const openPanel = (next: Panel) => {
     if (!panel) {
       origin.current =
@@ -304,7 +301,6 @@ export function VotingExperience() {
     setPanelClosing(false);
     setPanel(next);
   };
-
   const closePanel = useCallback(() => {
     if (closeTimer.current) return;
     const finish = () => {
@@ -325,14 +321,12 @@ export function VotingExperience() {
       closeTimer.current = setTimeout(finish, 450);
     } else finish();
   }, [panel, reduced]);
-
   useEffect(
       () => () => {
         if (closeTimer.current) clearTimeout(closeTimer.current);
       },
-      []
+      [],
   );
-
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get("nominee");
     const person = nominees.find((item) => item.id === id);
@@ -344,7 +338,6 @@ export function VotingExperience() {
     });
     return () => cancelAnimationFrame(frame);
   }, []);
-
   useEffect(() => {
     const opening = panel !== null && previousPanel.current === null;
     previousPanel.current = panel;
@@ -378,16 +371,14 @@ export function VotingExperience() {
       document.removeEventListener("keydown", escape);
     };
   }, [panel, closePanel, reduced]);
-
   const openProfile = (person: Nominee) => {
     setProfile(person);
     setVoteOrigin(null);
     openPanel("profile");
   };
-
   const selectCountry = (code: string | null) => {
     const focusedSidebar = document.activeElement?.closest(
-        ".voting-map-sidebar"
+        ".voting-map-sidebar",
     );
     if (
         code &&
@@ -403,13 +394,12 @@ export function VotingExperience() {
     if (focusedSidebar) {
       requestAnimationFrame(() => {
         const destination = focusedSidebar.querySelector<HTMLElement>(
-            code ? ".voting-country-heading h3" : 'input[type="search"]'
+            code ? ".voting-country-heading h3" : 'input[type="search"]',
         );
         destination?.focus({ preventScroll: true });
       });
     }
   };
-
   const resetFilters = () => {
     setCountry(null);
     setQuery("");
@@ -418,7 +408,6 @@ export function VotingExperience() {
     setCountryQuery("");
     setCountryPage(1);
   };
-
   const toNominees = () => {
     workspace.current?.focus({ preventScroll: true });
     workspace.current?.scrollIntoView({
@@ -426,13 +415,11 @@ export function VotingExperience() {
       block: "start",
     });
   };
-
   const beginVote = (person: Nominee) => {
     setVoteOrigin(panel === "profile" ? "profile" : null);
     setSelected(person.id);
     openPanel(voted ? "success" : "confirm");
   };
-
   const confirmVote = () => {
     if (Date.now() >= Date.parse(DEMO_ROUND.endsAt)) {
       setClosed(true);
@@ -443,7 +430,6 @@ export function VotingExperience() {
       setPanel(voteOrigin === "profile" ? "profile" : "success");
     }
   };
-
   const panelPerson = panel === "profile" ? profile : chosen;
   const title =
       panel === "profile" && profile
@@ -490,7 +476,7 @@ export function VotingExperience() {
                           {votingNumber(
                               ranked.findIndex((item) => item.id === person.id) + 1,
                               language,
-                              2
+                              2,
                           )}
                         </td>
                         <td>
@@ -577,6 +563,7 @@ export function VotingExperience() {
             className="voting-hero"
             aria-labelledby="voting-title"
         >
+          {/* Reserved for the owner's future background video. */}
           <div className="voting-hero__backdrop" aria-hidden="true" />
           <div className="voting-hero__content">
             <p className="voting-kicker voting-hero__eyebrow">{copy.round}</p>
@@ -611,7 +598,7 @@ export function VotingExperience() {
           <div
               className="voting-tabs voting-directory-ui"
               data-dissolved={directoryDissolved}
-              inert={panel !== null ? true : undefined}
+              inert={panel !== null}
               aria-hidden={panel !== null || undefined}
           >
             <div role="tablist" aria-label={copy.view}>
@@ -675,7 +662,7 @@ export function VotingExperience() {
             <div
                 className="voting-directory voting-directory-ui"
                 data-dissolved={directoryDissolved}
-                inert={panel !== null ? true : undefined}
+                inert={panel !== null}
                 aria-hidden={panel !== null || undefined}
             >
               <div
@@ -751,8 +738,8 @@ export function VotingExperience() {
                 {view === "map" && (
                     <div className="voting-map-layout">
                       <div className="voting-map-area">
-                        <Suspense fallback={<VotingMapFallback />}>
-                          <VotingMapComponent
+                        <Suspense fallback={<MapFallback/>}>
+                          <VotingMap
                               language={language}
                               continent={continent}
                               selectedCountry={country}
@@ -793,7 +780,7 @@ export function VotingExperience() {
                                   {votingCount(
                                       counts[country] ?? 0,
                                       "nominees",
-                                      language
+                                      language,
                                   )}
                                 </p>
                               </header>
@@ -838,7 +825,7 @@ export function VotingExperience() {
                             {votingCount(
                                 filteredCountries.length,
                                 "countries",
-                                language
+                                language,
                             )}{" "}
                             · {votingCount(countryTotal, "nominees", language)}
                           </span>
@@ -847,7 +834,7 @@ export function VotingExperience() {
                                     aria-label={copy.sort}
                                     onChange={(event) => {
                                       setCountrySort(
-                                          event.target.value as "name" | "count"
+                                          event.target.value as "name" | "count",
                                       );
                                       setCountryPage(1);
                                     }}
@@ -872,7 +859,7 @@ export function VotingExperience() {
                                     {filteredCountries
                                         .slice(
                                             (currentCountryPage - 1) * countryPageSize,
-                                            currentCountryPage * countryPageSize
+                                            currentCountryPage * countryPageSize,
                                         )
                                         .map((item) => (
                                             <li key={item.code}>
@@ -887,7 +874,7 @@ export function VotingExperience() {
                                                 <span>
                                       {votingNumber(
                                           counts[item.code] ?? 0,
-                                          language
+                                          language,
                                       )}
                                     </span>
                                                 <span aria-hidden="true">
@@ -916,8 +903,255 @@ export function VotingExperience() {
                 )}
               </div>
             </div>
+
+            {profileMode && profile && (
+                <NomineeProfile
+                    key={profile.id}
+                    person={profile}
+                    language={language}
+                    rank={ranked.findIndex((person) => person.id === profile.id) + 1}
+                    votes={voteCount(profile, voted)}
+                    voted={voted === profile.id}
+                    disabled={closed || voted !== null}
+                    closing={panelClosing}
+                    confirming={panel === "confirm"}
+                    reduced={reduced}
+                    headingRef={panelHeading}
+                    onClose={closePanel}
+                    onVote={() => beginVote(profile)}
+                    onConfirm={confirmVote}
+                    onCancel={() => setPanel("profile")}
+                />
+            )}
+            {panel && !profileMode && (
+                <section
+                    key={panel}
+                    className={"voting-panel voting-panel--" + panel}
+                    data-closing={panelClosing}
+                    inert={panelClosing}
+                    aria-labelledby="voting-panel-title"
+                >
+                  <button
+                      type="button"
+                      className="voting-close"
+                      aria-label={copy.close}
+                      onClick={closePanel}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                  <div className="voting-panel__intro">
+                    <p className="voting-kicker">{copy.round}</p>
+                    <h3 id="voting-panel-title" ref={panelHeading} tabIndex={-1}>
+                      {title}
+                    </h3>
+                  </div>
+                  {(panel === "confirm" || panel === "success") && panelPerson ? (
+                      <div className="voting-decision">
+                        <Portrait person={panelPerson} large/>
+                        <h4>{fullName(panelPerson)}</h4>
+                        <p className="voting-kicker">
+                          {getCountryName(panelPerson.country, language)}
+                        </p>
+                        <p>
+                          {panel === "confirm" ? copy.confirmText : copy.successText}
+                        </p>
+                        {panel === "confirm" ? (
+                            <div className="voting-actions">
+                              <button
+                                  className="voting-outline"
+                                  type="button"
+                                  onClick={() =>
+                                      voteOrigin ? setPanel(voteOrigin) : closePanel()
+                                  }
+                              >
+                                {copy.cancel}
+                              </button>
+                              <button
+                                  className="voting-solid"
+                                  type="button"
+                                  onClick={confirmVote}
+                                  disabled={closed || voted !== null}
+                              >
+                                {copy.confirm}
+                                <Arrow/>
+                              </button>
+                            </div>
+                        ) : (
+                            <button
+                                className="voting-outline"
+                                type="button"
+                                onClick={closePanel}
+                            >
+                              {copy.backToNominees}
+                              <Arrow/>
+                            </button>
+                        )}
+                      </div>
+                  ) : null}
+                  {panel === "nominate" ? (
+                      <NominationForm
+                          language={language}
+                          value={nomination}
+                          onChange={setNomination}
+                          onReview={(draft) => {
+                            setNomination(draft);
+                            setPanel("review");
+                          }}
+                      />
+                  ) : null}
+                  {panel === "review" ? (
+                      <div className="voting-nomination voting-nomination--review">
+                        <h4>{nomination.firstName + " " + nomination.lastName}</h4>
+                        <p className="voting-kicker">
+                          {getCountryName(nomination.country, language)} ·{" "}
+                          {nomination.city} · {nomination.activity}
+                        </p>
+                        <p className="voting-review-reason">{nomination.reason}</p>
+                        {nomination.showNominator && nomination.nominatorName && (
+                            <p>
+                              {interpolate(profileCopy.nominatedBy, {
+                                name: nomination.nominatorName,
+                              })}
+                            </p>
+                        )}
+                        {nomination.contributions.length > 0 && (
+                            <section className="nomination-review-extra">
+                              <h4>{profileCopy.contributions}</h4>
+                              <ol>
+                                {nomination.contributions.map((fact, index) => (
+                                    <li key={index}>
+                                      <time dateTime={fact.when}>{fact.when}</time>
+                                      <p>{fact.what}</p>
+                                      <p>
+                                        {profileCopy.factsBeneficiaries}: {fact.forWhom}
+                                      </p>
+                                    </li>
+                                ))}
+                              </ol>
+                            </section>
+                        )}
+                        {nomination.links.length > 0 && (
+                            <section className="nomination-review-extra">
+                              <h4>{profileCopy.links}</h4>
+                              <ul>
+                                {nomination.links.map((link, index) => (
+                                    <li key={index}>
+                                      <a
+                                          href={link.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                      >
+                                        {link.label}
+                                      </a>
+                                    </li>
+                                ))}
+                              </ul>
+                            </section>
+                        )}
+                        <div className="voting-actions">
+                          <button
+                              className="voting-outline"
+                              type="button"
+                              onClick={() => setPanel("nominate")}
+                          >
+                            {copy.edit}
+                          </button>
+                          <button
+                              className="voting-solid"
+                              type="button"
+                              onClick={() => setPanel("nomination-success")}
+                          >
+                            {copy.submit}
+                            <Arrow/>
+                          </button>
+                        </div>
+                      </div>
+                  ) : null}
+                  {panel === "nomination-success" ? (
+                      <div className="voting-decision">
+                        <div className="voting-success-symbol" aria-hidden="true">
+                          ✓
+                        </div>
+                        <p>{copy.nominationSuccessText}</p>
+                        <button
+                            className="voting-outline"
+                            type="button"
+                            onClick={() => {
+                              setNomination(emptyNominationDraft());
+                              closePanel();
+                            }}
+                        >
+                          {copy.backToNominees}
+                          <Arrow/>
+                        </button>
+                      </div>
+                  ) : null}
+                  <p className="voting-panel__demo">{copy.demoDetail}</p>
+                </section>
+            )}
           </div>
+          {chosen && (
+              <div
+                  className="voting-dock voting-directory-ui"
+                  data-dissolved={directoryDissolved}
+                  inert={panel !== null}
+                  aria-hidden={panel !== null || undefined}
+              >
+                <div className="voting-dock__selection">
+                  <Portrait person={chosen}/>
+                  <span>
+                <small>{copy.selected}</small>
+                <strong>{fullName(chosen)}</strong>
+              </span>
+                </div>
+                <button
+                    className="voting-dock__explore"
+                    type="button"
+                    onClick={() => openProfile(chosen)}
+                >
+                  {enhancementCopy.exploreNominee}
+                  <Arrow/>
+                </button>
+                <button
+                    className="voting-dock__vote"
+                    type="button"
+                    disabled={closed || voted !== null}
+                    onClick={() => beginVote(chosen)}
+                >
+                  {voted ? copy.voted : copy.vote}
+                  <Arrow/>
+                </button>
+              </div>
+          )}
+          {voted && !panel && (
+              <p className="voting-session-note" role="status">
+                {copy.alreadyVoted}
+              </p>
+          )}
+          <p
+              className="voting-demo-label voting-directory-ui"
+              data-dissolved={directoryDissolved}
+          >
+            {copy.demo}
+          </p>
         </section>
+        <VotingStory language={language} onViewNominees={toNominees}/>
+        <footer className="voting-footer">
+          <span>TREE OF UNITY</span>
+          <span>{copy.eyebrow}</span>
+          <button
+              type="button"
+              className="voting-text-link"
+              onClick={() =>
+                  window.scrollTo({
+                    top: 0,
+                    behavior: reduced ? "instant" : "smooth",
+                  })
+              }
+          >
+            ↑ <span className="voting-sr-only">{copy.back}</span>
+          </button>
+        </footer>
       </div>
   );
 }

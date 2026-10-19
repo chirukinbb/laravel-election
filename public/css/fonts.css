@@ -1,0 +1,37 @@
+@font-face {
+    font-family: "TOU Didot";
+    src: url("/fonts/tou/GFSDidot.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "TOU Karsten";
+    src: url("/fonts/tou/Karsten-Thin.otf") format("opentype");
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "TOU Montserrat";
+    src: url("/fonts/tou/Montserrat-Light.ttf") format("truetype");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "TOU Montserrat";
+    src: url("/fonts/tou/Montserrat-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --font-tou-home-display: "TOU Didot", "Times New Roman", serif;
+    --font-tou-display: "TOU Karsten", "Times New Roman", serif;
+    --font-tou-interface: "TOU Montserrat", Arial, sans-serif;
+}

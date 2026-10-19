@@ -4,25 +4,41 @@ import {useEffect, useId, useRef, useState} from "react";
 import {router, usePage} from "@inertiajs/react";
 import {homeCopy, type HomeLanguage, homeLanguages} from "./copy";
 
+const supportedCodes = new Set<string>(homeLanguages.map(({code}) => code.toLowerCase()));
+
+function isExternalOrAnchor(url: string): boolean {
+  return /^([a-z][a-z0-9+.-]*:)?\/\//i.test(url) || url.startsWith("#");
+}
+
 /**
- * Вспомогательная функция: заменяет или добавляет языковой префикс в URL.
- * Пример: withLocale("/ru/about", "es") -> "/es/about"
- *         withLocale("/about", "es")    -> "/es/about"
+ * Возвращает путь с нужной локалью.
+ * ISO-код языка учитывается ТОЛЬКО в первом сегменте пути.
+ * Поддерживаются все языки из homeLanguages. Query и hash сохраняются.
+ *
+ * withLocale("/ru/tree", "es")        => "/es/tree"
+ * withLocale("/about", "en")          => "/en/about"
+ * withLocale("/ru", "en")             => "/en"
+ * withLocale("/en/ru/page", "es")     => "/es/ru/page"  (второй "ru" — не язык)
+ * withLocale("/tree?id=1#top", "ru")  => "/ru/tree?id=1#top"
  */
-function withLocale(url: string, newLocale: string): string {
+export function withLocale(url: string, newLocale: HomeLanguage): string {
   if (!url) return `/${newLocale}`;
-  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("#")) {
-    return url;
+  if (isExternalOrAnchor(url)) return url;
+
+  // Отделяем путь от query/hash, чтобы они не терялись
+  const match = url.match(/^([^?#]*)(.*)$/);
+  const path = match?.[1] ?? "";
+  const suffix = match?.[2] ?? "";
+
+  const segments = path.split("/").filter(Boolean);
+
+  // Убираем язык, только если он стоит первым
+  if (segments.length > 0 && supportedCodes.has(segments[0].toLowerCase())) {
+    segments.shift();
   }
 
-  let cleanUrl = url.startsWith("/") ? url : `/${url}`;
-
-  // Очищаем существующий языковой префикс (/ru, /en, /es)
-  cleanUrl = cleanUrl.replace(/^\/(en|ru|es)(\/|$)/, "/");
-
-  // Формируем новый путь с выбранной локалью
-  const finalUrl = `/${newLocale}${cleanUrl}`.replace(/\/+/g, "/");
-  return finalUrl;
+  const newPath = "/" + [newLocale, ...segments].join("/");
+  return newPath + suffix;
 }
 
 export function LanguageSelector() {
@@ -31,13 +47,16 @@ export function LanguageSelector() {
   const trigger = useRef<HTMLButtonElement>(null);
   const menuId = useId();
 
-  // Достаем из Inertia текущий URL страницы и локаль
-  const { url: currentUrl, props } = usePage();
+  const {url: currentUrl, props} = usePage();
 
-  // Текущий язык берем из Shared Props Inertia (со страницы/middleware)
-  const currentLanguage = (props.locale as HomeLanguage) || "en";
+  const propLocale = String(props.locale ?? "").toLowerCase();
+  const currentLanguage = (
+      homeLanguages.find(({code}) => code.toLowerCase() === propLocale)?.code ??
+      homeLanguages[0].code
+  ) as HomeLanguage;
 
-  // Закрытие выпадающего списка при клике снаружи
+  const current = homeLanguages.find(({code}) => code === currentLanguage);
+
   useEffect(() => {
     if (!open) return;
     const closeOutside = (event: PointerEvent) => {
@@ -52,23 +71,18 @@ export function LanguageSelector() {
     return () => document.removeEventListener("pointerdown", closeOutside);
   }, [open]);
 
-  // Обработчик выбора языка (SPA-переход через Inertia)
   const handleSelectLanguage = (newCode: HomeLanguage) => {
     setOpen(false);
     trigger.current?.focus();
 
     if (newCode === currentLanguage) return;
 
-    // Формируем новый URL с выбранным языком
-    const newUrl = withLocale(currentUrl, newCode);
-
-    // Делаем SPA-переход без перезагрузки страницы
     router.get(
-        newUrl,
+        withLocale(currentUrl, newCode),
         {},
         {
-          preserveState: false, // Важно: сбрасываем состояние, чтобы Inertia подтянула свежие Shared Props
-          preserveScroll: true, // Сохраняем позицию скролла
+          preserveState: false, // подтянуть свежие Shared Props
+          preserveScroll: true,
         }
     );
   };
@@ -96,13 +110,12 @@ export function LanguageSelector() {
             aria-label={homeCopy[currentLanguage]?.languageLabel}
             aria-expanded={open}
             aria-controls={menuId}
+            aria-haspopup="true"
             onClick={() => setOpen((value) => !value)}
         >
-          <bdi>
-            {homeLanguages.find(({ code }) => code === currentLanguage)?.shortLabel}
-          </bdi>
+          <bdi>{current?.shortLabel}</bdi>
           <svg aria-hidden="true" viewBox="0 0 12 12" fill="none">
-            <path d="m3 4.5 3 3 3-3" stroke="currentColor" strokeWidth=".9" />
+            <path d="m3 4.5 3 3 3-3" stroke="currentColor" strokeWidth=".9"/>
           </svg>
         </button>
         {open ? (
@@ -112,7 +125,7 @@ export function LanguageSelector() {
                 role="group"
                 aria-label={homeCopy[currentLanguage]?.languageLabel}
             >
-              {homeLanguages.map(({ code, nativeName, dir }) => (
+              {homeLanguages.map(({code, nativeName, dir}) => (
                   <button
                       key={code}
                       type="button"

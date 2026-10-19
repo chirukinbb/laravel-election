@@ -21,7 +21,8 @@ class SettingsService
             $value = $setting->value;
 
             if (isset($setting->translations_array)) {
-                $value = $isFull ? $setting->translations_array : $setting->translations_array[app()->getLocale()];
+                $value = $isFull ? $setting->translations_array :
+                    ($setting->translations_array[app()->getLocale()] ?? $setting->translations_array['en']);
             }
 
             $this->settings[$keyEnum->key()] = $value;

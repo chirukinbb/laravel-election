@@ -6,19 +6,23 @@ export default defineConfig({
     plugins: [
         laravel({
             input: 'resources/js/app.tsx',
-            ssr: 'resources/js/ssr.tsx', // SSR bundle entry
+            ssr: 'resources/js/ssr.tsx', // Точка входа для SSR
             refresh: true,
         }),
         react(),
     ],
     server: {
-        host: '0.0.0.0', // reachable from other containers + host port mapping
+        host: '0.0.0.0',
         port: 5173,
         strictPort: true,
         hmr: {
-            // The host the BROWSER uses to reach the dev server (not 0.0.0.0)
             host: 'localhost',
             clientPort: 5173,
         },
     },
+    // Добавьте этот блок, чтобы Vite не ругался на серверные модули Inertia
+    ssr: {
+        noExternal: ['@inertiajs/react', '@inertiajs/core'],
+    },
+    input: ['resources/js/app.tsx', 'resources/css/app.css'],
 });

@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
 
         if (!Request::is('admin*')) {
             $segment = Request::segment(1);
-            $locales = config('tou.locales');
+            $locales = array_keys(config('tou.locales'));
             URL::defaults([
                 'lang' => in_array($segment, $locales) ? $segment : config('app.fallback_locale'),
             ]);

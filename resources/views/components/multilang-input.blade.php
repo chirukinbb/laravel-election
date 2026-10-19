@@ -1,5 +1,5 @@
 @php
-    $locales = ['ru' => 'RU', 'en' => 'EN', 'es' => 'ES'];
+    $locales = config('tou.locales');
 @endphp
 
 <div class="card card-primary card-outline card-outline-tabs">
