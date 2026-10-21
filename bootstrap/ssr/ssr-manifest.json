@@ -8,8 +8,8 @@
     "/build/assets/fonts-sMSngqf_.css"
   ],
   "resources/js/Pages/ElectionPage.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/Pages/HomePage.tsx": [
     "/build/assets/HomePage-BMexY_Wh.js",
@@ -19,8 +19,8 @@
     "/build/assets/TestPage-CEG1o47L.js"
   ],
   "resources/js/components/navigation/global-header.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/home/audio-hotspot.css": [
     "/build/assets/HomePage-BMexY_Wh.js",
@@ -117,128 +117,128 @@
     "/build/assets/HomePage-CPb6eYiA.css"
   ],
   "resources/js/features/voting/contribution-detail.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/contribution-gallery.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/copy-translations.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/copy.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/countdown.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/countries.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/enhancement-copy.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/format.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/geography-country-regions.json": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/map-copy.ts": [
-    "/build/assets/voting-map-CH6sVRLR.js",
+    "/build/assets/voting-map-BlutDzv-.js",
     "/build/assets/voting-map-HNnA4BQQ.css"
   ],
   "resources/js/features/voting/nomination-form.css": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/nomination-form.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/nomination-validation.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/nominee-profile.css": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/nominee-profile.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/nominee-translations.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/nominees.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/portrait.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/profile-copy.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/profile-data.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/story-translations.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/use-voting-motion.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/voting-experience.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/voting-map.css": [
-    "/build/assets/voting-map-CH6sVRLR.js",
+    "/build/assets/voting-map-BlutDzv-.js",
     "/build/assets/voting-map-HNnA4BQQ.css"
   ],
   "resources/js/features/voting/voting-map.tsx": [
-    "/build/assets/voting-map-CH6sVRLR.js",
+    "/build/assets/voting-map-BlutDzv-.js",
     "/build/assets/voting-map-HNnA4BQQ.css"
   ],
   "resources/js/features/voting/voting-model.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/voting-story-copy.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/voting-story.css": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/voting-story.tsx": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/features/voting/voting.css": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/i18n/catalog.ts": [
-    "/build/assets/ElectionPage-CQlFcRmm.js",
-    "/build/assets/ElectionPage-FLGO0eN_.css"
+    "/build/assets/ElectionPage-C5y_Y26n.js",
+    "/build/assets/ElectionPage-CriRv2W5.css"
   ],
   "resources/js/i18n/locales.ts": [
     "/build/assets/fonts-D39TxmSv.js",

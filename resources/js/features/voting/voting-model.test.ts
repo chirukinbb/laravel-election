@@ -3,13 +3,14 @@ import {describe, expect, it} from "vitest";
 import {countries, getCountryName} from "./countries";
 import {nominees} from "./nominees";
 import {
-    DEMO_ROUND,
-    filterNominees,
-    fullName,
-    getRanking,
-    normalizeSearch,
-    remainingTime,
-    voteCount,
+  DEMO_ROUND,
+  filterNominees,
+  fullName,
+  getRanking,
+  normalizeSearch,
+  normalizeServerCandidates,
+  remainingTime,
+  voteCount,
 } from "./voting-model";
 
 describe("Voting demonstration directory", () => {
@@ -80,6 +81,41 @@ describe("Voting demonstration directory", () => {
     expect(voteCount(ana, ana.id)).toBe(49);
     expect(voteCount(ana, "demo-kenji-morihara")).toBe(48);
     expect(ana.supporters).toHaveLength(48);
+  });
+
+  it("normalizes server paginated candidates into the UI nominee shape", () => {
+    const payload = [
+      {
+        id: 1,
+        firstName: "Alma",
+        lastName: "Aranda",
+        country: "AR",
+        city: "Buenos Aires",
+        portraitUrl: "https://example.com/alma.png",
+        activity: {en: "Community organizer", es: "Organizadora comunitaria"},
+        reason: "She combines local action with a strong focus on education and public trust.",
+        nominatorName: "Community Committee",
+        showNominator: true,
+        contributions: [
+          {what: "Technology access programs", when: "2024-01-15", forWhom: "Local families"},
+        ],
+        links: [{label: "Profile", url: "https://example.com/alma"}],
+        votes: 3,
+      },
+    ];
+
+    const normalized = normalizeServerCandidates(payload);
+
+    expect(normalized).toHaveLength(1);
+    expect(normalized[0]?.id).toBe("1");
+    expect(normalized[0]?.firstName).toBe("Alma");
+    expect(normalized[0]?.supporters).toHaveLength(3);
+    expect(normalized[0]?.nominator).toEqual({
+      name: "Community Committee",
+      consentToDisplay: true,
+    });
+    expect(normalized[0]?.contributions).toHaveLength(1);
+    expect(normalized[0]?.links?.[0]?.url).toBe("https://example.com/alma");
   });
 });
 

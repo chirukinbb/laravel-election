@@ -2,6 +2,7 @@ import {localeDirection} from "@/i18n/locales";
 import {interpolate} from "@/i18n/catalog";
 
 import {type CSSProperties, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState,} from "react";
+import {router} from "@inertiajs/react";
 import {GlobalHeader} from "@/components/navigation/global-header";
 import {didot, montserrat} from "@/features/home/fonts";
 import {useHomeLanguage} from "@/features/home/use-home-language";
@@ -17,10 +18,9 @@ import {useVotingMotion} from "./use-voting-motion";
 import {
   type CandidateSort,
   DEMO_ROUND,
-  filterNominees,
   fullName,
-  getRanking,
   normalizeSearch,
+  normalizeServerCandidates,
   voteCount,
 } from "./voting-model";
 import {NomineeProfile} from "./nominee-profile";
@@ -51,33 +51,56 @@ type Panel =
     | "review"
     | "nomination-success"
     | null;
+type PaginatorLink = {
+  url: string | null;
+  label: string;
+  page: number | null;
+  active: boolean;
+};
 type PaginatorMeta = {
   data?: unknown[];
   current_page?: number;
   last_page?: number;
   per_page?: number;
   total?: number;
+  links?: {
+    first?: string | null;
+    last?: string | null;
+    prev?: string | null;
+    next?: string | null;
+  };
+  meta?: {
+    current_page?: number;
+    last_page?: number;
+    per_page?: number;
+    total?: number;
+    links?: PaginatorLink[];
+  };
 };
 const PAGE_SIZE = 10;
 const TAB_QUERY = "tab";
 const NOMINEE_QUERY = "nominee";
-const counts = nominees.reduce<Record<string, number>>((result, person) => {
-  result[person.country] = (result[person.country] ?? 0) + 1;
-  return result;
-}, {});
 
 function updateVotingUrl({
                            tab,
                            nominee,
+                           country,
+                           sort,
                          }: {
   readonly tab?: View | null;
   readonly nominee?: string | null;
+  readonly country?: string | null;
+  readonly sort?: CandidateSort | null;
 }) {
   const url = new URL(window.location.href);
   if (tab) url.searchParams.set(TAB_QUERY, tab);
   else url.searchParams.delete(TAB_QUERY);
   if (nominee) url.searchParams.set(NOMINEE_QUERY, nominee);
   else url.searchParams.delete(NOMINEE_QUERY);
+  if (country) url.searchParams.set("country", country);
+  else url.searchParams.delete("country");
+  if (sort) url.searchParams.set("sort", sort);
+  else url.searchParams.delete("sort");
   const next = `${url.pathname}${url.search ? `?${url.searchParams.toString()}` : ""}${url.hash}`;
   window.history.replaceState(window.history.state, "", next);
 }
@@ -135,18 +158,31 @@ function Pagination({
                       size,
                       onChange,
                       language,
+                      pageUrlMap,
                     }: {
   readonly page: number;
   readonly total: number;
   readonly size: number;
   readonly onChange: (page: number) => void;
   readonly language: HomeLanguage;
+  readonly pageUrlMap?: ReadonlyMap<number, string>;
 }) {
   const copy = votingCopy[language];
   const pages = Math.max(1, Math.ceil(total / size));
   const visiblePages = [...new Set([1, page - 1, page, page + 1, pages])]
       .filter((value) => value >= 1 && value <= pages)
       .sort((a, b) => a - b);
+  const goTo = (target: number) => {
+    const href = pageUrlMap?.get(target);
+    if (href) {
+      router.visit(href, {
+        preserveScroll: true,
+        preserveState: true,
+      });
+      return;
+    }
+    onChange(target);
+  };
   return (
       <nav className="voting-pagination" aria-label={copy.page}>
       <span>
@@ -158,7 +194,7 @@ function Pagination({
           <button
               type="button"
               disabled={page === 1}
-              onClick={() => onChange(page - 1)}
+              onClick={() => goTo(page - 1)}
               aria-label={copy.previous}
           >
             {localeDirection(language) === "rtl" ? "›" : "‹"}
@@ -172,7 +208,7 @@ function Pagination({
                     type="button"
                     aria-label={copy.page + " " + votingNumber(value, language)}
                     aria-current={page === value ? "page" : undefined}
-                    onClick={() => onChange(value)}
+                    onClick={() => goTo(value)}
                 >
               {votingNumber(value, language)}
             </button>
@@ -181,7 +217,7 @@ function Pagination({
           <button
               type="button"
               disabled={page === pages}
-              onClick={() => onChange(page + 1)}
+              onClick={() => goTo(page + 1)}
               aria-label={copy.next}
           >
             {localeDirection(language) === "rtl" ? "‹" : "›"}
@@ -196,6 +232,7 @@ export function VotingExperience({
                                  }: {
   readonly candidates?: PaginatorMeta;
 }) {
+  console.log(candidates)
   const [language] = useHomeLanguage();
   const copy = votingCopy[language];
   const profileCopy = getProfileCopy(language);
@@ -233,24 +270,38 @@ export function VotingExperience({
   const origin = useRef<HTMLElement | null>(null);
   const previousPanel = useRef<Panel>(null);
   const closeRound = useCallback(() => setClosed(true), []);
-  const chosen = nominees.find((person) => person.id === selected) ?? null;
+  const normalizedServerCandidates = useMemo(() => {
+    if (!Array.isArray(candidates?.data)) return [];
+    return normalizeServerCandidates(candidates.data as Parameters<typeof normalizeServerCandidates>[0]);
+  }, [candidates]);
+  const sourceNominees = normalizedServerCandidates.length ? normalizedServerCandidates : nominees;
+  const counts = useMemo(
+      () =>
+          sourceNominees.reduce<Record<string, number>>((result, person) => {
+            result[person.country] = (result[person.country] ?? 0) + 1;
+            return result;
+          }, {}),
+      [sourceNominees],
+  );
+  const chosen = sourceNominees.find((person) => person.id === selected) ?? null;
   const ranked = useMemo(
-      () => getRanking(nominees, voted, language),
-      [voted, language],
+      () => [...sourceNominees],
+      [sourceNominees],
   );
-  const filtered = useMemo(
-      () => filterNominees(nominees, query, country, sort, language, voted),
-      [query, country, sort, language, voted],
-  );
+  const filtered = useMemo(() => sourceNominees, [sourceNominees]);
   const serverPagination = useMemo(() => {
     if (!candidates || !Array.isArray(candidates.data)) {
       return null;
     }
-    const total = typeof candidates.total === "number" ? candidates.total : filtered.length;
-    const size = typeof candidates.per_page === "number" ? candidates.per_page : PAGE_SIZE;
-    const pages = Math.max(1, typeof candidates.last_page === "number" ? candidates.last_page : Math.ceil(total / size));
+    const meta = candidates.meta ?? candidates;
+    const total = typeof meta.total === "number" ? meta.total : filtered.length;
+    const size = typeof meta.per_page === "number" ? meta.per_page : PAGE_SIZE;
+    const pages = Math.max(
+        1,
+        typeof meta.last_page === "number" ? meta.last_page : Math.ceil(total / size),
+    );
     const current = Math.min(
-        Math.max(1, typeof candidates.current_page === "number" ? candidates.current_page : page),
+        Math.max(1, typeof meta.current_page === "number" ? meta.current_page : page),
         pages,
     );
     return {current, total, size, pages};
@@ -265,6 +316,50 @@ export function VotingExperience({
     size: PAGE_SIZE,
     pages: Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
   };
+  const pageUrlMap = useMemo(() => {
+    const map = new Map<number, string>();
+    const meta = candidates?.meta ?? candidates;
+    const metaLinks = Array.isArray(meta?.links) ? meta.links : [];
+    for (const link of metaLinks) {
+      if (typeof link.url === "string" && typeof link.page === "number") {
+        map.set(link.page, link.url);
+      }
+    }
+    if (candidates?.links && typeof candidates.links === "object") {
+      const directLinks = candidates.links as Record<string, string | null>;
+      const firstPage = 1;
+      if (typeof directLinks.first === "string") map.set(firstPage, directLinks.first);
+      if (typeof meta.last_page === "number" && typeof directLinks.last === "string") {
+        map.set(meta.last_page, directLinks.last);
+      }
+      if (typeof meta.current_page === "number" && typeof directLinks.prev === "string") {
+        map.set(meta.current_page - 1, directLinks.prev);
+      }
+      if (typeof meta.current_page === "number" && typeof directLinks.next === "string") {
+        map.set(meta.current_page + 1, directLinks.next);
+      }
+    }
+    return map;
+  }, [candidates]);
+
+  useEffect(() => {
+    const nextPage =
+        (typeof candidates?.meta?.current_page === "number"
+            ? candidates.meta.current_page
+            : typeof candidates?.current_page === "number"
+                ? candidates.current_page
+                : null);
+    if (nextPage !== null) {
+      setPage(nextPage);
+    }
+  }, [candidates?.current_page, candidates?.meta?.current_page]);
+  const visiblePeople = useMemo(() => {
+    if (serverPagination) return filtered;
+    return filtered.slice(
+        (pagination.current - 1) * pagination.size,
+        pagination.current * pagination.size,
+    );
+  }, [filtered, pagination, serverPagination]);
   const orderedCountries = useMemo(
       () =>
           [...countries].sort((a, b) =>
@@ -377,17 +472,28 @@ export function VotingExperience({
     const validTab = tab === "list" || tab === "map" ? tab : null;
     if (validTab) setView(validTab);
 
+    const countryParam = params.get("country");
+    if (countryParam) setCountry(countryParam);
+
+    const sortParam = params.get("sort");
+    if (sortParam === "votes" || sortParam === "name") setSort(sortParam);
+
     const id = params.get(NOMINEE_QUERY);
-    const person = nominees.find((item) => item.id === id);
+    const person = sourceNominees.find((item) => item.id === id);
     if (!person) return;
     const frame = requestAnimationFrame(() => {
       origin.current = workspace.current;
       setProfile(person);
       setPanel("profile");
-      updateVotingUrl({tab: validTab ?? view, nominee: person.id});
+      updateVotingUrl({
+        tab: validTab ?? view,
+        nominee: person.id,
+        country: countryParam,
+        sort: sortParam as CandidateSort | null
+      });
     });
     return () => cancelAnimationFrame(frame);
-  }, [view]);
+  }, [view, sourceNominees]);
   useEffect(() => {
     const opening = panel !== null && previousPanel.current === null;
     previousPanel.current = panel;
@@ -424,9 +530,25 @@ export function VotingExperience({
   const openProfile = (person: Nominee) => {
     setProfile(person);
     setVoteOrigin(null);
-    updateVotingUrl({tab: view, nominee: person.id});
+    updateVotingUrl({tab: view, nominee: person.id, country, sort});
     openPanel("profile");
   };
+  const updateFiltersViaInertia = useCallback(
+      (nextCountry: string | null, nextSort: CandidateSort) => {
+        const params = new URLSearchParams(window.location.search);
+        if (nextCountry) params.set("country", nextCountry);
+        else params.delete("country");
+        params.set("sort", nextSort);
+        const href = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+        router.visit(href, {
+          preserveScroll: true,
+          preserveState: false,
+          replace: true,
+          only: ["candidates"],
+        });
+      },
+      [],
+  );
   const selectCountry = (code: string | null) => {
     const focusedSidebar = document.activeElement?.closest(
         ".voting-map-sidebar",
@@ -442,6 +564,7 @@ export function VotingExperience({
     setCountry(code);
     setPage(1);
     setQuery("");
+    updateFiltersViaInertia(code, sort);
     if (focusedSidebar) {
       requestAnimationFrame(() => {
         const destination = focusedSidebar.querySelector<HTMLElement>(
@@ -458,6 +581,7 @@ export function VotingExperience({
     setContinent(null);
     setCountryQuery("");
     setCountryPage(1);
+    updateFiltersViaInertia(null, sort);
   };
   const toNominees = () => {
     workspace.current?.focus({ preventScroll: true });
@@ -515,19 +639,17 @@ export function VotingExperience({
               </tr>
               </thead>
               <tbody>
-              {filtered
-                  .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-                  .map((person) => (
-                      <tr
-                          key={person.id}
-                          data-selected={selected === person.id}
-                          data-nominee-id={person.id}
-                      >
-                        <td className="voting-rank">
-                          {votingNumber(
-                              ranked.findIndex((item) => item.id === person.id) + 1,
-                              language,
-                              2,
+              {visiblePeople.map((person) => (
+                  <tr
+                      key={person.id}
+                      data-selected={selected === person.id}
+                      data-nominee-id={person.id}
+                  >
+                    <td className="voting-rank">
+                      {votingNumber(
+                          ranked.findIndex((item) => item.id === person.id) + 1,
+                          language,
+                          2,
                           )}
                         </td>
                         <td>
@@ -596,6 +718,7 @@ export function VotingExperience({
             size={pagination.size}
             onChange={setPage}
             language={language}
+            pageUrlMap={pageUrlMap}
         />
       </div>
   );
@@ -758,9 +881,10 @@ export function VotingExperience({
                     <select
                         aria-label={copy.country}
                         value={country ?? ""}
-                        onChange={(event) =>
-                            selectCountry(event.target.value || null)
-                        }
+                        onChange={(event) => {
+                          const nextCountry = event.target.value || null;
+                          selectCountry(nextCountry);
+                        }}
                     >
                       <option value="">{copy.allCountries}</option>
                       {orderedCountries.map((item) => (
@@ -776,8 +900,10 @@ export function VotingExperience({
                         aria-label={copy.sort}
                         value={sort}
                         onChange={(event) => {
-                          setSort(event.target.value as CandidateSort);
+                          const nextSort = event.target.value as CandidateSort;
+                          setSort(nextSort);
                           setPage(1);
+                          updateFiltersViaInertia(country, nextSort);
                         }}
                     >
                       <option value="votes">{copy.mostVotes}</option>
@@ -857,8 +983,10 @@ export function VotingExperience({
                                     aria-label={copy.sort}
                                     value={sort}
                                     onChange={(event) => {
-                                      setSort(event.target.value as CandidateSort);
+                                      const nextSort = event.target.value as CandidateSort;
+                                      setSort(nextSort);
                                       setPage(1);
+                                      updateFiltersViaInertia(country, nextSort);
                                     }}
                                 >
                                   <option value="votes">{copy.mostVotes}</option>

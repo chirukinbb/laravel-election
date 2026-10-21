@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 use Modules\Election\Enums\CandidateStatusEnum;
 use Modules\Election\Events\CandidateApproved;
 use Modules\Election\Events\CandidateMerged;
@@ -16,6 +17,7 @@ use Modules\Election\Events\UpdateCandidates;
 class Candidate extends Model
 {
     protected $fillable = [
+        'uuid',
         'first_name',
         'last_name',
         'country',
@@ -33,6 +35,13 @@ class Candidate extends Model
         'show_nominator' => 'boolean',
         'activity' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $candidate) {
+            $candidate->uuid ??= (string)Str::uuid();
+        });
+    }
 
     public static function boot()
     {

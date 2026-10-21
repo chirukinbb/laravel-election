@@ -13,15 +13,6 @@ class CandidateResource extends JsonResource
      */
     public $resource;
 
-    public function __construct($resource)
-    {
-        if ($resource instanceof Candidate) {
-            $resource->load(['contributions', 'links'])
-                ->loadCount('votes');
-        }
-
-        parent::__construct($resource);
-    }
 
     /**
      * @param Request $request
@@ -30,7 +21,7 @@ class CandidateResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->uuid,
             'firstName' => $this->first_name,
             'lastName' => $this->last_name,
             'country' => $this->country,

@@ -53,7 +53,12 @@ class WidgetController extends Controller
                 'media' => $this->settingsService->get(SettingKeyEnum::SOCIAL_MEDIA)
             ],
             'election_finish' => Carbon::parse($election->date_end)->timestamp,
-            'candidates' => CandidateResource::collection($this->candidateRepository->paginate())
+            'candidates' => CandidateResource::collection($this->candidateRepository->paginate(
+                country: $request->country,
+                sort: $request->sort ?? 'votes',
+                search: $request->s ?? '',
+                electionId: $election->id
+            ))
         ]);
     }
 }
