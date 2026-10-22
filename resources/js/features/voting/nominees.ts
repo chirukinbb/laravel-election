@@ -22,6 +22,7 @@ export interface Nominee extends NomineeProfileDetails {
   qualities: LocalizedNomineeText;
   contribution: LocalizedNomineeText;
   portraitUrl: string;
+  rank?: number;
 }
 
 export const NOMINEE_PORTRAIT_ATLAS = "/media/voting/nominees-atlas.webp";

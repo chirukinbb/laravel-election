@@ -8,7 +8,7 @@ import {didot, montserrat} from "@/features/home/fonts";
 import {useHomeLanguage} from "@/features/home/use-home-language";
 import type {HomeLanguage} from "@/features/home/copy";
 import {type Continent, countries, getCountryName} from "./countries";
-import {type Nominee, nominees} from "./nominees";
+import type {Nominee} from "./nominees";
 import {votingCopy} from "./copy";
 import {votingCount, votingNumber} from "./format";
 import {Countdown} from "./countdown";
@@ -86,11 +86,13 @@ function updateVotingUrl({
                            nominee,
                            country,
                            sort,
+                           search,
                          }: {
   readonly tab?: View | null;
   readonly nominee?: string | null;
   readonly country?: string | null;
   readonly sort?: CandidateSort | null;
+  readonly search?: string | null;
 }) {
   const url = new URL(window.location.href);
   if (tab) url.searchParams.set(TAB_QUERY, tab);
@@ -101,6 +103,8 @@ function updateVotingUrl({
   else url.searchParams.delete("country");
   if (sort) url.searchParams.set("sort", sort);
   else url.searchParams.delete("sort");
+  if (search && search.trim()) url.searchParams.set("search", search.trim());
+  else url.searchParams.delete("search");
   const next = `${url.pathname}${url.search ? `?${url.searchParams.toString()}` : ""}${url.hash}`;
   window.history.replaceState(window.history.state, "", next);
 }
@@ -232,7 +236,6 @@ export function VotingExperience({
                                  }: {
   readonly candidates?: PaginatorMeta;
 }) {
-  console.log(candidates)
   const [language] = useHomeLanguage();
   const copy = votingCopy[language];
   const profileCopy = getProfileCopy(language);
@@ -245,6 +248,7 @@ export function VotingExperience({
   const [sort, setSort] = useState<CandidateSort>("votes");
   const [countrySort, setCountrySort] = useState<"name" | "count">("name");
   const [page, setPage] = useState(1);
+  const searchInputTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [countryPage, setCountryPage] = useState(1);
   const [countryPageSize, setCountryPageSize] = useState(10);
   const [selected, setSelected] = useState<string | null>(null);
@@ -274,7 +278,7 @@ export function VotingExperience({
     if (!Array.isArray(candidates?.data)) return [];
     return normalizeServerCandidates(candidates.data as Parameters<typeof normalizeServerCandidates>[0]);
   }, [candidates]);
-  const sourceNominees = normalizedServerCandidates.length ? normalizedServerCandidates : nominees;
+  const sourceNominees = normalizedServerCandidates;
   const counts = useMemo(
       () =>
           sourceNominees.reduce<Record<string, number>>((result, person) => {
@@ -360,6 +364,12 @@ export function VotingExperience({
         pagination.current * pagination.size,
     );
   }, [filtered, pagination, serverPagination]);
+  const getDisplayRank = (person: Nominee) => {
+    if (typeof person.rank === "number" && Number.isFinite(person.rank)) {
+      return person.rank;
+    }
+    return ranked.findIndex((item) => item.id === person.id) + 1;
+  };
   const orderedCountries = useMemo(
       () =>
           [...countries].sort((a, b) =>
@@ -478,6 +488,9 @@ export function VotingExperience({
     const sortParam = params.get("sort");
     if (sortParam === "votes" || sortParam === "name") setSort(sortParam);
 
+    const searchParam = params.get("search");
+    if (searchParam) setQuery(searchParam);
+
     const id = params.get(NOMINEE_QUERY);
     const person = sourceNominees.find((item) => item.id === id);
     if (!person) return;
@@ -534,11 +547,14 @@ export function VotingExperience({
     openPanel("profile");
   };
   const updateFiltersViaInertia = useCallback(
-      (nextCountry: string | null, nextSort: CandidateSort) => {
+      (nextCountry: string | null, nextSort: CandidateSort, nextSearch?: string) => {
         const params = new URLSearchParams(window.location.search);
         if (nextCountry) params.set("country", nextCountry);
         else params.delete("country");
         params.set("sort", nextSort);
+        const trimmedSearch = nextSearch?.trim() ?? "";
+        if (trimmedSearch) params.set("search", trimmedSearch);
+        else params.delete("search");
         const href = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
         router.visit(href, {
           preserveScroll: true,
@@ -549,6 +565,9 @@ export function VotingExperience({
       },
       [],
   );
+  const triggerSearchReload = useCallback((nextSearch: string) => {
+    updateFiltersViaInertia(country, sort, nextSearch);
+  }, [country, sort, updateFiltersViaInertia]);
   const selectCountry = (code: string | null) => {
     const focusedSidebar = document.activeElement?.closest(
         ".voting-map-sidebar",
@@ -581,7 +600,11 @@ export function VotingExperience({
     setContinent(null);
     setCountryQuery("");
     setCountryPage(1);
-    updateFiltersViaInertia(null, sort);
+    if (searchInputTimer.current) {
+      clearTimeout(searchInputTimer.current);
+      searchInputTimer.current = null;
+    }
+    updateFiltersViaInertia(null, sort, "");
   };
   const toNominees = () => {
     workspace.current?.focus({ preventScroll: true });
@@ -646,21 +669,17 @@ export function VotingExperience({
                       data-nominee-id={person.id}
                   >
                     <td className="voting-rank">
-                      {votingNumber(
-                          ranked.findIndex((item) => item.id === person.id) + 1,
-                          language,
-                          2,
-                          )}
-                        </td>
-                        <td>
-                          <button
-                              type="button"
-                              className="voting-person"
-                              onClick={() => openProfile(person)}
-                              aria-label={copy.profile + ": " + fullName(person)}
-                          >
-                            <Portrait person={person} />
-                            <span>
+                      {votingNumber(getDisplayRank(person), language, 2)}
+                    </td>
+                    <td>
+                      <button
+                          type="button"
+                          className="voting-person"
+                          onClick={() => openProfile(person)}
+                          aria-label={copy.profile + ": " + fullName(person)}
+                      >
+                        <Portrait person={person}/>
+                        <span>
                         <strong>{fullName(person)}</strong>
                         <small className="voting-person__activity">
                           {compact
@@ -874,6 +893,10 @@ export function VotingExperience({
                       onChange={(value) => {
                         setQuery(value);
                         setPage(1);
+                        if (searchInputTimer.current) clearTimeout(searchInputTimer.current);
+                        searchInputTimer.current = setTimeout(() => {
+                          updateFiltersViaInertia(country, sort, value);
+                        }, 350);
                       }}
                   />
                   <label className="voting-select">
@@ -975,6 +998,10 @@ export function VotingExperience({
                                   onChange={(value) => {
                                     setQuery(value);
                                     setPage(1);
+                                    if (searchInputTimer.current) clearTimeout(searchInputTimer.current);
+                                    searchInputTimer.current = setTimeout(() => {
+                                      updateFiltersViaInertia(country, sort, value);
+                                    }, 350);
                                   }}
                               />
                               <label className="voting-select voting-map-sort">

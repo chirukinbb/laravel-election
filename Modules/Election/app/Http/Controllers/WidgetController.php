@@ -56,7 +56,7 @@ class WidgetController extends Controller
             'candidates' => CandidateResource::collection($this->candidateRepository->paginate(
                 country: $request->country,
                 sort: $request->sort ?? 'votes',
-                search: $request->s ?? '',
+                search: $request->search ?? '',
                 electionId: $election->id
             ))
         ]);

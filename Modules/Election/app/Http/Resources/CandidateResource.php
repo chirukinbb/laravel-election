@@ -34,6 +34,7 @@ class CandidateResource extends JsonResource
             'contributions' => CandidateContributionResource::collection($this->contributions),
             'links' => CandidateLinkResource::collection($this->links),
             'votes' => $this->votes_count ?? 0,
+            'rank' => $this->rank
         ];
     }
 }

@@ -20,6 +20,7 @@ export type ServerCandidate = {
   }>;
   links?: Array<{ label?: string | null; url?: string | null }>;
   votes?: number | null;
+  rank?: number | null;
 };
 
 export function normalizeServerCandidates(
@@ -30,6 +31,7 @@ export function normalizeServerCandidates(
   return payload.map((candidate) => {
     const id = String(candidate.id);
     const votes = Number.isFinite(Number(candidate.votes)) ? Number(candidate.votes) : 0;
+    const rank = Number.isFinite(Number(candidate.rank)) ? Number(candidate.rank) : undefined;
     const fallbackReason = candidate.reason ?? "";
     const activity = {
       en: candidate.activity?.en ?? candidate.activity?.["en-US"] ?? "",
@@ -43,6 +45,7 @@ export function normalizeServerCandidates(
       country: candidate.country ?? "",
       city: candidate.city ?? "",
       portraitUrl: candidate.portraitUrl || NOMINEE_PORTRAIT_ATLAS,
+      rank,
       activity,
       reason: {en: fallbackReason, es: fallbackReason},
       qualities: {en: fallbackReason, es: fallbackReason},

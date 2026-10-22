@@ -6913,7 +6913,7 @@ server_default(
   (page2) => createInertiaApp({
     page: page2,
     render: ReactDOMServer.renderToString,
-    resolve: (name) => resolvePageComponent(`./Pages/${name}.tsx`, /* @__PURE__ */ Object.assign({ "./Pages/ElectionPage.tsx": () => import("./assets/ElectionPage-C5y_Y26n.js").then((n) => n.E), "./Pages/HomePage.tsx": () => import("./assets/HomePage-BMexY_Wh.js"), "./Pages/TestPage.tsx": () => import("./assets/TestPage-CEG1o47L.js") })),
+    resolve: (name) => resolvePageComponent(`./Pages/${name}.tsx`, /* @__PURE__ */ Object.assign({ "./Pages/ElectionPage.tsx": () => import("./assets/ElectionPage-CPvCSGV6.js").then((n) => n.E), "./Pages/HomePage.tsx": () => import("./assets/HomePage-BMexY_Wh.js"), "./Pages/TestPage.tsx": () => import("./assets/TestPage-CEG1o47L.js") })),
     setup: ({ App: App2, props }) => /* @__PURE__ */ jsx(App2, { ...props })
   })
 );
