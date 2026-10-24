@@ -5,6 +5,7 @@ namespace Modules\Auth\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
+use Inertia\Inertia;
 
 class ForgotPasswordController extends Controller
 {
@@ -13,7 +14,7 @@ class ForgotPasswordController extends Controller
      */
     public function showLinkRequestForm()
     {
-        return view('auth::auth.passwords.email');
+        return Inertia::render('ForgotPasswordPage');
     }
 
     /**

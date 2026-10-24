@@ -1,8 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import Link from "next/link";
-import {useRouter} from "next/navigation";
 import {type CSSProperties, useCallback, useEffect, useRef, useState,} from "react";
 import {didot, montserrat} from "@/features/home/fonts";
 import {cinematicMedia} from "@/features/home/media";
@@ -14,13 +11,10 @@ import {leafEditorialFilm, leafEditorialMedia, type LeafEditorialMedia,} from ".
 import {useEditorialMotion} from "./use-editorial-motion";
 import {useEditorialRail} from "./use-editorial-rail";
 import {EditorialCursor} from "./editorial-cursor";
+import {LeafScene} from "./leaf-scene";
 import {goldenLeavesCopy} from "./copy";
 import "./golden-leaves.css";
 
-const LeafScene = dynamic(
-  () => import("./leaf-scene").then((module) => module.LeafScene),
-  { ssr: false },
-);
 type Overlay = "gallery" | "film" | null;
 
 function RollingLabel({ children }: { readonly children: string }) {
@@ -60,7 +54,6 @@ function MediaSlot({
 }
 
 export function GoldenLeavesExperience() {
-  const router = useRouter();
   const [language, setLanguage] = useHomeLanguage();
   const copy = goldenLeavesCopy[language];
   const localizedMedia = leafEditorialMedia.map((media, index) => ({
@@ -155,25 +148,25 @@ export function GoldenLeavesExperience() {
       dir={localeDirection(language)}
       data-reduced-motion={reduced}
     >
-      <EditorialCursor rootRef={root} reducedMotion={reduced} />
+      <EditorialCursor rootRef={root} reducedMotion={reduced}/>
       <CinematicHeader
-        inspect
-        language={language}
-        onLanguageChange={setLanguage}
-        sound={sound}
-        onToggleSound={() => {
-          setNotice(false);
-          setSound((value) => !value);
-        }}
-        onTree={() => router.push("/#tree")}
-        onHome={() => router.push("/")}
-        onClose={() => router.push("/#tree")}
-        backRef={back}
-        logo={cinematicMedia.logo}
-        logoBlack={cinematicMedia.logoBlack}
+          inspect
+          language={language}
+          onLanguageChange={setLanguage}
+          sound={sound}
+          onToggleSound={() => {
+            setNotice(false);
+            setSound((value) => !value);
+          }}
+          onTree={() => window.location.assign("/#tree")}
+          onHome={() => window.location.assign("/")}
+          onClose={() => window.location.assign("/#tree")}
+          backRef={back}
+          logo={cinematicMedia.logo}
+          logoBlack={cinematicMedia.logoBlack}
       />
       <div className="leaves-progress" aria-hidden="true">
-        <span className="leaves-progress__fill" />
+        <span className="leaves-progress__fill"/>
       </div>
 
       <section className="leaves-hero" aria-label={copy.heroLabel}>

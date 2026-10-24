@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Profile\Http\Controllers\ProfileController;
 
-Route::middleware(['auth', 'verified'])->as('users::')->prefix('admin')->group(function () {
+Route::middleware(['auth', 'verified'])->as('profile::')->prefix('admin')->group(function () {
     Route::prefix('users')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])
             ->middleware('role:ADMIN')
@@ -26,4 +26,9 @@ Route::middleware(['auth', 'verified'])->as('users::')->prefix('admin')->group(f
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
         Route::put('/', [ProfileController::class, 'update'])->name('update');
     });
+});
+
+Route::prefix('account')->middleware(['auth', 'verified'])->as('account:')->group(function () {
+    Route::get('', function () {
+    })->name('index');
 });

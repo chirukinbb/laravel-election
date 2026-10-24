@@ -8,8 +8,22 @@ export interface AccountCapabilities {
 }
 
 export interface AccountExperienceProps {
-  readonly mode: AccountMode;
-  readonly capabilities: AccountCapabilities;
-  readonly resetToken?: string;
-  readonly resetError?: boolean;
+    readonly mode: AccountMode;
+    readonly capabilities: AccountCapabilities;
+    readonly resetToken?: string;
+    readonly resetError?: boolean;
+    readonly loginUrl?: string;
+    readonly registerUrl?: string;
+    readonly signUpUrl?: string;
+    readonly signinUrl?: string;
+    readonly signInUrl?: string;
+    readonly forgotPasswordUrl?: string;
+    readonly navigation?: {
+        readonly loginUrl?: string;
+        readonly registerUrl?: string;
+        readonly signUpUrl?: string;
+        readonly signinUrl?: string;
+        readonly signInUrl?: string;
+        readonly forgotPasswordUrl?: string;
+    };
 }

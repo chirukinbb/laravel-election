@@ -2,6 +2,7 @@
 
 namespace Modules\Auth\Providers;
 
+use App\Events\CinematicMenuEvent;
 use Illuminate\Support\Facades\Event;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 use Nwidart\Modules\Support\ModuleServiceProvider;
@@ -44,6 +45,12 @@ class AuthServiceProvider extends ModuleServiceProvider
                 'classes' => 'text-center',
                 'topnav_user' => true,
             ]);
+        });
+
+        Event::listen(CinematicMenuEvent::class, function (CinematicMenuEvent $event) {
+            $event->setAccountUrl(auth()->check() ? route('account:index') : route('login'));
+            $event->setLoginUrl(route('login'));
+            $event->setRegisterUrl(route('register'));
         });
     }
 }

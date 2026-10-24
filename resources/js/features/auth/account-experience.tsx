@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import {useRouter} from "next/navigation";
 import {type FormEvent, useEffect, useRef, useState} from "react";
 import {didot, montserrat} from "@/features/home/fonts";
 import {useHomeLanguage} from "@/features/home/use-home-language";
@@ -12,16 +10,34 @@ import {accountCopy} from "./copy";
 import type {AccountExperienceProps} from "./types";
 import "./account.css";
 import "@/features/home/cinematic-header.css";
+import {Link, router, usePage} from "@inertiajs/react";
+
+type SharedAuthProps = {
+  loginUrl?: string;
+  registerUrl?: string;
+  signUpUrl?: string;
+  signinUrl?: string;
+  signInUrl?: string;
+  forgotPasswordUrl?: string;
+  navigation?: {
+    loginUrl?: string;
+    registerUrl?: string;
+    signUpUrl?: string;
+    signinUrl?: string;
+    signInUrl?: string;
+    forgotPasswordUrl?: string;
+  };
+};
 
 function Arrow() {
   return (
-    <svg
-      className="directional-icon"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      fill="none"
-      aria-hidden="true"
+      <svg
+          className="directional-icon"
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          aria-hidden="true"
     >
       <path d="M3 12h17m-6-5 6 5-6 5" stroke="currentColor" strokeWidth="1.1" />
     </svg>
@@ -99,14 +115,61 @@ type AccountErrorKey =
   | "invalidReset";
 
 function AccountForm({
-  mode,
-  capabilities,
-  resetToken,
-  resetError,
-}: AccountExperienceProps) {
+                       mode,
+                       capabilities,
+                       resetToken,
+                       resetError,
+                       loginUrl: providedLoginUrl,
+                       registerUrl: providedRegisterUrl,
+                       signUpUrl: providedSignUpUrl,
+                       signinUrl: providedSigninUrl,
+                       signInUrl: providedSignInUrl,
+                       forgotPasswordUrl: providedForgotPasswordUrl,
+                     }: AccountExperienceProps) {
   const [language] = useHomeLanguage();
+  const {props} = usePage<SharedAuthProps>();
+  const loginUrl =
+      providedLoginUrl ??
+      props.loginUrl ??
+      props.signinUrl ??
+      props.signInUrl ??
+      props.navigation?.loginUrl ??
+      props.navigation?.signinUrl ??
+      props.navigation?.signInUrl ??
+      "/account/login";
+  const registerUrl =
+      providedRegisterUrl ??
+      providedSignUpUrl ??
+      props.registerUrl ??
+      props.signUpUrl ??
+      props.navigation?.registerUrl ??
+      props.navigation?.signUpUrl ??
+      "/account/register";
+  const forgotPasswordUrl =
+      providedForgotPasswordUrl ??
+      props.forgotPasswordUrl ??
+      props.navigation?.forgotPasswordUrl ??
+      "/account/forgot-password";
+  const signInUrl =
+      providedSigninUrl ??
+      props.signinUrl ??
+      props.signInUrl ??
+      props.navigation?.signinUrl ??
+      props.navigation?.signInUrl ??
+      loginUrl;
+  const signUpUrl =
+      providedSignUpUrl ??
+      props.signUpUrl ??
+      props.registerUrl ??
+      props.navigation?.signUpUrl ??
+      registerUrl;
+  const csrfToken =
+      typeof document !== "undefined"
+          ? document.head
+          .querySelector('meta[name="csrf-token"]')
+          ?.getAttribute("content") ?? ""
+          : "";
   const copy = accountCopy[language];
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -114,7 +177,7 @@ function AccountForm({
   const pendingRef = useRef(false);
   const [error, setError] = useState<AccountErrorKey | "">("");
   const [fieldError, setFieldError] = useState<"email" | "password" | null>(
-    null,
+      null,
   );
   const [completion, setCompletion] = useState<Completion>(null);
   const [resendSent, setResendSent] = useState(false);
@@ -174,20 +237,25 @@ function AccountForm({
     event.preventDefault();
     if (pendingRef.current || invalidReset || unavailableReset) return;
     const address = email.trim();
-    if (
-      mode !== "reset" &&
-      (address.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address))
-    ) {
-      setFieldError("email");
-      setError("invalidEmail");
-      emailRef.current?.focus();
-      return;
+
+    if (mode !== "reset") {
+      if (
+          address.length > 254 ||
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)
+      ) {
+        setFieldError("email");
+        setError("invalidEmail");
+        emailRef.current?.focus();
+        return;
+      }
     }
+
     if (
-      mode !== "forgot" &&
-      (!password ||
-        password.length > 128 ||
-        (mode !== "login" && password.length < 15))
+        mode !== "forgot" &&
+        mode !== "signup" &&
+        (!password ||
+            password.length > 128 ||
+            (mode !== "login" && password.length < 15))
     ) {
       setFieldError("password");
       setError(
@@ -196,36 +264,59 @@ function AccountForm({
       passwordRef.current?.focus();
       return;
     }
+
     if (!beginRequest()) return;
+
     try {
       if (mode === "signup") {
-        const result = await authClient.signUp.email({
-          name: "Tree of Unity member",
-          email: address,
-          password,
-          callbackURL: "/account",
-        });
-        if (result.error) {
-          reportError(result.error, "signupError");
-        } else if (capabilities.emailVerificationRequired) {
-          setEmail(address);
-          setCompletion("verification");
-        } else {
-          router.replace("/account");
-          router.refresh();
-        }
-      } else if (mode === "login") {
-        const result = await authClient.signIn.email({
-          email: address,
-          password,
-          callbackURL: "/account",
-        });
-        if (result.error) reportError(result.error, "loginError");
-        else {
-          router.replace("/account");
-          router.refresh();
-        }
-      } else if (mode === "forgot") {
+        const name =
+            (document.getElementById("account-name") as HTMLInputElement | null)?.value.trim() ||
+            "Tree of Unity member";
+
+        router.post(
+            signUpUrl,
+            {name, email: address},
+            {
+              preserveScroll: true,
+              onSuccess: () => {
+                setError("");
+                clearSensitiveInput();
+              },
+              onError: () => {
+                setFieldError("email");
+                setError("signupError");
+              },
+              onFinish: () => {
+                finishRequest();
+              },
+            },
+        );
+        return;
+      }
+
+      if (mode === "login") {
+        router.post(
+            signInUrl,
+            {email: address, password},
+            {
+              preserveScroll: true,
+              onSuccess: () => {
+                setError("");
+                clearSensitiveInput();
+              },
+              onError: () => {
+                setFieldError("password");
+                setError("loginError");
+              },
+              onFinish: () => {
+                finishRequest();
+              },
+            },
+        );
+        return;
+      }
+
+      if (mode === "forgot") {
         const result = await authClient.requestPasswordReset({
           email: address,
           redirectTo: "/account/reset-password",
@@ -243,7 +334,9 @@ function AccountForm({
     } catch {
       setError("requestError");
     } finally {
-      finishRequest();
+      if (mode !== "login" && mode !== "signup") {
+        finishRequest();
+      }
     }
   }
 
@@ -322,16 +415,16 @@ function AccountForm({
           {isEntry ? (
             <nav className="account-tabs" aria-label={copy.navigation}>
               <Link
-                href="/account/login"
-                aria-current={mode === "login" ? "page" : undefined}
-                onClick={clearSensitiveInput}
+                  href={loginUrl}
+                  aria-current={mode === "login" ? "page" : undefined}
+                  onClick={clearSensitiveInput}
               >
                 {copy.login}
               </Link>
               <Link
-                href="/account/register"
-                aria-current={mode === "signup" ? "page" : undefined}
-                onClick={clearSensitiveInput}
+                  href={registerUrl}
+                  aria-current={mode === "signup" ? "page" : undefined}
+                  onClick={clearSensitiveInput}
               >
                 {copy.signup}
               </Link>
@@ -371,9 +464,9 @@ function AccountForm({
               <p className="account-inline-status" role="status">
                 {resendSent ? copy.resent : ""}
               </p>
-              <Link className="account-back" href="/account/login">
+              <Link className="account-back" href={loginUrl}>
                 {copy.backToLogin}
-                <Arrow />
+                <Arrow/>
               </Link>
             </div>
           ) : unavailableReset || invalidReset ? (
@@ -384,7 +477,9 @@ function AccountForm({
               <Link
                 className="account-back"
                 href={
-                  unavailableReset ? "/contact" : "/account/forgot-password"
+                  unavailableReset
+                      ? "/contact"
+                      : forgotPasswordUrl
                 }
               >
                 {unavailableReset ? copy.contact : copy.requestNewLink}
@@ -397,51 +492,66 @@ function AccountForm({
                 <p className="account-reset-intro">{copy.resetIntro}</p>
               ) : null}
               <form
-                className="account-form"
-                onSubmit={submit}
-                noValidate
-                aria-busy={pending}
+                  className="account-form"
+                  onSubmit={submit}
+                  noValidate
+                  aria-busy={pending}
               >
-                {mode !== "reset" ? (
-                  <div className="account-field">
-                    <label htmlFor="account-email">{copy.email}</label>
-                    <input
-                      ref={emailRef}
-                      id="account-email"
-                      name="email"
-                      type="email"
-                      dir="ltr"
-                      autoComplete="email"
-                      inputMode="email"
-                      autoCapitalize="none"
-                      spellCheck={false}
-                      maxLength={254}
-                      required
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      readOnly={pending}
-                      aria-invalid={fieldError === "email"}
-                      aria-describedby={
-                        fieldError === "email" ? "account-feedback" : undefined
-                      }
-                    />
-                  </div>
-                ) : null}
-                {mode !== "forgot" ? (
-                  <div className="account-field account-field--password">
-                    <label htmlFor="account-password">
-                      {mode === "signup"
-                        ? copy.createPassword
-                        : mode === "reset"
-                          ? copy.newPassword
-                          : copy.password}
-                    </label>
-                    <div className="account-password-control">
+                <input type="hidden" name="_token" value={csrfToken}/>
+                {mode === "signup" ? (
+                    <div className="account-field">
+                      <label htmlFor="account-name">Name</label>
                       <input
-                        ref={passwordRef}
-                        id="account-password"
-                        name="password"
-                        dir="ltr"
+                          id="account-name"
+                          name="name"
+                          type="text"
+                          dir="ltr"
+                          autoComplete="name"
+                          autoCapitalize="words"
+                          spellCheck={false}
+                          required
+                          value={email}
+                          onChange={(event) => setEmail(event.target.value)}
+                          readOnly={pending}
+                      />
+                    </div>
+                ) : null}
+                {mode !== "reset" ? (
+                    <div className="account-field">
+                      <label htmlFor="account-email">{copy.email}</label>
+                      <input
+                          ref={emailRef}
+                          id="account-email"
+                          name="email"
+                          type="email"
+                          dir="ltr"
+                          autoComplete="email"
+                          inputMode="email"
+                          autoCapitalize="none"
+                          spellCheck={false}
+                          maxLength={254}
+                          required
+                          value={email}
+                          onChange={(event) => setEmail(event.target.value)}
+                          readOnly={pending}
+                          aria-invalid={fieldError === "email"}
+                          aria-describedby={
+                            fieldError === "email" ? "account-feedback" : undefined
+                          }
+                      />
+                    </div>
+                ) : null}
+                {mode !== "forgot" && mode !== "signup" ? (
+                    <div className="account-field account-field--password">
+                      <label htmlFor="account-password">
+                        {mode === "reset" ? copy.newPassword : copy.password}
+                      </label>
+                      <div className="account-password-control">
+                        <input
+                            ref={passwordRef}
+                            id="account-password"
+                            name="password"
+                            dir="ltr"
                         type={showPassword ? "text" : "password"}
                         autoComplete={
                           mode === "login" ? "current-password" : "new-password"
@@ -487,9 +597,9 @@ function AccountForm({
                 ) : null}
                 {mode === "login" ? (
                   <Link
-                    className="account-forgot"
-                    href="/account/forgot-password"
-                    onClick={clearSensitiveInput}
+                      className="account-forgot"
+                      href={forgotPasswordUrl}
+                      onClick={clearSensitiveInput}
                   >
                     {copy.forgotPassword}
                   </Link>
@@ -530,15 +640,15 @@ function AccountForm({
               {mode === "signup" ? (
                 <p className="account-switch">
                   {copy.alreadyMember}{" "}
-                  <Link href="/account/login" onClick={clearSensitiveInput}>
+                  <Link href={loginUrl} onClick={clearSensitiveInput}>
                     {copy.login}
                   </Link>
                 </p>
               ) : !isEntry ? (
                 <Link
-                  className="account-back"
-                  href="/account/login"
-                  onClick={clearSensitiveInput}
+                    className="account-back"
+                    href={loginUrl}
+                    onClick={clearSensitiveInput}
                 >
                   {copy.backToLogin}
                 </Link>

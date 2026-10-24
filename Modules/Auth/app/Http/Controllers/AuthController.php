@@ -7,51 +7,83 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Laravel\Socialite\Socialite;
 use Modules\Auth\Services\UserService;
 
 class AuthController extends Controller
 {
     // Show login form
-    public function showLoginForm(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+    public function showLoginForm(): \Inertia\Response
     {
-        return view("auth::login");
+        return Inertia::render('LoginPage', [
+            'loginUrl' => route('login'),
+            'registerUrl' => route('register'),
+            'forgotPasswordUrl' => route('password.request'),
+            'signUpUrl' => route('signup'),
+            'signinUrl' => route('signin'),
+        ]);
     }
 
-    public function showRegisterForm(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+    public function showRegisterForm(): \Inertia\Response
     {
-        return view("auth::register");
+        return Inertia::render('RegisterPage', [
+            'loginUrl' => route('login'),
+            'registerUrl' => route('register'),
+            'forgotPasswordUrl' => route('password.request'),
+            'signUpUrl' => route('signup'),
+            'signinUrl' => route('signin'),
+        ]);
     }
 
     // Handle login request with static credentials (demo only)
     public function login(Request $request): \Illuminate\Http\RedirectResponse
     {
-        $request->validate([
-            "email" => "required|email",
-            "password" => "required",
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        if (Auth::attempt(['email' => $request->post('email'), 'password' => $request->post('password')], true)) {
+        if (Auth::attempt($credentials, true)) {
+            $request->session()->regenerate();
 
-            return redirect()->route("dashboard");
+            return redirect()->intended(route('dashboard', [], false) ?? '/dashboard');
         }
 
-        return back()->withErrors([
-            "email" => "The provided credentials do not match our records.",
-        ]);
+        return back()
+            ->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ])
+            ->onlyInput('email');
     }
 
     public function register(Request $request): \Illuminate\Http\RedirectResponse
     {
-        $request->validate([
-            "email" => "required|email|unique:users,email",
-            "name" => "required"
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
         ]);
 
         $password = Str::random(12);
-        (new UserService())->signup($request->name, $request->email, $password);
+        $user = (new UserService())->signup(
+            $data['name'],
+            $data['email'],
+            $password,
+        );
 
-        return redirect()->intended("/dashboard");
+        if ($user instanceof \Exception) {
+            return back()
+                ->withErrors([
+                    'email' => 'Unable to create the account. Please try again.',
+                ])
+                ->withInput();
+        }
+
+        $user->notify(new \Modules\Auth\Notifications\NewUserNotification($password));
+
+        Auth::login($user);
+
+        return redirect()->intended(route('dashboard', [], false) ?? '/dashboard');
     }
 
     // Handle logout

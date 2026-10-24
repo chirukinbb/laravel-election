@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'navigation' => [
                 'menu' => $menuEvent->items,
+                'accountUrl' => $menuEvent->accountUrl ?? ($request->user() ? route('dashboard') : route('login')),
             ],
         ]);
     }

@@ -16,7 +16,7 @@ export type MenuItem = {
 
 type SharedProps = {
   locale?: string;
-  navigation?: { menu?: MenuItem[] };
+  navigation?: { menu?: MenuItem[]; accountUrl?: string };
 };
 
 /* ---------- Хелперы ---------- */
@@ -99,7 +99,7 @@ export function CinematicHeader({
                                   onNavigate,
                                   menu: menuProp,
                                   homeUrl = "/",
-                                  accountUrl = "/account",
+                                  accountUrl: accountUrlProp,
                                 }: {
   readonly inspect?: boolean;
   /** По умолчанию берётся из shared prop `locale` */
@@ -126,6 +126,7 @@ export function CinematicHeader({
   const { props } = usePage<SharedProps>();
   const language = (languageProp ?? props.locale ?? "en") as HomeLanguage;
   const menu = menuProp ?? props.navigation?.menu ?? [];
+  const accountLink = accountUrlProp ?? props.navigation?.accountUrl ?? "/account";
   // Пустое место под логотип — посередине меню
   const logoSlot = Math.floor(menu.length / 2);
 
@@ -537,7 +538,7 @@ export function CinematicHeader({
             ) : null}
             <div className="inspect-menu__language">
               <Link
-                  href={accountUrl}
+                  href={accountLink}
                   className="inspect-account-link"
                   aria-label={copy.navigation.account}
                   onClick={collapse}

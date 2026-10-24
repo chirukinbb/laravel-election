@@ -1,4 +1,3 @@
-import "server-only";
 import type {Metadata} from "next";
 import {accountCopy, accountSummaryCopy} from "@/features/auth/copy";
 import {getRequestLocale} from "./server";

@@ -1,5 +1,3 @@
-import "server-only";
-import {headers} from "next/headers";
 import {readAuthConfig} from "./config";
 import type {AccountProvider} from "./provider-types";
 
@@ -32,5 +30,5 @@ export function getAccountAuth(): Promise<AccountProvider> {
 }
 export async function getAccountSession() {
   const service = await getAccountAuth();
-  return service.getSession(new Headers(await headers()));
+  return service.getSession(new Headers());
 }

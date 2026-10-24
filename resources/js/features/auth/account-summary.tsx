@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import {useState} from "react";
-import {useRouter} from "next/navigation";
 import {didot, montserrat} from "@/features/home/fonts";
 import {useHomeLanguage} from "@/features/home/use-home-language";
 import {GlobalHeader} from "@/components/navigation/global-header";
@@ -15,7 +13,6 @@ import "@/features/home/cinematic-header.css";
 export function AccountSummary({ email }: { email: string }) {
   const [language] = useHomeLanguage();
   const text = accountSummaryCopy[language];
-  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
   async function logout() {
@@ -28,8 +25,7 @@ export function AccountSummary({ email }: { email: string }) {
         setError(true);
         return;
       }
-      router.replace("/account/login");
-      router.refresh();
+      window.location.assign("/account/login");
     } catch {
       setError(true);
     } finally {
@@ -50,12 +46,12 @@ export function AccountSummary({ email }: { email: string }) {
           <p className="account-summary__email">
             <bdi dir="ltr">{email}</bdi>
           </p>
-          <Link href="/">
+          <a href="/">
             {text.explore}{" "}
             <span className="directional-icon" aria-hidden="true">
               →
             </span>
-          </Link>
+          </a>
           <button type="button" disabled={busy} onClick={logout}>
             {text.logout}
           </button>
